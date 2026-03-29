@@ -1,0 +1,621 @@
+/* ── Mortgage Detail Modal ── */
+
+.mdm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mdm-modal {
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    width: 92%;
+    max-width: 620px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Header */
+.mdm-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.mdm-header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+}
+
+.mdm-header h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.mdm-header-sub {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.mdm-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: color 0.15s;
+    flex-shrink: 0;
+}
+
+.mdm-close:hover {
+    color: white;
+}
+
+/* Body */
+.mdm-body {
+    padding: 1.25rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.mdm-empty {
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+    padding: 2rem 0;
+}
+
+/* Hero / primary stat */
+.mdm-hero {
+    text-align: center;
+    padding: 1.25rem;
+    background: rgba(99, 102, 241, 0.06);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.mdm-hero-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.mdm-hero-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    font-family: 'Monaco', monospace;
+    color: white;
+}
+
+/* Progress bar */
+.mdm-progress-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.mdm-progress-bar {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.mdm-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.mdm-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.73rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Reminders */
+.mdm-reminders {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.mdm-reminder {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.18);
+    border-radius: 0.5rem;
+    color: #fbbf24;
+    font-size: 0.8rem;
+}
+
+.mdm-reminder div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.mdm-reminder-title {
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.mdm-reminder-date {
+    font-size: 0.7rem;
+    opacity: 0.65;
+}
+
+/* Stats grid */
+.mdm-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.mdm-stat {
+    padding: 0.65rem 0.85rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.mdm-stat-label {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.mdm-stat-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: 'Monaco', monospace;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.mdm-stat-value.mdm-green { color: #10b981; }
+.mdm-stat-value.mdm-amber { color: #f59e0b; }
+.mdm-stat-value.mdm-small { font-size: 0.78rem; }
+
+/* Lifetime interest */
+.mdm-lifetime {
+    padding: 0.65rem 0.85rem;
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid rgba(245, 158, 11, 0.12);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+/* Actions */
+.mdm-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.mdm-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.825rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+}
+
+.mdm-action-primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+}
+
+.mdm-action-primary:hover {
+    opacity: 0.9;
+}
+
+.mdm-action-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.mdm-action-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* History section */
+.mdm-history {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 1rem;
+}
+
+.mdm-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 0.75rem 0;
+}
+
+.mdm-no-events {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.3);
+    padding: 0.75rem 0;
+    margin: 0;
+}
+
+/* Timeline */
+.mdm-timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.mdm-tl-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.55rem 0.4rem;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: background 0.15s;
+    position: relative;
+}
+
+.mdm-tl-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.mdm-tl-dot {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.mdm-tl-line {
+    position: absolute;
+    left: calc(0.4rem + 12px);
+    top: calc(0.55rem + 24px);
+    width: 2px;
+    height: calc(100% - 0.55rem);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.mdm-tl-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.08rem;
+    padding-top: 0.15rem;
+}
+
+.mdm-tl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.mdm-tl-type {
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.mdm-tl-date {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.mdm-tl-detail {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Monaco', monospace;
+}
+
+.mdm-tl-note {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
+    margin-top: 0.05rem;
+}
+
+.mdm-tl-chevron {
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.12);
+    margin-top: 0.3rem;
+}
+
+/* ── Back button ── */
+.mdm-back {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 0.25rem;
+    transition: color 0.15s;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+}
+
+.mdm-back:hover {
+    color: white;
+}
+
+/* ── Error message ── */
+.mdm-error {
+    padding: 0.6rem 0.85rem;
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.25);
+    border-radius: 0.5rem;
+    color: #f43f5e;
+    font-size: 0.82rem;
+}
+
+/* Payment History */
+.mdm-payments-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 1rem;
+}
+
+.mdm-payments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.mdm-payment-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.65rem;
+    background: rgba(16, 185, 129, 0.04);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+    border-radius: 0.5rem;
+}
+
+.mdm-payment-month {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Monaco', monospace;
+    min-width: 56px;
+}
+
+.mdm-payment-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.mdm-payment-amount {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #10b981;
+    font-family: 'Monaco', monospace;
+}
+
+.mdm-payment-split {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.mdm-payment-remove {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 0.25rem;
+    transition: color 0.15s;
+}
+
+.mdm-payment-remove:hover {
+    color: #f43f5e;
+}
+
+/* ── Inline form styles ── */
+.mdm-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.mdm-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.mdm-form-group label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mdm-form-hint {
+    font-weight: 400;
+    opacity: 0.5;
+    margin-left: 4px;
+}
+
+.mdm-form-group input,
+.mdm-form-group select {
+    padding: 0.55rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.45rem;
+    color: white;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.mdm-form-group input:focus,
+.mdm-form-group select:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.mdm-form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.mdm-form-group select {
+    cursor: pointer;
+    color-scheme: dark;
+}
+
+.mdm-form-group select option {
+    background: #1e293b;
+    color: white;
+}
+
+.mdm-form-group input[type="date"],
+.mdm-form-group input[type="number"],
+.mdm-form-group input[type="text"] {
+    color-scheme: dark;
+}
+
+.mdm-calc-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.6);
+    border-radius: 0.45rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.mdm-calc-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.mdm-delete-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    color: #f43f5e;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.825rem;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.mdm-delete-btn:hover {
+    background: rgba(244, 63, 94, 0.18);
+}
+
+.mdm-delete-btn:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+.mdm-action-btn:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+.mdm-action-btn .spin {
+    animation: mdm-spin 1s linear infinite;
+}
+
+@keyframes mdm-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .mdm-modal {
+        width: 95%;
+        max-width: none;
+        max-height: 90vh;
+    }
+
+    .mdm-overlay {
+        align-items: flex-end;
+    }
+
+    .mdm-modal {
+        border-radius: 1rem 1rem 0 0;
+    }
+
+    .mdm-header,
+    .mdm-body {
+        padding: 1rem;
+    }
+
+    .mdm-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .mdm-timeline-item {
+        padding-left: 1.5rem;
+    }
+
+    .mdm-actions-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .mdm-action-btn,
+    .mdm-delete-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

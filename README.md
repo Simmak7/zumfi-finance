@@ -1,0 +1,307 @@
+<p align="center">
+  <img src="frontend/public/favicon.svg" alt="Zumfi Logo" width="80" />
+</p>
+
+<h1 align="center">Zumfi Finance</h1>
+
+<p align="center">
+  <strong>Your Personal Finance Companion</strong><br/>
+  Self-hosted, privacy-first finance management with AI-powered insights
+</p>
+
+<p align="center">
+  <a href="https://zumfi.net">Website</a> &bull;
+  <a href="#features">Features</a> &bull;
+  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#tech-stack">Tech Stack</a> &bull;
+  <a href="#license">License</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/license-BSL--1.1-blue" alt="License" />
+  <img src="https://img.shields.io/badge/version-1.0.0-green" alt="Version" />
+  <img src="https://img.shields.io/badge/docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/self--hosted-yes-brightgreen" alt="Self-hosted" />
+</p>
+
+---
+
+## What is Zumfi?
+
+Zumfi is a **full-stack, self-hosted personal finance application** that helps you take complete control of your money. Upload bank statements, automatically categorize transactions, set budgets and savings goals, track your portfolio, and get AI-powered financial insights - all running on your own infrastructure with your data never leaving your server.
+
+**Your data stays yours.** No cloud subscriptions, no third-party analytics, no data selling. Everything runs locally via Docker.
+
+Visit **[zumfi.net](https://zumfi.net)** for more information.
+
+---
+
+## Features
+
+### Dashboard and Analytics
+- **Monthly KPI cards** - income, expenses, savings rate, net worth at a glance
+- **Interactive charts** - spending trends, category breakdowns, income vs. expenses
+- **Month-close wizard** - guided workflow to review and finalize each month
+- **AI-powered insights** - anomaly detection, spend forecasts, recurring expense analysis (via local Ollama LLM)
+
+### Bank Statement Parsing
+- **Automatic PDF parsing** for Czech banks:
+  - Raiffeisen CZ
+  - FIO Banka
+  - CSOB / Ceska Sporitelna
+  - Revolut
+  - Czech Universal format
+- **CSV and Excel import** wizard with column mapping
+- **Multi-account support** with automatic statement linking
+
+### Smart Categorization
+- **4-tier intelligent categorization system:**
+  1. User-defined rules (highest priority)
+  2. AI-learned patterns from your corrections
+  3. Keyword-based matching
+  4. Fuzzy fallback classification
+- **Drag-and-drop category editor** with custom sections
+- **Auto-learning** - correcting a category teaches the system for next time
+
+### Budgets
+- **Monthly budget allocations** per category
+- **Smart suggestions** based on historical spending
+- **Visual comparison** - budgeted vs. actual with progress bars
+- **Overspend alerts** when approaching or exceeding limits
+
+### Savings Goals
+- **Goal tracking** with target amounts and deadlines
+- **Allocation wizard** - distribute surplus income across goals
+- **Progress visualization** with contribution history
+- **Multi-currency support** with automatic conversion
+
+### Bills and Mortgages
+- **Recurring bill tracker** with due date reminders
+- **Mortgage calculator** with amortization schedule
+- **Mortgage event tracking** (extra payments, rate changes)
+- **Bill status checklist** per month
+
+### Portfolio Tracker
+- **Savings accounts** with balance and interest tracking
+- **Investment accounts** - deposits, withdrawals, performance
+- **Stock holdings** - shares, cost basis, market value, P and L
+- **Real estate** - property values, mortgages, equity calculation
+- **Multi-currency** portfolio with CZK/EUR/USD support
+
+### Multi-Currency
+- **Daily exchange rates** from the Czech National Bank (CNB)
+- **Automatic conversion** across CZK, EUR, USD
+- **Per-account currency** assignment
+- **Portfolio values** consolidated in your preferred currency
+
+### Internationalization
+- **3 languages** supported: English, Czech, Ukrainian
+- **Complete UI translation** including charts, labels, and messages
+
+### Zumfi - Your Finance Mascot
+- **Interactive rabbit mascot** with mood-based expressions
+- **Financial mood awareness** - Zumfi reacts to your spending habits
+- **Page-specific insights** - contextual tips on every page
+- **Draggable and proximity-aware** - follows your cursor, hides near edges
+- **Idle behaviors** - ambient animations when not interacting
+
+### Security
+- **JWT authentication** with refresh token rotation
+- **Google OAuth** integration (optional)
+- **TOTP two-factor authentication** (2FA)
+- **Rate limiting** with Redis-backed sliding windows
+- **Security headers** middleware
+- **Multi-user support** with complete data isolation
+
+---
+
+## Quick Start
+
+### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+- 4 GB RAM minimum (8 GB recommended for AI features)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Simmak7/zumfi-finance.git
+cd zumfi-finance
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set a strong `SECRET_KEY`:
+```bash
+SECRET_KEY=your-random-32-character-string-here
+```
+
+### 3. Start all services
+
+```bash
+docker-compose up -d --build
+```
+
+This starts:
+| Service | Description | Local Port |
+|---------|-------------|------------|
+| **Frontend** | React UI | [localhost:3001](http://localhost:3001) |
+| **Backend** | FastAPI server | [localhost:8001](http://localhost:8001) |
+| **PostgreSQL** | Database | 5433 |
+| **Redis** | Cache and queue | 6380 |
+| **Ollama** | Local AI (optional) | 11435 |
+| **Celery** | Background tasks | - |
+
+### 4. Open the app
+
+Navigate to **http://localhost:3001** and create your account.
+
+### 5. Optional - Enable AI insights
+
+Pull a model into Ollama for AI-powered analysis:
+```bash
+docker exec finance_ollama ollama pull llama3.2
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 19, Vite 7, Framer Motion, Recharts, Chart.js, dnd-kit |
+| **Backend** | Python, FastAPI 0.115, SQLAlchemy (async), Alembic |
+| **Database** | PostgreSQL 16 |
+| **Cache and Queue** | Redis 7, Celery |
+| **AI Engine** | Ollama (local LLM - Llama, Mistral, etc.) |
+| **Auth** | JWT with bcrypt, Google OAuth, TOTP 2FA |
+| **Exchange Rates** | Czech National Bank (CNB) daily rates |
+| **Containerization** | Docker Compose |
+
+---
+
+## Architecture
+
+```
+zumfi-finance/
+  backend/
+    Dockerfile
+    app/
+      main.py              # FastAPI entry (13 routers)
+      core/                # Auth, DB, config, security
+      migrations/          # Alembic DB migrations
+      features/
+        auth/              # JWT, OAuth, 2FA
+        statements/        # PDF parsing engine
+        categories/        # Smart categorization
+        dashboard/         # KPIs and month-close
+        budgets/           # Budget management
+        goals/             # Savings goals
+        bills/             # Bills and mortgages
+        portfolio/         # Portfolio tracker
+        analysis/          # AI insights (Ollama)
+        accounts/          # Multi-bank accounts
+        imports/           # CSV/Excel import
+        settings/          # User preferences
+        donate/            # Support the project
+    tests/
+
+  frontend/
+    Dockerfile
+    src/
+      features/            # Feature modules
+      components/          # Shared UI
+      context/             # React contexts
+      i18n/                # Translations (EN, CS, UK)
+      services/api.js      # API client
+
+  docker-compose.yml
+  .env.example
+  LICENSE
+```
+
+---
+
+## Supported Banks
+
+| Bank | Format | Status |
+|------|--------|--------|
+| Raiffeisen CZ | PDF | Fully supported |
+| FIO Banka | PDF | Fully supported |
+| Revolut | PDF | Fully supported |
+| CSOB / Ceska Sporitelna | PDF | Fully supported |
+| Czech Universal | PDF | Fully supported |
+| Any bank | CSV / Excel | Via import wizard |
+
+---
+
+## Environment Variables
+
+See `.env.example` for all available configuration options:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SECRET_KEY` | JWT signing key | Must change for production |
+| `POSTGRES_PASSWORD` | Database password | Must change for production |
+| `DATABASE_URL` | PostgreSQL connection string | Auto-configured |
+| `REDIS_URL` | Redis connection string | `redis://redis:6379/0` |
+| `OLLAMA_HOST` | Ollama AI server | `http://ollama:11434` |
+| `GOOGLE_CLIENT_ID` | Google OAuth (optional) | Empty |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth (optional) | Empty |
+| `CORS_ORIGINS` | Allowed CORS origins | `http://localhost:3001` |
+
+---
+
+## Contributing
+
+Contributions are welcome! Please open an issue first to discuss what you would like to change.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## Support the Project
+
+If Zumfi helps you manage your finances, consider supporting the project:
+
+- [GitHub Sponsors](https://github.com/sponsors/mzsim) - Buy a carrot for Zumfi the rabbit!
+- Star this repository
+- Share with friends
+
+---
+
+## Roadmap
+
+- Mobile-responsive UI improvements
+- Data export (CSV, PDF reports)
+- Bank API integrations (PSD2 / Open Banking)
+- Shared household accounts
+- Receipt scanning (OCR)
+- Native mobile app
+- AI financial advisor chat
+
+---
+
+## License
+
+This project is licensed under the **Business Source License 1.1** (BUSL-1.1).
+
+- **Personal and non-commercial use**: Fully permitted
+- **Commercial production use**: Requires a separate license
+- **Change Date**: March 29, 2030 - after this date, the code becomes available under the Apache License 2.0
+
+See the [LICENSE](LICENSE) file for full details.
+
+---
+
+<p align="center">
+  Made with care by <a href="https://github.com/Simmak7">Simmak7</a><br/>
+  <a href="https://zumfi.net">zumfi.net</a>
+</p>

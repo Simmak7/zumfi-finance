@@ -1,0 +1,17 @@
+/* Environment Effects — animated layer around Zumi */
+
+.zumi-env-effects {
+    position: absolute;
+    inset: -50px;
+    pointer-events: none;
+    z-index: 0;
+    overflow: visible;
+}
+
+.zumi-env-effects svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: visible;
+}

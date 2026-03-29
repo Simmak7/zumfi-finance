@@ -1,0 +1,12 @@
+/* Glow effect when Zumfi is dragged near a dashboard component */
+
+[data-zumfi-zone] {
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+[data-zumfi-zone].zumfi-hover-glow {
+    box-shadow:
+        0 0 20px rgba(212, 168, 67, 0.18),
+        0 0 40px rgba(99, 102, 241, 0.10);
+    border-color: rgba(212, 168, 67, 0.35) !important;
+}

@@ -1,0 +1,68 @@
+.empty-state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(99, 102, 241, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6366f1;
+    margin-bottom: 1rem;
+}
+
+.empty-state-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 0.5rem;
+}
+
+.empty-state-desc {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.45);
+    max-width: 340px;
+    margin: 0 0 1.25rem;
+    line-height: 1.5;
+}
+
+.empty-state-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.empty-state-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.empty-state-btn:hover {
+    opacity: 0.85;
+}
+
+.empty-state-btn.primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+}
+
+.empty-state-btn.secondary {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}

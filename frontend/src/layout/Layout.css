@@ -1,0 +1,149 @@
+.app-shell {
+    display: grid;
+    grid-template-columns: 260px 1fr 0px;
+    /* Default: Inspector closed */
+    grid-template-areas: "sidebar main inspector";
+    min-height: 100vh;
+    background: #0d0d12;
+    transition: grid-template-columns 0.3s ease;
+    overflow: hidden;
+    /* Prevent body scroll if main scrolls */
+}
+
+.app-shell.inspector-open {
+    grid-template-columns: 260px 1fr 350px;
+}
+
+.sidebar-col {
+    grid-area: sidebar;
+    /* Sidebar component is fixed inside this col, or we make this the container */
+    position: relative;
+    z-index: 20;
+}
+
+.app-main {
+    grid-area: main;
+    background: #0d0d12;
+    padding: 2rem;
+    overflow-y: auto;
+    height: 100vh;
+    /* No margin-left needed because grid handles it */
+}
+
+.inspector-col {
+    grid-area: inspector;
+    overflow: hidden;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    background: #1c1d24;
+}
+
+.inspector-backdrop {
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    .app-shell.inspector-open {
+        grid-template-columns: 80px 1fr 300px;
+        /* Compact sidebar */
+    }
+}
+
+@media (max-width: 768px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-areas: "main";
+    }
+
+    .app-shell.inspector-open {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-col {
+        display: none;
+    }
+
+    .app-main {
+        position: relative;
+        padding: 1rem;
+        padding-bottom: 5rem;
+        height: 100vh;
+        height: 100dvh;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    .inspector-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 49;
+        animation: backdropFade 0.2s ease;
+    }
+
+    .inspector-col {
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 92%;
+        max-width: 400px;
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 50;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .app-shell.inspector-open .inspector-col {
+        transform: translateX(0);
+    }
+
+    @keyframes backdropFade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+}
+
+.ptr-indicator {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .ptr-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    .ptr-indicator.refreshing {
+        transition: transform 0.3s ease;
+    }
+
+    .ptr-spinner {
+        width: 24px;
+        height: 24px;
+        border: 2.5px solid rgba(255, 255, 255, 0.15);
+        border-top-color: #6366f1;
+        border-radius: 50%;
+    }
+
+    .ptr-indicator.refreshing .ptr-spinner {
+        animation: ptr-spin 0.7s linear infinite;
+    }
+
+    @keyframes ptr-spin {
+        to { transform: rotate(360deg); }
+    }
+}

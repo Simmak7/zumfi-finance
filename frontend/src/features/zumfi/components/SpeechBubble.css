@@ -1,0 +1,78 @@
+.zumfi-speech {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 10px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    max-width: 190px;
+    text-align: center;
+    pointer-events: none;
+    background: rgba(15, 12, 25, 0.92);
+    border: 1px solid rgba(212, 168, 67, 0.2);
+    color: #e8e2f0;
+    backdrop-filter: blur(10px);
+    line-height: 1.4;
+    white-space: normal;
+    word-wrap: break-word;
+    letter-spacing: 0.01em;
+    z-index: 10;
+}
+
+.zumfi-speech.positive {
+    border-color: rgba(212, 168, 67, 0.45);
+    color: #f0d78c;
+}
+
+.zumfi-speech.warning {
+    border-color: rgba(200, 140, 80, 0.4);
+    color: #e8c8a0;
+}
+
+.zumfi-speech.neutral {
+    border-color: rgba(99, 102, 241, 0.25);
+}
+
+.speech-arrow {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 9px;
+    height: 9px;
+    background: rgba(15, 12, 25, 0.92);
+    border-right: 1px solid rgba(212, 168, 67, 0.2);
+    border-bottom: 1px solid rgba(212, 168, 67, 0.2);
+}
+
+.zumfi-speech.positive .speech-arrow {
+    border-color: rgba(212, 168, 67, 0.45);
+}
+
+.zumfi-speech.warning .speech-arrow {
+    border-color: rgba(200, 140, 80, 0.4);
+}
+
+.zumfi-speech.neutral .speech-arrow {
+    border-color: rgba(99, 102, 241, 0.25);
+}
+
+/* Flipped below the rabbit when near top of screen */
+.zumfi-speech.below {
+    bottom: auto;
+    top: 100%;
+    margin-bottom: 0;
+    margin-top: 10px;
+}
+
+.zumfi-speech.below .speech-arrow {
+    bottom: auto;
+    top: -5px;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid rgba(212, 168, 67, 0.2);
+    border-top: 1px solid rgba(212, 168, 67, 0.2);
+}

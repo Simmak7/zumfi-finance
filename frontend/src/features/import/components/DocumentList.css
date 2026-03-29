@@ -1,0 +1,355 @@
+.document-list {
+    padding: 2rem;
+}
+
+.document-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.document-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #1a1a2e;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.45rem 0.9rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+}
+
+.document-filter:hover {
+    background: #252540;
+}
+
+.document-filter svg {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.document-filter select {
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    font-size: 0.85rem;
+    color: white;
+    background: transparent;
+    cursor: pointer;
+    min-width: 100px;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.document-filter select option {
+    background: #1e293b;
+    color: white;
+}
+
+.document-filter-count {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+}
+
+.document-list-loading,
+.document-list-error {
+    padding: 2rem;
+    text-align: center;
+    color: #6b7280;
+}
+
+.document-list-error {
+    color: #ef4444;
+}
+
+.document-list-empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 3rem;
+}
+
+.document-list-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+.document-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: box-shadow 0.2s;
+}
+
+.document-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.document-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.document-header svg {
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.document-info {
+    flex: 1;
+}
+
+.document-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    color: #1f2937;
+    word-break: break-word;
+}
+
+.document-meta {
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.transaction-count-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #3b82f6;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    width: fit-content;
+}
+
+.status-icon {
+    flex-shrink: 0;
+}
+
+.status-success {
+    color: #10b981;
+}
+
+.status-error {
+    color: #ef4444;
+}
+
+.status-processing {
+    color: #f59e0b;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+.document-period {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.period-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.period-display p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.btn-edit-period {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.btn-edit-period:hover {
+    background: #2563eb;
+}
+
+.period-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.period-edit label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.period-edit input[type="date"] {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+.period-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.period-actions button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.period-actions button:first-child {
+    background: #10b981;
+    color: white;
+}
+
+.period-actions button:first-child:hover {
+    background: #059669;
+}
+
+.period-actions button:last-child {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.period-actions button:last-child:hover {
+    background: #d1d5db;
+}
+
+.document-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-view {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.btn-view:hover {
+    background: #2563eb;
+}
+
+.btn-delete {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+}
+
+.savings-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #22c55e;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.stock-badge {
+    background: #0ea5e9;
+}
+
+.pnl-badge {
+    background: #a855f7;
+}
+
+.btn-toggle-type {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.btn-toggle-type:hover {
+    background: #4b5563;
+}
+
+.btn-toggle-savings {
+    background: #22c55e;
+}
+
+.btn-toggle-savings:hover {
+    background: #16a34a;
+}
+
+.closing-balance {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+    color: #059669;
+    font-weight: 500;
+}

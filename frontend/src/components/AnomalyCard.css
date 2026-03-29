@@ -1,0 +1,94 @@
+.anomaly-card {
+    background: linear-gradient(145deg, rgba(244, 63, 94, 0.1), rgba(244, 63, 94, 0.05));
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    box-shadow: 0 4px 20px rgba(244, 63, 94, 0.1);
+}
+
+.anomaly-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.alert-icon {
+    color: #f43f5e;
+}
+
+.anomaly-card h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #f43f5e;
+    font-weight: 600;
+}
+
+.anomaly-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.anomaly-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+}
+
+.anomaly-item.severe {
+    border-left-color: #f43f5e;
+}
+
+.anomaly-item.moderate {
+    border-left-color: #f97316;
+}
+
+.anomaly-item.mild {
+    border-left-color: #eab308;
+}
+
+.anomaly-row-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.anomaly-type-icon {
+    flex-shrink: 0;
+}
+
+.anomaly-type-icon.severe {
+    color: #f43f5e;
+}
+
+.anomaly-type-icon.moderate {
+    color: #f97316;
+}
+
+.anomaly-type-icon.mild {
+    color: #eab308;
+}
+
+.anomaly-desc {
+    font-weight: 500;
+    font-size: 0.85rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.anomaly-amount {
+    font-weight: 600;
+    color: #f43f5e;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+}
+
+.anomaly-reason {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    padding-left: 1.5rem;
+}

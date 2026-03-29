@@ -1,0 +1,157 @@
+.app-sidebar {
+    width: 100%;
+    height: 100%;
+    background: #0d0d12;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    /* Position fixed removed to respect Grid layout */
+}
+
+.logo-section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 3rem;
+    padding-left: 0.5rem;
+}
+
+.logo-text {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 0.08em;
+}
+
+.logo-zum {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo-fi {
+    color: #f59e0b;
+}
+
+.logo-section .logo-finance {
+    color: #f59e0b;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: -0.15rem;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: white;
+}
+
+.nav-item.active {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0));
+    color: #818cf8;
+    border-left: 3px solid #6366f1;
+}
+
+.nav-item.active svg {
+    color: #818cf8;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: #1e1e2d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.user-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.logout-icon {
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.logout-icon:hover {
+    color: #f43f5e;
+}
+
+/* Zumi house + carrot area */
+.zumfi-home-area {
+    margin-left: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.zumfi-home-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.zumfi-home-area .zumfi-home {
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+.zumfi-carrot-btn {
+    font-size: 28px;
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 0.2s, transform 0.2s;
+    user-select: none;
+    line-height: 1;
+    margin-left: 20px;
+    margin-bottom: 2px;
+}
+
+.zumfi-carrot-btn:hover {
+    opacity: 1;
+    transform: scale(1.2) rotate(-12deg);
+}

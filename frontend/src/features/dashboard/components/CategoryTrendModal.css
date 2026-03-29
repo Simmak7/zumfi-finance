@@ -1,0 +1,136 @@
+.ctrend-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ctrend-modal {
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    width: 92%;
+    max-width: 700px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.ctrend-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.ctrend-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.ctrend-subtitle {
+    margin: 0;
+    padding: 0.5rem 1.5rem 0;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    flex-shrink: 0;
+}
+
+.ctrend-body {
+    padding: 1rem 1.5rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ctrend-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 120px;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.9rem;
+}
+
+.ctrend-category-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: grab;
+    transition: border-color 0.15s, opacity 0.15s, transform 0.15s;
+}
+
+.ctrend-category-card:active {
+    cursor: grabbing;
+}
+
+.ctrend-category-card.ctrend-dragging {
+    opacity: 0.3;
+}
+
+.ctrend-category-card.ctrend-drop-target {
+    border-color: rgba(99, 102, 241, 0.6);
+    transform: scale(1.01);
+}
+
+.ctrend-cat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.ctrend-drag-handle {
+    color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    cursor: grab;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.ctrend-category-card:hover .ctrend-drag-handle {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ctrend-cat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ctrend-cat-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.ctrend-cat-avg {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'Monaco', monospace;
+}
+
+@media (max-width: 768px) {
+    .ctrend-modal {
+        width: 95%;
+        max-width: none;
+        max-height: 85vh;
+    }
+
+    .ctrend-drag-handle {
+        padding: 0.4rem;
+    }
+}

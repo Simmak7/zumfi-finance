@@ -1,0 +1,473 @@
+/* Header Actions */
+.budget-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.budget-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.budget-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.budget-action-btn.suggest {
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+}
+
+.budget-action-btn.suggest:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: #c7d2fe;
+}
+
+.budget-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Comparison Chart Panel */
+.budget-comparison-panel {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    position: relative;
+}
+
+.budget-comparison-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.budget-comparison-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+
+/* Stats row */
+.budget-comparison-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.budget-stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.6rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.budget-stat-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.budget-stat-value {
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Monaco', monospace;
+}
+
+.budget-stat-value.accent {
+    color: #6366f1;
+}
+
+/* Overall progress bar */
+.budget-comparison-bar {
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.budget-comparison-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.budget-comparison-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+
+.budget-comparison-bar-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+}
+
+.budget-chart-container {
+    margin-top: 0.5rem;
+}
+
+/* Inherited badge */
+.budget-inherited-badge {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
+}
+
+/* Empty state */
+.budget-comparison-empty {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+}
+
+.budget-comparison-empty p {
+    margin: 0.25rem 0;
+}
+
+/* ── Manage Popup ── */
+.bc-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.bc-popup {
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.75rem;
+    width: 100%;
+    max-width: 440px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.bc-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.bc-popup-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.bc-popup-close {
+    display: flex;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 0.35rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.bc-popup-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+/* Budget list */
+.bc-popup-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.bc-popup-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.45rem 0.5rem;
+    border-radius: 0.4rem;
+    transition: background 0.15s;
+}
+
+.bc-popup-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.bc-popup-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bc-popup-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.bc-popup-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.bc-popup-input-pen {
+    position: absolute;
+    left: 6px;
+    color: rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.bc-popup-input-wrap:hover .bc-popup-input-pen,
+.bc-popup-input-wrap:focus-within .bc-popup-input-pen {
+    color: rgba(99, 102, 241, 0.6);
+}
+
+.bc-popup-input {
+    width: 85px;
+    padding: 0.3rem 0.45rem 0.3rem 1.25rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.3rem;
+    color: white;
+    font-size: 0.8rem;
+    text-align: right;
+    font-family: 'Monaco', monospace;
+    transition: border-color 0.2s;
+}
+
+.bc-popup-input:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.bc-popup-input.saving {
+    border-color: #10b981;
+}
+
+.bc-popup-suffix {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.bc-popup-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 0.2rem;
+    transition: all 0.2s;
+}
+
+.bc-popup-delete:hover {
+    color: #f43f5e;
+    background: rgba(244, 63, 94, 0.1);
+}
+
+.bc-popup-empty {
+    text-align: center;
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.8rem;
+}
+
+/* Add row in popup */
+.bc-popup-add {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    padding: 0.75rem 1.25rem 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.bc-popup-add-name {
+    flex: 1;
+    padding: 0.35rem 0.5rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.35rem;
+    color: white;
+    font-size: 0.8rem;
+}
+
+.bc-popup-add-name:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.bc-popup-add-amt {
+    width: 75px;
+    padding: 0.35rem 0.5rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.35rem;
+    color: white;
+    font-size: 0.8rem;
+    text-align: right;
+    font-family: 'Monaco', monospace;
+}
+
+.bc-popup-add-amt:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.bc-popup-add-btn {
+    padding: 0.35rem 0.65rem;
+    background: #6366f1;
+    border: none;
+    border-radius: 0.35rem;
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.bc-popup-add-btn:hover {
+    background: #4f46e5;
+}
+
+.bc-popup-add-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Quick chips in popup */
+.bc-popup-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.25rem 1.25rem 0.75rem;
+}
+
+.bc-popup-chip {
+    padding: 0.15rem 0.45rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.68rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.bc-popup-chip:hover {
+    background: rgba(99, 102, 241, 0.12);
+    border-color: rgba(99, 102, 241, 0.25);
+    color: #a5b4fc;
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+    .budget-header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .budget-action-btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .budget-comparison-panel {
+        padding: 1rem;
+        border-radius: 0.75rem;
+    }
+
+    .budget-comparison-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .budget-comparison-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .budget-stat-item {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .bc-popup {
+        max-width: 95vw;
+        max-height: 85vh;
+    }
+
+    .bc-popup-input {
+        width: 75px;
+    }
+
+    .bc-popup-add {
+        flex-wrap: wrap;
+    }
+
+    .bc-popup-add-amt {
+        width: 65px;
+    }
+
+    .bc-popup-add-name {
+        min-width: 0;
+    }
+
+    .budget-chart-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .budget-chart-container .recharts-yAxis .recharts-cartesian-axis-tick text {
+        font-size: 10px !important;
+    }
+}

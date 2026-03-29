@@ -1,0 +1,123 @@
+# Environment
+.env
+.env.local
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.venv/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Uploads (user data)
+data/uploads/*.pdf
+
+# ===== PUBLIC REPO SAFETY =====
+
+# Claude AI configuration & docs (private development aids)
+.claude/
+CLAUDE.md
+**/claude.md
+
+# Personal financial data
+data/
+legacy_excel_data/
+legacy/
+work notes/
+
+# Internal planning docs
+docs/
+IMPROVEMENT_PLAN.md
+PROJECT_MAP.md
+
+# Debug & analysis scripts (reference local files/bank data)
+analyze_pdf.py
+analyze_pdf_multirow.py
+check_text.py
+check_latest_statement.py
+check_newest_transactions.py
+check_statement_17.py
+check_transactions.py
+debug_row_parsing.py
+debug_tables.py
+list_statements.py
+backend/app/debug_parser.py
+
+# Root-level test scripts (reference local data)
+test_category_editor.py
+test_parse_statement.py
+test_parser_detail.py
+test_sorting.py
+test_text_parsing.py
+test_upload_api.py
+test_pixel_colors.mjs
+test_wizard_colors.mjs
+test_cs_debug.py
+test_cs_run.py
+
+# Playwright root config & tests
+playwright.config.js
+package.json
+package-lock.json
+/tests/
+
+# Seed demo script (contains test credentials)
+backend/app/seed_demo.py
+
+# Utility scripts (internal)
+backend/app/apply_dedup_indexes.py
+backend/app/migrate_legacy.py
+mappings.json
+
+# PDF files (may contain bank statements)
+*.pdf
+
+# Debug artifacts
+debug_*.json
+*_text.txt
+pdf_analysis.txt
+text_analysis.txt
+
+# Personal / sensitive documents
+Zuzi docs/
+
+# Windows artifacts
+nul
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# Temp files
+temp_*
+
+# OCR test images
+data/*.png
+
+# Memory files (Claude AI)
+memory/

@@ -1,0 +1,1410 @@
+/* Portfolio Page Layout */
+.portfolio-page {
+    padding: 2rem;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    color: white;
+    padding-bottom: 5rem;
+}
+
+.portfolio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.portfolio-header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.portfolio-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+}
+
+/* Add buttons */
+.portfolio-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: inherit;
+}
+
+.portfolio-add-btn.savings {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.portfolio-add-btn.savings:hover {
+    background: rgba(34, 197, 94, 0.3);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.portfolio-add-btn.investment {
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.portfolio-add-btn.investment:hover {
+    background: rgba(99, 102, 241, 0.3);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.portfolio-add-btn.stock {
+    background: rgba(14, 165, 233, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.portfolio-add-btn.stock:hover {
+    background: rgba(14, 165, 233, 0.3);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.portfolio-add-btn.property {
+    background: rgba(249, 115, 22, 0.15);
+    color: #fb923c;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.portfolio-add-btn.property:hover {
+    background: rgba(249, 115, 22, 0.3);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* KPI icon themes */
+.kpi-icon.savings-icon {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.kpi-icon.invest-icon {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+}
+
+.kpi-icon.stock-icon {
+    background: rgba(14, 165, 233, 0.1);
+    color: #0ea5e9;
+}
+
+.kpi-icon.portfolio-icon {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+.kpi-icon.property-icon {
+    background: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+}
+
+.kpi-icon.gain-icon {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.kpi-icon.loss-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.text-green { color: #22c55e; }
+.text-red { color: #ef4444; }
+
+.kpi-pct {
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.kpi-card.clickable {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.kpi-card.clickable:hover {
+    background: rgba(14, 165, 233, 0.12);
+    border-color: rgba(14, 165, 233, 0.3);
+}
+
+/* Hero KPI card (Total Portfolio on overview) */
+.kpi-card-hero {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(99, 102, 241, 0.08));
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    transition: all 0.2s;
+    margin-bottom: 1.5rem;
+}
+
+.kpi-card-hero:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.18), rgba(99, 102, 241, 0.12));
+    border-color: rgba(168, 85, 247, 0.35);
+}
+
+.kpi-card-hero .kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-value-hero {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* Sections layout */
+.portfolio-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+    .portfolio-sections {
+        grid-template-columns: 1fr;
+    }
+}
+
+.portfolio-section {
+    min-width: 0;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.section-count {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Cards grid */
+.portfolio-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.portfolio-card {
+    background: rgba(30, 30, 45, 0.8);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.portfolio-card:hover {
+    transform: translateY(-1px);
+    background: rgba(40, 40, 55, 0.9);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.card-top-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.card-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.card-name {
+    font-weight: 600;
+    font-size: 1rem;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.type-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-ticker {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    font-family: monospace;
+    margin-bottom: 0.4rem;
+}
+
+.card-units {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+}
+
+.card-balance {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.card-rate {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #22c55e;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.card-gain {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.card-gain.positive {
+    color: #22c55e;
+}
+
+.card-gain.negative {
+    color: #ef4444;
+}
+
+.card-gain.neutral {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* Property feature tags */
+.card-features {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-top: 0.15rem;
+}
+
+.feature-tag {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    background: rgba(249, 115, 22, 0.15);
+    color: #fb923c;
+    font-weight: 500;
+}
+
+/* Property form checkbox row */
+.checkbox-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: #f97316;
+    width: 16px;
+    height: 16px;
+}
+
+/* Property form hints */
+.field-hint {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 0.25rem;
+    font-weight: 400;
+}
+
+.field-hint.warning {
+    color: #f59e0b;
+}
+
+.metric-row.highlight span:last-child {
+    color: #f97316;
+    font-weight: 700;
+    font-size: 1.05em;
+}
+
+.metric-row.neutral-hint {
+    padding: 0.5rem 0;
+}
+
+.metric-row.neutral-hint span {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* Property value chart (inside inspector form) */
+.chart-card-compact {
+    margin: 0.75rem 0;
+    padding: 1rem;
+    border-radius: 12px;
+    background: rgba(30, 30, 45, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-card-compact h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.chart-card-compact .chart-empty {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+/* Empty states */
+.portfolio-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: rgba(30, 30, 45, 0.5);
+    border-radius: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+}
+
+.portfolio-empty p {
+    margin: 0.5rem 0 0;
+}
+
+.empty-hint {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.25);
+}
+
+/* Form styles */
+.portfolio-form h3 {
+    margin: 0 0 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.portfolio-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.portfolio-form label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+.portfolio-form input,
+.portfolio-form select,
+.portfolio-form textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.portfolio-form input:focus,
+.portfolio-form select:focus,
+.portfolio-form textarea:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.portfolio-form textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-row {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-row .form-group-small {
+    flex: 0 0 90px;
+}
+
+/* Computed metrics display */
+.computed-metrics {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.metric-row.positive span:last-child {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.metric-row.negative span:last-child {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+/* Color picker */
+.portfolio-form .color-picker {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.portfolio-form .color-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.portfolio-form .color-swatch.selected {
+    border-color: white;
+    transform: scale(1.15);
+}
+
+.portfolio-form .color-swatch:hover {
+    transform: scale(1.1);
+}
+
+/* Form buttons */
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.portfolio-form .save-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.2rem;
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.portfolio-form .save-btn:hover {
+    background: rgba(99, 102, 241, 0.35);
+    color: white;
+}
+
+.portfolio-form .delete-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.portfolio-form .delete-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+    color: white;
+}
+
+/* Tab label visibility (desktop: full, mobile: short) */
+.tab-label-short {
+    display: none;
+}
+
+/* Tab navigation */
+.portfolio-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.portfolio-tab {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.portfolio-tab:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.portfolio-tab.active {
+    color: white;
+    border-bottom-color: #6366f1;
+}
+
+/* Full-width section (single-tab view) */
+.portfolio-section-full .portfolio-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.75rem;
+}
+
+/* Month-over-month delta */
+.kpi-delta {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.15rem;
+    opacity: 0.8;
+}
+
+/* Add Goal button */
+.portfolio-add-btn.goal {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.portfolio-add-btn.goal:hover {
+    background: rgba(251, 191, 36, 0.3);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Goal progress bar */
+.goal-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0.4rem;
+}
+
+.goal-progress-bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.goal-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.goal-progress-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    min-width: 36px;
+    text-align: right;
+}
+
+.goal-done-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: rgba(34, 197, 94, 0.15) !important;
+    color: #22c55e !important;
+}
+
+.goal-edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.goal-edit-btn:hover {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+}
+
+/* Goal month-over-month delta */
+.goal-delta {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.15rem;
+    opacity: 0.85;
+}
+
+.goal-delta.positive {
+    color: #22c55e;
+}
+
+.goal-delta.negative {
+    color: #ef4444;
+}
+
+.goal-delta.neutral {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* Goal Progress Charts */
+.goal-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1rem;
+}
+
+.goal-chart-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.goal-chart-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(99, 102, 241, 0.25);
+    transform: translateY(-2px);
+}
+
+.goal-chart-ring-wrap {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.goal-chart-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    pointer-events: none;
+}
+
+.goal-chart-pct {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1;
+}
+
+.goal-chart-pct.goal-over {
+    font-size: 1.2rem;
+    color: #22c55e;
+}
+
+.goal-chart-over-label {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.15);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+}
+
+.goal-chart-done-label {
+    display: flex;
+    align-items: center;
+    color: #22c55e;
+}
+
+.goal-chart-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    margin-top: 0.25rem;
+    width: 100%;
+}
+
+.goal-chart-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    max-width: 100%;
+}
+
+.goal-chart-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.goal-chart-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+}
+
+.goal-chart-amounts {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 500;
+}
+
+.goal-chart-deadline {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 600px) {
+    .goal-charts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+}
+
+/* P&L Section */
+.pnl-total {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.pnl-trades-list {
+    margin-top: 0.75rem;
+}
+
+.pnl-trades-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.8fr 1fr 1fr 1.5fr;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pnl-trade-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.8fr 1fr 1fr 1.5fr;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.65rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.85rem;
+}
+
+.pnl-trade-row:last-child {
+    border-bottom: none;
+}
+
+.pnl-trade-name {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.pnl-trade-name strong {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.pnl-trade-meta {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pnl-trade-date {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.pnl-trade-qty {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.pnl-col-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.pnl-icon {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-right: 0.2rem;
+}
+
+.pnl-czk-hint {
+    display: block;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 400;
+}
+
+.pnl-sub-header {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 1rem 0 0.5rem;
+}
+
+.pnl-dividends .pnl-trade-row {
+    grid-template-columns: 2fr 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+    .pnl-trades-header,
+    .pnl-trade-row {
+        grid-template-columns: 1.5fr 1fr 1fr;
+    }
+    .pnl-trade-qty,
+    .pnl-trades-header span:nth-child(3) {
+        display: none;
+    }
+    .pnl-trade-row span:nth-child(4),
+    .pnl-trades-header span:nth-child(4) {
+        display: none;
+    }
+}
+
+/* Stock Detail Modal Stats */
+.stock-detail-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.stock-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stock-stat-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stock-stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: 'Monaco', monospace;
+}
+
+.stock-stat-value.positive {
+    color: #22c55e;
+}
+
+.stock-stat-value.negative {
+    color: #ef4444;
+}
+
+.stock-stat-pct {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+@media (max-width: 500px) {
+    .stock-detail-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+    .portfolio-page {
+        padding: 0.75rem;
+        padding-bottom: 5rem;
+    }
+
+    .portfolio-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .portfolio-header h1 {
+        font-size: 1.4rem;
+    }
+
+    .portfolio-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 1rem;
+        gap: 0;
+    }
+
+    .portfolio-tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .tab-label-full {
+        display: none;
+    }
+
+    .tab-label-short {
+        display: inline;
+    }
+
+    .kpi-card-hero {
+        padding: 1.25rem;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .kpi-value-hero {
+        font-size: 1.5rem;
+    }
+
+    .portfolio-sections {
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .portfolio-section-full .portfolio-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .portfolio-card {
+        padding: 0.875rem 1rem;
+    }
+
+    .card-balance {
+        font-size: 1.1rem;
+    }
+
+    .goal-charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .goal-chart-ring-wrap {
+        width: 110px;
+        height: 110px;
+    }
+
+    .goal-chart-pct {
+        font-size: 1.1rem;
+    }
+
+    .goal-chart-name {
+        font-size: 0.75rem;
+        max-width: 100px;
+    }
+
+    .goal-chart-amounts {
+        font-size: 0.7rem;
+    }
+
+    .portfolio-add-btn {
+        padding: 0.45rem 0.75rem;
+        font-size: 0.825rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .form-row .form-group-small {
+        flex: auto;
+    }
+
+    .portfolio-form .save-btn,
+    .portfolio-form .delete-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+/* ── Add Savings Modal ── */
+.add-savings-methods {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.add-savings-method {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.6rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-savings-method:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.add-savings-method.active {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+}
+
+.add-savings-accounts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.add-savings-account-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+}
+
+.add-savings-account-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.add-savings-account-name {
+    display: block;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+}
+
+.add-savings-account-old {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 0.15rem;
+}
+
+.add-savings-account-input {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.add-savings-account-input input {
+    width: 120px;
+    padding: 0.45rem 0.6rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: white;
+    font-size: 0.875rem;
+    outline: none;
+    text-align: right;
+}
+
+.add-savings-account-input input:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.add-savings-currency {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    min-width: 28px;
+}
+
+.add-savings-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+}
+
+.add-savings-total-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Monaco', monospace;
+}
+
+.add-savings-diff {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.add-savings-diff.positive {
+    color: #22c55e;
+}
+
+.add-savings-diff.negative {
+    color: #f43f5e;
+}
+
+.add-savings-import-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem 1rem;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.add-savings-leftover {
+    margin-bottom: 0.5rem;
+}
+
+.add-savings-leftover-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+}
+
+.add-savings-surplus-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+}
+
+.surplus-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.825rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.surplus-row.surplus-available {
+    margin-top: 0.25rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.surplus-row .positive {
+    color: #22c55e;
+}
+
+.add-savings-distribute-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 8px;
+    color: #4ade80;
+    font-size: 0.825rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-savings-distribute-btn:hover {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+.add-savings-no-data {
+    padding: 1.5rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.85rem;
+}
+
+/* ── Add Saving Account Button (inline in section title) ── */
+.section-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 6px;
+    color: #4ade80;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    vertical-align: middle;
+}
+
+.section-add-btn:hover {
+    background: rgba(34, 197, 94, 0.2);
+    color: #86efac;
+}
+
+@media (max-width: 768px) {
+    .add-savings-methods {
+        flex-direction: column;
+    }
+
+    .add-savings-account-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .add-savings-account-input input {
+        width: 100%;
+    }
+}

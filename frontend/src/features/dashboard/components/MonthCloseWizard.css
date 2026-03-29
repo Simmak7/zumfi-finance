@@ -1,0 +1,433 @@
+.mcw-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mcw-modal {
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Closed month — gray overlay mode */
+.mcw-modal.mcw-closed {
+    background: #1c1c2a;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.mcw-modal.mcw-closed .mcw-header h2 {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.mcw-modal.mcw-closed .mcw-step-content h3 {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.mcw-modal.mcw-closed .mcw-kpi {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.04);
+}
+
+.mcw-modal.mcw-closed .mcw-kpi-value {
+    opacity: 0.65;
+}
+
+.mcw-modal.mcw-closed .mcw-next-btn,
+.mcw-modal.mcw-closed .mcw-back-btn {
+    opacity: 0.7;
+}
+
+.mcw-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mcw-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.mcw-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+.mcw-close:hover { color: white; }
+
+/* Step dots */
+.mcw-steps {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.mcw-step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+    transition: all 0.2s;
+}
+
+.mcw-step-dot.active {
+    background: rgba(99, 102, 241, 0.2);
+    color: #6366f1;
+}
+
+.mcw-step-dot.current {
+    background: #6366f1;
+    color: white;
+}
+
+.mcw-step-dot.clickable {
+    cursor: pointer;
+}
+
+.mcw-step-dot.clickable:hover {
+    background: rgba(99, 102, 241, 0.35);
+    color: white;
+}
+
+/* Closed mode: all dots grayish */
+.mcw-closed .mcw-step-dot.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.mcw-closed .mcw-step-dot.current {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Body */
+.mcw-body {
+    padding: 1.5rem;
+}
+
+.mcw-step-content h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    margin: 0 0 1rem;
+}
+
+/* KPI grid */
+.mcw-kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.mcw-kpi {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mcw-kpi-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.04em;
+}
+
+.mcw-kpi-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'Monaco', monospace;
+}
+
+.mcw-kpi-value.income { color: #22c55e; }
+.mcw-kpi-value.expense { color: #f43f5e; }
+
+/* Allocation */
+.mcw-alloc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.mcw-alloc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.mcw-alloc-name { font-size: 0.875rem; }
+
+.mcw-alloc-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.mcw-alloc-input {
+    width: 100px;
+    padding: 0.4rem 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.375rem;
+    color: white;
+    font-size: 0.875rem;
+    text-align: right;
+}
+
+.mcw-alloc-currency { font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); }
+
+.mcw-alloc-total {
+    text-align: right;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 1rem;
+}
+
+.mcw-alloc-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: rgba(34, 197, 94, 0.06);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+}
+
+.mcw-alloc-summary strong {
+    color: #22c55e;
+    font-family: 'Monaco', monospace;
+}
+
+/* Status badge (savings/portfolio growth/drop) */
+.mcw-status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Account / holdings list */
+.mcw-account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+}
+
+.mcw-account-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.75rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0.375rem;
+}
+
+.mcw-account-name {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mcw-account-balance {
+    font-size: 0.85rem;
+    font-family: 'Monaco', monospace;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.mcw-account-balance.income { color: #22c55e; }
+.mcw-account-balance.expense { color: #f43f5e; }
+
+/* Text states */
+.mcw-info-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+.mcw-success-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #22c55e;
+    font-size: 0.9rem;
+    margin: 0 0 1rem;
+}
+
+/* Navigation */
+.mcw-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.mcw-back-btn {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.mcw-next-btn, .mcw-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mcw-next-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mcw-action-btn { margin-bottom: 0.5rem; }
+
+/* Done */
+.mcw-done {
+    text-align: center;
+}
+
+.mcw-done-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mcw-actions-log {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    text-align: left;
+}
+
+.mcw-actions-log li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0.3rem 0;
+}
+
+.mcw-done-btn {
+    padding: 0.6rem 2rem;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+    .mcw-overlay {
+        align-items: stretch;
+    }
+
+    .mcw-modal {
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        max-height: 100%;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mcw-body {
+        padding: 1rem;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mcw-kpi-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .mcw-step-dots {
+        gap: 0.5rem;
+    }
+
+    .mcw-step-dot {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+
+    .mcw-input {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .mcw-nav {
+        padding: 0.75rem 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        background: #1a1a2e;
+        position: sticky;
+        bottom: 0;
+    }
+}

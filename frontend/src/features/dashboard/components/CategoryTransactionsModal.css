@@ -1,0 +1,154 @@
+.ctm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ctm-modal {
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 560px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.ctm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.ctm-header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ctm-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ctm-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.ctm-amount {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'Monaco', monospace;
+}
+
+.ctm-subtitle {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    flex-shrink: 0;
+}
+
+.ctm-body {
+    padding: 0.5rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 100px;
+}
+
+.ctm-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 120px;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.9rem;
+}
+
+.ctm-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ctm-tx-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    gap: 1rem;
+}
+
+.ctm-tx-row:last-child {
+    border-bottom: none;
+}
+
+.ctm-tx-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.ctm-tx-desc {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ctm-tx-meta {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.ctm-tx-cat {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.ctm-tx-amount {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #f43f5e;
+    white-space: nowrap;
+    font-family: 'Monaco', monospace;
+}
+
+.ctm-footer {
+    padding: 0.75rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.ctm-count {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.ctm-modal.property-modal {
+    max-width: 640px;
+    max-height: 85vh;
+}
+
+@media (max-width: 768px) {
+    .ctm-modal {
+        width: 95%;
+        max-width: none;
+        max-height: 85vh;
+    }
+}

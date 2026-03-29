@@ -1,0 +1,408 @@
+.wizard-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wizard-modal {
+    background: #1e1e2d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    width: 520px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+/* Force white on every element — overrides :root rgba(255,255,255,0.87) */
+.wizard-modal,
+.wizard-modal * {
+    color: #ffffff;
+}
+
+/* Colored accents (re-declared with modal prefix for specificity) */
+.wizard-modal .surplus-income { color: #22c55e; }
+.wizard-modal .surplus-expense { color: #f43f5e; }
+.wizard-modal .surplus-alloc { color: #eab308; }
+.wizard-modal .remaining-banner-amount.over { color: #f43f5e; }
+.wizard-modal .success-icon { color: #22c55e; }
+
+.wizard-modal.wizard-wide {
+    width: 520px;
+    max-width: 95vw;
+}
+
+.wizard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.wizard-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.wizard-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+.wizard-steps {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.step-dot.active {
+    background: #6366f1;
+}
+
+.wizard-step.alloc-step {
+    display: block;
+}
+
+.wizard-step h3 {
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.wizard-loading, .wizard-empty {
+    text-align: center;
+    padding: 2rem;
+}
+
+.wizard-sub {
+    font-size: 0.85rem;
+}
+
+/* Step 1: Surplus summary */
+.surplus-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.surplus-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    gap: 1rem;
+}
+
+.surplus-income { color: #22c55e; }
+.surplus-expense { color: #f43f5e; }
+.surplus-alloc { color: #eab308; }
+
+.surplus-total {
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* Step 2: Distribution */
+.distribute-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.suggest-btn {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.suggest-btn:hover {
+    background: rgba(99, 102, 241, 0.25);
+}
+
+.remaining-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.remaining-banner-label {
+    font-size: 1.1rem;
+}
+
+.remaining-banner-amount {
+    font-size: 1.15rem;
+    font-weight: 700;
+    transition: color 0.2s;
+}
+
+.remaining-banner-amount.over {
+    color: #f43f5e;
+}
+
+.remaining-banner-amount.done {
+    color: #22c55e;
+}
+
+.remaining-bar {
+    background: rgba(255, 255, 255, 0.1);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+}
+
+.remaining-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.goals-allocation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.goal-alloc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.85rem 1.1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 1rem;
+}
+
+.goal-alloc-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.goal-alloc-name {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.goal-alloc-remaining {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+.goal-alloc-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.goal-alloc-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.5rem;
+    width: 130px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: right;
+}
+
+.goal-alloc-input:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.goal-alloc-currency {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+/* Step 3: Confirm */
+.confirm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.confirm-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    padding: 0.5rem 0;
+    gap: 1rem;
+}
+
+.confirm-amount {
+    font-weight: 700;
+}
+
+.confirm-total {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.75rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+/* Navigation buttons */
+.wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.wizard-next-btn, .wizard-confirm-btn {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: opacity 0.2s;
+    width: 100%;
+    justify-content: center;
+}
+
+.wizard-next-btn:disabled, .wizard-confirm-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.wizard-back-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.6rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Success state */
+.success-modal {
+    text-align: center;
+}
+
+.success-content {
+    padding: 2rem 1rem;
+}
+
+.success-icon {
+    background: rgba(34, 197, 94, 0.15);
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.success-content h2 {
+    margin: 0 0 0.5rem;
+}
+
+.success-content p {
+    font-weight: 700;
+}
+
+/* Dimmed allocate button (dashboard) */
+.allocate-btn-dimmed {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+}
+
+/* Info popup body */
+.alloc-info-body h3 {
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.alloc-info-hint {
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    text-align: center;
+    opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+    .alloc-modal {
+        width: 95%;
+        max-width: none;
+        max-height: 90vh;
+    }
+
+    .alloc-body {
+        padding: 1rem;
+    }
+
+    .alloc-input {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .alloc-goal-row {
+        flex-wrap: wrap;
+    }
+}

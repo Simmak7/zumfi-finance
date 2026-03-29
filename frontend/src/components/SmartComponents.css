@@ -1,0 +1,407 @@
+/* Smart Components Shared Styles */
+.smart-card {
+    background: rgba(30, 30, 46, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1.5rem;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.2s;
+}
+
+.smart-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.smart-card h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #a1a1aa;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Forecast Widget */
+.forecast-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.forecast-numbers {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.label {
+    font-size: 0.8rem;
+    color: #71717a;
+    display: block;
+}
+
+.value {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.forecast-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    position: relative;
+    margin: 0.5rem 0;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease-out;
+}
+
+.bar-fill.good {
+    background: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+.bar-fill.warning {
+    background: #eab308;
+}
+
+.bar-fill.danger {
+    background: #ef4444;
+}
+
+.prediction-marker {
+    position: absolute;
+    top: -5px;
+    bottom: -5px;
+    width: 2px;
+    background: #6366f1;
+    /* Target color */
+}
+
+.forecast-meta {
+    font-size: 0.75rem;
+    color: #52525b;
+    text-align: right;
+}
+
+/* Recurring List */
+.recurring-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.recurring-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recurring-item:last-child {
+    border-bottom: none;
+}
+
+.rec-name {
+    display: block;
+    font-weight: 500;
+}
+
+.rec-freq {
+    font-size: 0.75rem;
+    color: #71717a;
+}
+
+.rec-amount {
+    font-family: 'Mono', monospace;
+    font-weight: 600;
+}
+
+/* Top Categories */
+.cat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.cat-item-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.cat-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.cat-bar-bg {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.cat-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+}
+
+/* ── Insight Cards (shared) ── */
+.insight-card {
+    min-height: 180px;
+}
+
+.insight-empty {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.insight-summary-line {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Insight bar (budget usage) */
+.insight-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.insight-bar-bg {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.insight-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease-out;
+}
+
+.insight-bar-fill.good { background: #22c55e; }
+.insight-bar-fill.warning { background: #eab308; }
+.insight-bar-fill.danger { background: #ef4444; }
+
+.insight-bar-label {
+    font-size: 0.75rem;
+    color: #71717a;
+    text-align: right;
+}
+
+/* Insight list (over-budget, bills) */
+.insight-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.insight-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.insight-list-item:last-child { border-bottom: none; }
+
+.insight-item-name {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Savings rate row */
+.insight-rate-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.insight-rate-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+}
+
+.insight-rate-delta {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.insight-narrative {
+    font-size: 0.85rem;
+}
+
+.insight-goal-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    padding-top: 0.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.insight-goal-name { flex: 1; }
+
+.insight-goal-pct {
+    font-weight: 600;
+    color: #6366f1;
+}
+
+/* Bill count badges */
+.insight-bill-counts {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.bill-count-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+}
+
+.bill-count-badge.paid {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.bill-count-badge.pending {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.bill-count-badge.overdue {
+    background: rgba(244, 63, 94, 0.15);
+    color: #f43f5e;
+}
+
+.insight-all-good {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #22c55e;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Money Flow bars */
+.flow-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.flow-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.flow-label {
+    width: 28px;
+    font-size: 0.8rem;
+    color: #71717a;
+    flex-shrink: 0;
+}
+
+.flow-bar-bg {
+    flex: 1;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.flow-bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease-out;
+}
+
+.flow-bar-fill.income { background: #22c55e; }
+.flow-bar-fill.expense { background: #f43f5e; }
+
+.flow-amount {
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 70px;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.flow-net {
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.25rem 0;
+}
+
+.flow-sources {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.flow-source-row {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.flow-source-label {
+    color: #71717a;
+}
+
+/* Shared color utilities */
+.text-green { color: #22c55e; }
+.text-red { color: #f43f5e; }
+.text-yellow { color: #fbbf24; }
+
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+    .insight-card {
+        min-height: unset;
+        padding: 1rem;
+    }
+
+    .top-category-label {
+        min-width: 0;
+        font-size: 0.8rem;
+    }
+
+    .top-category-amount {
+        min-width: 0;
+        font-size: 0.8rem;
+    }
+
+    .forecast-bar-group {
+        gap: 0.35rem;
+    }
+}
+.text-muted { color: #71717a; }

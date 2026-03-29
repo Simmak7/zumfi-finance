@@ -1,0 +1,18 @@
+.zumfi-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 76px;
+    margin-bottom: 0.75rem;
+    margin-left: 0.25rem;
+    opacity: 0.75;
+    transition: opacity 0.3s ease;
+    cursor: default;
+    filter: drop-shadow(0 2px 6px rgba(99, 102, 241, 0.12))
+            drop-shadow(0 1px 3px rgba(212, 168, 67, 0.1));
+}
+
+.zumfi-home:hover {
+    opacity: 1;
+}

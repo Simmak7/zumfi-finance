@@ -1,0 +1,217 @@
+/* ── Guided Tour Overlay ── */
+.guided-tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+/* ── Backdrop SVG ── */
+.guided-tour-backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: all;
+}
+
+/* ── Highlight ring around target ── */
+.guided-tour-highlight {
+    position: absolute;
+    border: 2px solid rgba(99, 102, 241, 0.7);
+    border-radius: 8px;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), 0 0 20px rgba(99, 102, 241, 0.15);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    animation: tour-pulse 2s ease-in-out infinite;
+}
+
+@keyframes tour-pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), 0 0 20px rgba(99, 102, 241, 0.15); }
+    50% { box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.3), 0 0 30px rgba(99, 102, 241, 0.25); }
+}
+
+/* ── Tooltip ── */
+.guided-tour-tooltip {
+    position: absolute;
+    width: 340px;
+    background: #1e1e2e;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    pointer-events: all;
+    z-index: 10001;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.15);
+    transition: top 0.3s ease, left 0.3s ease, opacity 0.2s ease;
+    animation: tour-tooltip-in 0.25s ease-out;
+}
+
+.guided-tour-tooltip.loading {
+    opacity: 0.6;
+}
+
+@keyframes tour-tooltip-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Tooltip header ── */
+.tour-tooltip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.tour-phase-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.12);
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+}
+
+.tour-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tour-close-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+/* ── Tooltip content ── */
+.tour-tooltip-title {
+    margin: 0 0 0.4rem 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+}
+
+.tour-tooltip-text {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.55;
+}
+
+/* ── Phase progress dots ── */
+.tour-phase-dots {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0.75rem;
+}
+
+.tour-phase-dot {
+    width: 20px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.25s;
+}
+
+.tour-phase-dot.active {
+    background: #818cf8;
+    width: 28px;
+}
+
+.tour-phase-dot.done {
+    background: rgba(99, 102, 241, 0.4);
+}
+
+/* ── Footer ── */
+.tour-tooltip-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tour-step-counter {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    font-variant-numeric: tabular-nums;
+}
+
+.tour-tooltip-actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+/* ── Buttons ── */
+.tour-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tour-btn-skip {
+    background: none;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 0.4rem 0.5rem;
+}
+
+.tour-btn-skip:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tour-btn-prev {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tour-btn-prev:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.tour-btn-next {
+    background: #6366f1;
+    color: white;
+}
+
+.tour-btn-next:hover {
+    background: #5558e6;
+}
+
+.tour-btn-finish {
+    background: #10b981;
+    color: white;
+    padding: 0.4rem 1rem;
+}
+
+.tour-btn-finish:hover {
+    background: #0ea572;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+    .guided-tour-tooltip {
+        width: calc(100vw - 32px);
+        max-width: 340px;
+    }
+
+    .tour-btn-skip span {
+        display: none;
+    }
+}
