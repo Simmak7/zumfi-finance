@@ -260,8 +260,11 @@ zumfi-finance/
 | FIO Banka | PDF | Fully supported |
 | Revolut | PDF | Fully supported |
 | CSOB / Ceska Sporitelna | PDF | Fully supported |
-| Czech Universal | PDF | Fully supported |
+| UniCredit | PDF | Fully supported |
+| Universal format | PDF | Auto-detection fallback |
 | Any bank | CSV / Excel | Via import wizard |
+
+> **Your bank missing?** See [Contributing](#contributing) - we're building the world's most complete open-source bank parser, and every new format helps everyone.
 
 ---
 
@@ -284,13 +287,27 @@ See `.env.example` for all available configuration options:
 
 ## Contributing
 
-Contributions are welcome! Please open an issue first to discuss what you would like to change.
+**Our vision: the first truly universal open-source personal finance app** - one that can parse bank statements from any bank in the world, in any language, in any format.
+
+We already support several Czech banks and Revolut, but the world has thousands of banks. Every parser you contribute unlocks Zumfi for an entire country or institution. That's the power of open source.
+
+### How you can help
+
+**Add your bank's parser** - This is the single highest-impact contribution. Upload a sample statement (anonymized), write a parser, and suddenly every user of that bank can use Zumfi. We have a modular parser architecture that makes adding new banks straightforward.
+
+**Improve existing features** - Better charts, smarter categorization, new languages, accessibility improvements - all welcome.
+
+**Report bugs and suggest ideas** - Open an issue. Even "this doesn't work with my bank's PDF" is valuable feedback.
+
+### Getting started
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+Let's build something that gives everyone, everywhere, full control over their finances.
 
 ---
 
