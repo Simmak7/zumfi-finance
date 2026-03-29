@@ -115,7 +115,34 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 
 ---
 
-## Quick Start
+## Installation
+
+### The Lazy Way (AI-Assisted)
+
+Already using an AI coding agent? Just give it this prompt and let it handle the rest:
+
+**Claude Code / Claude CLI:**
+```
+Clone https://github.com/Simmak7/zumfi-finance.git and set it up:
+create .env from .env.example, generate a secure SECRET_KEY,
+and run docker-compose up -d --build. Then tell me the URL to open.
+```
+
+**OpenAI Codex / ChatGPT:**
+```
+Help me install Zumfi Finance from https://github.com/Simmak7/zumfi-finance.git
+- clone the repo, configure .env with a strong secret key, start Docker services
+```
+
+**Cursor / Windsurf / Any AI IDE:**
+> Open a terminal, paste the repo URL, and ask your AI assistant:
+> *"Set up this project with Docker"*
+
+The AI will clone, configure, build, and start everything. You just open **localhost:3001** when it's done.
+
+---
+
+### Manual Setup
 
 ### Prerequisites
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
