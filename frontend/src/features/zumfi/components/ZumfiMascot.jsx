@@ -58,6 +58,17 @@ export const ZumfiMascot = React.memo(function ZumfiMascot() {
         }
     }, [reaction, idleState, clickAnim]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // Failsafe: if proximity stays active for over 10s without drag, force reset
+    useEffect(() => {
+        const failsafe = setInterval(() => {
+            if (proximityActiveRef.current && !document.body.classList.contains('zumfi-dragging')) {
+                proximityActiveRef.current = false;
+                document.querySelectorAll('.zumfi-hover-glow').forEach(el => el.classList.remove('zumfi-hover-glow'));
+            }
+        }, 10_000);
+        return () => clearInterval(failsafe);
+    }, [proximityActiveRef]);
+
     const handlePointerDown = useCallback(() => {
         document.body.classList.add('zumfi-dragging');
     }, []);

@@ -10,6 +10,7 @@ const MASCOT_HEIGHT = 75;
 const PROXIMITY_MARGIN = 30;  // extra px around Zumfi for "near" detection
 const COOLDOWN_MS = 15_000;   // don't re-trigger same zone within 15s
 const THROTTLE_MS = 100;      // limit DOM queries to ~10/s
+const SPEECH_HOLD_MS = 2000;  // keep proximity flag briefly so speech isn't overwritten
 
 function rectsOverlap(a, b) {
     return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
@@ -42,7 +43,7 @@ export function useZumfiProximity() {
     const activeZoneRef = useRef(null);
     const cooldownMapRef = useRef({});
     const lastCheckRef = useRef(0);
-    const resetTimerRef = useRef(null);
+    const holdTimerRef = useRef(null);
 
     const isOnCooldown = useCallback((zoneId) => {
         const last = cooldownMapRef.current[zoneId];
@@ -53,24 +54,27 @@ export function useZumfiProximity() {
         const el = document.querySelector(`[data-zumfi-zone="${zoneId}"]`);
         if (el) {
             el.classList.toggle('zumfi-hover-glow', on);
-        } else if (on === false && activeZoneRef.current === zoneId) {
-            // Zone was removed from DOM while active — clean up
-            activeZoneRef.current = null;
         }
     }, []);
 
+    // Hard reset — called on drag end. No timers, no conditions.
     const clearActiveZone = useCallback(() => {
+        // Remove glow from any active zone
         if (activeZoneRef.current) {
             setGlow(activeZoneRef.current, false);
             activeZoneRef.current = null;
         }
-        // Reset proximity flag after a short delay so mood system resumes
-        clearTimeout(resetTimerRef.current);
-        resetTimerRef.current = setTimeout(() => {
+        // Also remove any stale glows (safety net for zones removed from DOM)
+        document.querySelectorAll('.zumfi-hover-glow').forEach(el => {
+            el.classList.remove('zumfi-hover-glow');
+        });
+
+        // Brief hold so speech bubble isn't immediately overwritten by mood
+        clearTimeout(holdTimerRef.current);
+        holdTimerRef.current = setTimeout(() => {
             proximityActiveRef.current = false;
-            // Reset visual state back to idle so the rabbit doesn't stay frozen
             setVisualState({ animation: 'idle' });
-        }, 3000);
+        }, SPEECH_HOLD_MS);
     }, [setGlow, proximityActiveRef, setVisualState]);
 
     const checkProximity = useCallback((x, y) => {
@@ -79,7 +83,6 @@ export function useZumfiProximity() {
         if (now - lastCheckRef.current < THROTTLE_MS) return;
         lastCheckRef.current = now;
 
-        // Skip if no dashboard data
         if (!pageDataRef.current) return;
 
         const newZone = detectZone(x, y);
@@ -94,12 +97,6 @@ export function useZumfiProximity() {
 
         if (!newZone) {
             activeZoneRef.current = null;
-            // Start decay timer for proximity flag
-            clearTimeout(resetTimerRef.current);
-            resetTimerRef.current = setTimeout(() => {
-                proximityActiveRef.current = false;
-                setVisualState({ animation: 'idle' });
-            }, 3000);
             return;
         }
 
@@ -112,7 +109,7 @@ export function useZumfiProximity() {
             const insight = generateInsight(newZone, pageDataRef.current);
             if (insight) {
                 proximityActiveRef.current = true;
-                clearTimeout(resetTimerRef.current);
+                clearTimeout(holdTimerRef.current);
 
                 showSpeechBubble(insight.text, insight.type);
                 setVisualState({
