@@ -6,7 +6,8 @@
 
 <p align="center">
   <strong>Your Personal Finance Companion</strong><br/>
-  Self-hosted, privacy-first finance management with AI-powered insights
+  Take full control of your finances. Privacy-first, self-hosted money management<br/>
+  with smart categorization and AI-powered insights — your data never leaves your server.
 </p>
 
 <p align="center">
