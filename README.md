@@ -59,6 +59,7 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 > **Your bank missing?** See [Contributing](#contributing) — we're building the world's most complete open-source bank parser, and every new format helps everyone.
 
 ### Smart Categorization
+- **Automatic AI-learned category allocation** of transactions from bank statements
 - **Intelligent categorization system:**
   - User-defined rules (highest priority)
   - AI-learned patterns from your corrections
