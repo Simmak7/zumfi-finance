@@ -41,8 +41,8 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 
 ### Dashboard and Analytics
 - **Monthly KPI cards** - income, expenses, savings rate, net worth at a glance
-- **Interactive charts** - spending trends, category breakdowns, income vs. expenses
-- **Month-close wizard** - guided workflow to review and finalize each month
+- **Interactive charts** - spending trends, expense category breakdowns
+- **Month-close wizard** - guided workflow to review and finalize each month with savings allocation to your own savings goals
 - **AI-powered insights** - anomaly detection, spend forecasts, recurring expense analysis (via local Ollama LLM)
 
 ### Bank Statement Parsing
