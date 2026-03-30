@@ -65,8 +65,10 @@ export function useZumfiProximity() {
         clearTimeout(resetTimerRef.current);
         resetTimerRef.current = setTimeout(() => {
             proximityActiveRef.current = false;
+            // Reset visual state back to idle so the rabbit doesn't stay frozen
+            setVisualState({ animation: 'idle' });
         }, 3000);
-    }, [setGlow, proximityActiveRef]);
+    }, [setGlow, proximityActiveRef, setVisualState]);
 
     const checkProximity = useCallback((x, y) => {
         // Throttle DOM queries
@@ -93,6 +95,7 @@ export function useZumfiProximity() {
             clearTimeout(resetTimerRef.current);
             resetTimerRef.current = setTimeout(() => {
                 proximityActiveRef.current = false;
+                setVisualState({ animation: 'idle' });
             }, 3000);
             return;
         }
