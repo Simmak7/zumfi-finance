@@ -260,7 +260,6 @@ zumfi-finance/
 | Bank | Format | Status |
 |------|--------|--------|
 | Raiffeisen CZ | PDF | Fully supported |
-| FIO Banka | PDF | Fully supported |
 | Revolut | PDF | Fully supported |
 | CSOB / Ceska Sporitelna | PDF | Fully supported |
 | UniCredit | PDF | Fully supported |
