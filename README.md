@@ -87,7 +87,7 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 ### Portfolio Tracker
 - **Savings accounts** with balance and interest tracking
 - **Investment accounts** - deposits, withdrawals, performance
-- **Stock holdings** - shares, cost basis, market value, P and L
+- **Stock holdings** - shares, cost basis, market value, profit and loss
 - **Real estate** - property values, mortgages, equity calculation
 - **Multi-currency** portfolio with CZK/EUR/USD support
 
