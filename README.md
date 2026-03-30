@@ -46,14 +46,16 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 - **AI-powered insights** - anomaly detection, spend forecasts, recurring expense analysis (via local Ollama LLM)
 
 ### Bank Statement Parsing
+- **Upload and parse** bank statements, stock statements, and savings account statements
 - **Automatic PDF parsing** for Czech banks:
   - Raiffeisen CZ
-  - FIO Banka
   - CSOB / Ceska Sporitelna
   - Revolut
   - Czech Universal format
 - **CSV and Excel import** wizard with column mapping
 - **Multi-account support** with automatic statement linking
+
+> **Your bank missing?** See [Contributing](#contributing) — we're building the world's most complete open-source bank parser, and every new format helps everyone.
 
 ### Smart Categorization
 - **4-tier intelligent categorization system:**
