@@ -35,6 +35,33 @@ Zumfi is a **full-stack, self-hosted personal finance application** that helps y
 
 Visit **[zumfi.net](https://zumfi.net)** for more information.
 
+### Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" alt="Dashboard — KPIs, charts, category breakdown" width="700" /><br/>
+  <em>Dashboard — income, expenses, savings rate, and category breakdown at a glance</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/transactions.png" alt="Transactions — search, filter, categorize" width="700" /><br/>
+  <em>Transactions — search, filter, and categorize with smart AI-powered suggestions</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/budget-goals.png" alt="Budget — planned vs actual spending" width="700" /><br/>
+  <em>Budget — compare planned vs. actual spending across all categories</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/portfolio.png" alt="Portfolio — savings, stocks, properties" width="700" /><br/>
+  <em>Portfolio — track savings, stocks, and property values in one place</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/bills.png" alt="Bills — recurring expenses and mortgages" width="700" /><br/>
+  <em>Bills — manage recurring expenses and mortgage payments</em>
+</p>
+
 ---
 
 ## Features

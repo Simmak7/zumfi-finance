@@ -51,7 +51,8 @@ legacy/
 work notes/
 
 # Internal planning docs
-docs/
+docs/plans/
+!docs/screenshots/
 IMPROVEMENT_PLAN.md
 PROJECT_MAP.md
 
@@ -104,7 +105,8 @@ pdf_analysis.txt
 text_analysis.txt
 
 # Personal / sensitive documents
-Zuzi docs/
+Zuzi docs/plans/
+!docs/screenshots/
 
 # Windows artifacts
 nul
