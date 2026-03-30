@@ -475,3 +475,46 @@ export function generateBudgetInsight(zoneId, data) {
     if (!generator || !data) return null;
     return generator(data);
 }
+
+export function budgetPageSummary(data) {
+    const { categories, totalPlanned, totalActual, remaining, usagePct } = data;
+
+    if (!categories?.length || !totalPlanned) {
+        return {
+            text: pick(["No budgets set yet — try Auto-suggest to create them from your spending history!", "Set up a budget and I'll track every category for you."]),
+            type: 'neutral', expression: 'neutral', mouth: 'neutral', animation: 'wave',
+        };
+    }
+
+    const pct = usagePct > 1 ? Math.round(usagePct) : Math.round((usagePct || (totalActual / totalPlanned)) * 100);
+    const overBudget = (categories || []).filter(c => (c.actual || c.spent || 0) > (c.planned || c.budget || 0));
+    const worstCat = overBudget.sort((a, b) => ((b.actual || b.spent || 0) - (b.planned || b.budget || 0)) - ((a.actual || a.spent || 0) - (a.planned || a.budget || 0)))[0];
+
+    if (pct > 100) {
+        return {
+            text: pick([
+                `Budget is ${pct}% used — over by ${formatMoney(Math.abs(remaining || totalActual - totalPlanned))}! ${worstCat ? `"${worstCat.name || worstCat.category}" is the biggest offender.` : 'Time to tighten up.'}`,
+                `Overspent by ${formatMoney(Math.abs(remaining || totalActual - totalPlanned))} (${pct}% of budget). ${overBudget.length} categor${overBudget.length === 1 ? 'y is' : 'ies are'} over limit.`,
+            ]),
+            type: 'warning', expression: 'concerned', mouth: 'frown', animation: 'idle',
+        };
+    }
+
+    if (pct <= 60) {
+        return {
+            text: pick([
+                `Only ${pct}% of budget used with ${formatMoney(remaining || totalPlanned - totalActual)} remaining. You're well ahead — great discipline!`,
+                `Budget looking healthy at ${pct}% usage. Plenty of room with ${formatMoney(remaining || totalPlanned - totalActual)} left.`,
+            ]),
+            type: 'positive', expression: 'happy', mouth: 'smile', animation: 'hop',
+        };
+    }
+
+    return {
+        text: pick([
+            `Budget is ${pct}% used — ${formatMoney(remaining || totalPlanned - totalActual)} remaining. ${overBudget.length > 0 ? `${overBudget.length} categor${overBudget.length === 1 ? 'y' : 'ies'} over limit.` : 'All categories within bounds!'}`,
+            `${formatMoney(totalActual)} spent of ${formatMoney(totalPlanned)} budgeted (${pct}%). ${overBudget.length === 0 ? 'Everything under control!' : `Watch "${(overBudget[0]?.name || overBudget[0]?.category) || 'top spender'}".`}`,
+        ]),
+        type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'idle',
+    };
+}

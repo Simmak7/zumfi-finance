@@ -85,6 +85,7 @@ export function ZumfiProvider({ children }) {
     const speechTimerRef = useRef(null);
     const pageDataRef = useRef(null);
     const proximityActiveRef = useRef(false);
+    const pageReactionActiveRef = useRef(false);
 
     // Persist prefs
     useEffect(() => {
@@ -127,7 +128,11 @@ export function ZumfiProvider({ children }) {
     }, []);
 
     const setPageData = useCallback((data) => {
+        const prevPage = pageDataRef.current?._page;
         pageDataRef.current = data;
+        if (data?._page && data._page !== prevPage) {
+            window.dispatchEvent(new CustomEvent('zumfi-page-change', { detail: { page: data._page } }));
+        }
     }, []);
 
     // Cleanup speech timer
@@ -149,6 +154,7 @@ export function ZumfiProvider({ children }) {
         toggleMuteSpeech,
         pageDataRef,
         proximityActiveRef,
+        pageReactionActiveRef,
         setPageData,
     };
 

@@ -582,3 +582,49 @@ export function generateDashboardInsight(zoneId, data) {
     if (!generator || !data) return null;
     return generator(data);
 }
+
+// ── Page Summary (auto-triggered on navigation) ─────────────────────────────
+export function dashboardPageSummary(data) {
+    const { totalIncome, totalExpenses, savingsRate, remainingBudget, topCategories, monthlyHistory } = data;
+
+    if (!totalIncome && !totalExpenses) {
+        return {
+            text: pick(["Your dashboard is empty — import a bank statement to see your finances come alive!", "No data yet! Upload a statement and I'll crunch the numbers for you."]),
+            type: 'neutral', expression: 'neutral', mouth: 'neutral', animation: 'wave',
+        };
+    }
+
+    const net = totalIncome - totalExpenses;
+    const savPct = Math.round((savingsRate || 0) * 100);
+    const topCat = topCategories?.[0]?.name || topCategories?.[0]?.category;
+    const months = monthlyHistory?.months || monthlyHistory || [];
+    const trend = months.length >= 3 ? analyzeTrend(months.map(m => m.total_expenses || m.expenses || 0)) : null;
+
+    if (net < 0) {
+        return {
+            text: pick([
+                `Spending exceeds income by ${formatMoney(Math.abs(net))} this month. ${topCat ? `"${topCat}" is the biggest category.` : ''} Let's find where to cut back!`,
+                `We're ${formatMoney(Math.abs(net))} in the red this month. ${trend?.direction === 'rising' ? 'Expenses have been climbing — time to act.' : 'Let me help find savings.'}`,
+            ]),
+            type: 'warning', expression: 'concerned', mouth: 'frown', animation: 'idle',
+        };
+    }
+
+    if (savPct >= 30) {
+        return {
+            text: pick([
+                `Amazing — ${savPct}% savings rate! You're keeping ${formatMoney(net)} this month. ${trend?.direction === 'falling' ? 'Expenses are trending down too!' : 'Keep it up!'}`,
+                `${savPct}% saved with ${formatMoney(remainingBudget || net)} remaining in budget. ${topCat ? `"${topCat}" leads spending.` : ''} Impressive discipline!`,
+            ]),
+            type: 'positive', expression: 'excited', mouth: 'open', animation: 'hop',
+        };
+    }
+
+    return {
+        text: pick([
+            `Income: ${formatMoney(totalIncome)}, spending: ${formatMoney(totalExpenses)} — ${savPct}% savings rate. ${topCat ? `Top category: "${topCat}".` : ''} ${remainingBudget > 0 ? `${formatMoney(remainingBudget)} budget left.` : ''}`,
+            `Net surplus of ${formatMoney(net)} this month (${savPct}% saved). ${trend?.direction === 'rising' ? 'Heads up — expenses are trending upward.' : 'Looking stable!'}`,
+        ]),
+        type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'idle',
+    };
+}

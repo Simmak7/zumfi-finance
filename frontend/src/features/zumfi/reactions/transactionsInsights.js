@@ -516,3 +516,51 @@ export function generateTransactionsInsight(zoneId, data) {
     if (!generator || !data) return null;
     return generator(data);
 }
+
+export function transactionsPageSummary(data) {
+    const { total, reviewCount, transactions, statements } = data;
+
+    if (total === 0) {
+        return {
+            text: pick(["No transactions yet — import a bank statement and I'll parse everything automatically!", "Your transaction list is empty. Upload a PDF or CSV to get started."]),
+            type: 'neutral', expression: 'neutral', mouth: 'neutral', animation: 'wave',
+        };
+    }
+
+    const txs = transactions || [];
+    const merchants = {};
+    txs.forEach(t => {
+        const name = (t.merchant || t.description || t.counterparty || '').trim();
+        if (name) merchants[name] = (merchants[name] || 0) + 1;
+    });
+    const topMerchant = Object.entries(merchants).sort((a, b) => b[1] - a[1])[0];
+    const stmtCount = statements?.length || 0;
+
+    if (reviewCount > 10) {
+        return {
+            text: pick([
+                `${total} transactions loaded, ${reviewCount} need review. ${topMerchant ? `"${topMerchant[0]}" appears ${topMerchant[1]} times — try bulk-categorizing those first!` : 'Use bulk select to speed through them!'}`,
+                `Big backlog: ${reviewCount} uncategorized out of ${total}. ${stmtCount > 0 ? `Across ${stmtCount} imported statements.` : ''} Let's clear those!`,
+            ]),
+            type: 'warning', expression: 'concerned', mouth: 'neutral', animation: 'idle',
+        };
+    }
+
+    if (reviewCount > 0) {
+        return {
+            text: pick([
+                `${total} transactions, just ${reviewCount} left to review. ${topMerchant ? `Most frequent: "${topMerchant[0]}" (${topMerchant[1]}x).` : ''} Almost clean!`,
+                `Nearly there — ${reviewCount} more to categorize out of ${total}. Your data is almost spotless!`,
+            ]),
+            type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'idle',
+        };
+    }
+
+    return {
+        text: pick([
+            `All ${total} transactions categorized! ${topMerchant ? `Top merchant: "${topMerchant[0]}" (${topMerchant[1]} visits).` : ''} ${stmtCount > 0 ? `From ${stmtCount} statements.` : ''} Pristine data!`,
+            `Clean inbox: ${total} transactions, zero to review. ${topMerchant ? `"${topMerchant[0]}" is your most visited place.` : ''} Financial data is ready for analysis!`,
+        ]),
+        type: 'positive', expression: 'excited', mouth: 'open', animation: 'hop',
+    };
+}

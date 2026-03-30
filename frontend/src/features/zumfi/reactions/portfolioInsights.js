@@ -1105,3 +1105,53 @@ export function generatePortfolioInsight(zoneId, data) {
     if (!generator || !data) return null;
     return generator(data);
 }
+
+export function portfolioPageSummary(data) {
+    const summary = data.summary || data;
+    const total = summary.total_portfolio || summary.totalPortfolio || 0;
+    const savings = summary.total_savings || summary.savings || 0;
+    const stocks = summary.total_stocks || summary.stocks || 0;
+    const properties = summary.total_properties || summary.properties || 0;
+    const delta = summary.delta_total || summary.deltaTotal || summary.portfolioChange || 0;
+
+    if (!total || total === 0) {
+        return {
+            text: pick(["Your portfolio is empty — add savings accounts, stocks, or properties to start tracking!", "No portfolio data yet. Track your assets here and watch your net worth grow."]),
+            type: 'neutral', expression: 'neutral', mouth: 'neutral', animation: 'wave',
+        };
+    }
+
+    const parts = [];
+    if (savings > 0) parts.push(`savings ${formatMoney(savings)}`);
+    if (stocks > 0) parts.push(`stocks ${formatMoney(stocks)}`);
+    if (properties > 0) parts.push(`property ${formatMoney(properties)}`);
+    const breakdown = parts.length > 0 ? parts.join(', ') : '';
+
+    if (delta > 0) {
+        return {
+            text: pick([
+                `Portfolio at ${formatMoney(total)} — up ${formatMoney(delta)} vs last month! ${breakdown ? `Split: ${breakdown}.` : ''}`,
+                `${formatMoney(total)} total portfolio, growing by ${formatMoney(delta)}. ${properties > total * 0.7 ? 'Property-heavy — consider diversifying.' : 'Nice diversification!'}`,
+            ]),
+            type: 'positive', expression: 'excited', mouth: 'smile', animation: 'hop',
+        };
+    }
+
+    if (delta < 0) {
+        return {
+            text: pick([
+                `Portfolio at ${formatMoney(total)}, down ${formatMoney(Math.abs(delta))} from last month. ${stocks > 0 ? 'Market fluctuations are normal — stay the course.' : 'Let\'s review what changed.'}`,
+                `${formatMoney(total)} total, ${formatMoney(Math.abs(delta))} decline this month. ${breakdown ? `Breakdown: ${breakdown}.` : ''} Long-term matters most.`,
+            ]),
+            type: 'neutral', expression: 'neutral', mouth: 'neutral', animation: 'idle',
+        };
+    }
+
+    return {
+        text: pick([
+            `Portfolio overview: ${formatMoney(total)} total. ${breakdown ? `${breakdown}.` : ''} Holding steady this month.`,
+            `${formatMoney(total)} across your assets. ${parts.length >= 3 ? 'Well diversified!' : parts.length >= 2 ? 'Good spread across asset types.' : 'Consider adding more asset types for diversification.'}`,
+        ]),
+        type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'idle',
+    };
+}

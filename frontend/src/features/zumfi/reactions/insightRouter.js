@@ -1,12 +1,12 @@
 // Central dispatcher — routes zone insights to page-specific generators.
 
-import { generateDashboardInsight } from './dashboardInsights';
-import { generateTransactionsInsight } from './transactionsInsights';
-import { generateBudgetInsight } from './budgetInsights';
-import { generateBillsInsight } from './billsInsights';
-import { generateImportInsight } from './importInsights';
-import { generatePortfolioInsight } from './portfolioInsights';
-import { generateSettingsInsight } from './settingsInsights';
+import { generateDashboardInsight, dashboardPageSummary } from './dashboardInsights';
+import { generateTransactionsInsight, transactionsPageSummary } from './transactionsInsights';
+import { generateBudgetInsight, budgetPageSummary } from './budgetInsights';
+import { generateBillsInsight, billsPageSummary } from './billsInsights';
+import { generateImportInsight, importPageSummary } from './importInsights';
+import { generatePortfolioInsight, portfolioPageSummary } from './portfolioInsights';
+import { generateSettingsInsight, settingsPageSummary } from './settingsInsights';
 
 const PAGE_GENERATORS = {
     dashboard: generateDashboardInsight,
@@ -18,9 +18,26 @@ const PAGE_GENERATORS = {
     settings: generateSettingsInsight,
 };
 
+const PAGE_SUMMARY_GENERATORS = {
+    dashboard: dashboardPageSummary,
+    transactions: transactionsPageSummary,
+    budget: budgetPageSummary,
+    bills: billsPageSummary,
+    import: importPageSummary,
+    portfolio: portfolioPageSummary,
+    settings: settingsPageSummary,
+};
+
 export function generateInsight(zoneId, data) {
     if (!data || !data._page) return null;
     const generator = PAGE_GENERATORS[data._page];
     if (!generator) return null;
     return generator(zoneId, data);
+}
+
+export function generatePageSummary(data) {
+    if (!data || !data._page) return null;
+    const generator = PAGE_SUMMARY_GENERATORS[data._page];
+    if (!generator) return null;
+    return generator(data);
 }

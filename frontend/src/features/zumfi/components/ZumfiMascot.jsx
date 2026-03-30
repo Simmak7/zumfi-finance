@@ -5,6 +5,7 @@ import { useZumfiDrag, getHomePosition } from '../hooks/useZumfiDrag';
 import { useIdleBehavior } from '../hooks/useIdleBehavior';
 import { useFinancialMood } from '../hooks/useFinancialMood';
 import { useZumfiProximity } from '../hooks/useZumfiProximity';
+import { usePageReaction } from '../hooks/usePageReaction';
 import { zumfiVariants } from '../animations/variants';
 import { ZumfiBody } from './ZumfiBody';
 import { SpeechBubble } from './SpeechBubble';
@@ -15,12 +16,13 @@ import './ZumfiProximity.css';
 const CLICK_ANIMATIONS = ['hop', 'wave'];
 
 export const ZumfiMascot = React.memo(function ZumfiMascot() {
-    const { visual, speechBubble, prefs, setVisualState, showSpeechBubble, dismissSpeechBubble, proximityActiveRef } = useZumfi();
+    const { visual, speechBubble, prefs, setVisualState, showSpeechBubble, dismissSpeechBubble, proximityActiveRef, pageReactionActiveRef } = useZumfi();
     const { constraints, isClick, position, setPosition, resetPosition } = useZumfiDrag();
     const { reaction } = useFinancialMood();
     const hasReaction = !!reaction;
     const { idleState, wakeUp } = useIdleBehavior(!hasReaction);
     const { checkProximity, clearActiveZone } = useZumfiProximity();
+    usePageReaction();
     const [clickAnim, setClickAnim] = useState(null);
     const clickTimerRef = useRef(null);
 
@@ -35,9 +37,10 @@ export const ZumfiMascot = React.memo(function ZumfiMascot() {
         motionY.set(position.y);
     }, [position.x, position.y, motionX, motionY]);
 
-    // Apply financial reaction or idle state (skip if proximity interaction is active)
+    // Apply financial reaction or idle state (skip if proximity or page reaction is active)
     useEffect(() => {
         if (proximityActiveRef.current) return;
+        if (pageReactionActiveRef.current) return;
         if (reaction) {
             setVisualState({
                 expression: reaction.expression,

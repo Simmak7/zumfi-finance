@@ -568,3 +568,57 @@ export function generateBillsInsight(zoneId, data) {
     if (!generator || !data) return null;
     return generator(data);
 }
+
+export function billsPageSummary(data) {
+    const { billStatuses, totalMonthly, paidCount, overdueCount, mortgages, activeTab } = data;
+    const bills = billStatuses || [];
+    const totalBills = bills.length;
+    const morts = mortgages || [];
+
+    if (totalBills === 0 && morts.length === 0) {
+        return {
+            text: pick(["No bills or mortgages tracked yet. Add your recurring expenses and I'll keep an eye on them!", "Track your fixed costs here — electricity, subscriptions, mortgage. I'll remind you what's due."]),
+            type: 'neutral', expression: 'neutral', mouth: 'neutral', animation: 'wave',
+        };
+    }
+
+    if (activeTab === 'mortgage' && morts.length > 0) {
+        const totalRemaining = morts.reduce((s, m) => s + (m.remaining_balance || m.remaining || 0), 0);
+        const totalMonthlyMort = morts.reduce((s, m) => s + (m.monthly_payment || m.amount || 0), 0);
+        return {
+            text: pick([
+                `${morts.length} mortgage${morts.length !== 1 ? 's' : ''} with ${formatMoney(totalRemaining)} remaining. Monthly payments: ${formatMoney(totalMonthlyMort)}.`,
+                `Mortgage overview: ${formatMoney(totalRemaining)} outstanding across ${morts.length} loan${morts.length !== 1 ? 's' : ''}. ${formatMoney(totalMonthlyMort)}/month in payments.`,
+            ]),
+            type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'idle',
+        };
+    }
+
+    if (overdueCount > 0) {
+        return {
+            text: pick([
+                `${overdueCount} bill${overdueCount !== 1 ? 's' : ''} overdue! ${paidCount} of ${totalBills} paid so far. Total fixed costs: ${formatMoney(totalMonthly || 0)}/month.`,
+                `Heads up — ${overdueCount} unpaid bill${overdueCount !== 1 ? 's' : ''}. Let's get those sorted. ${totalBills - overdueCount} already taken care of.`,
+            ]),
+            type: 'warning', expression: 'concerned', mouth: 'frown', animation: 'idle',
+        };
+    }
+
+    if (paidCount === totalBills && totalBills > 0) {
+        return {
+            text: pick([
+                `All ${totalBills} bills paid this month — ${formatMoney(totalMonthly || 0)} in fixed costs covered! Clean slate.`,
+                `Every bill is checked off! ${formatMoney(totalMonthly || 0)}/month in recurring expenses, all handled.`,
+            ]),
+            type: 'positive', expression: 'excited', mouth: 'open', animation: 'hop',
+        };
+    }
+
+    return {
+        text: pick([
+            `${paidCount} of ${totalBills} bills paid. ${formatMoney(totalMonthly || 0)}/month in fixed expenses. ${totalBills - paidCount} still pending.`,
+            `Bills: ${paidCount}/${totalBills} done. Total monthly fixed costs: ${formatMoney(totalMonthly || 0)}. Keep checking them off!`,
+        ]),
+        type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'idle',
+    };
+}

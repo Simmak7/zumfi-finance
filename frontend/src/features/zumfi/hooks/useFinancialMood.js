@@ -11,6 +11,7 @@ import {
 import { useZumfi } from '../context/ZumfiContext';
 
 const POLL_INTERVAL = 10 * 60 * 1000; // 10 minutes
+const MOOD_SPEECH_DELAY = 4000; // wait before showing mood speech (gives page reaction time)
 const DEBOUNCE_MS = 1000;
 
 function getCurrentMonth() {
@@ -29,7 +30,7 @@ const FINANCIAL_EVENTS = [
 ];
 
 export function useFinancialMood() {
-    const { showSpeechBubble } = useZumfi();
+    const { showSpeechBubble, proximityActiveRef, pageReactionActiveRef } = useZumfi();
     const [reaction, setReaction] = useState(null);
     const [healthScore, setHealthScore] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -88,9 +89,10 @@ export function useFinancialMood() {
             const updatedMemory = updateMemory(memory, mood.moodId, score.total, month);
             saveMemory(updatedMemory);
 
-            // Try AI-powered speech bubble (non-blocking)
+            // Try AI-powered speech bubble (non-blocking, respects priority)
             fetchAiInsight(snapshot, score, mood).then(aiText => {
                 if (controller.signal.aborted) return;
+                if (proximityActiveRef.current || pageReactionActiveRef.current) return;
                 if (aiText && aiText !== lastSpeechRef.current) {
                     lastSpeechRef.current = aiText;
                     const type = mood.priority >= 70 ? 'warning' : mood.priority >= 50 ? 'positive' : 'neutral';
@@ -136,22 +138,23 @@ export function useFinancialMood() {
     }, [evaluate]);
 
     // Fallback: show static speech bubble if AI didn't fire
+    // Respects proximity and page-reaction priority
     useEffect(() => {
         if (reaction?.speechBubble) {
             const text = reaction.speechBubble.text;
-            // Only show static text if AI hasn't already spoken
             if (text !== lastSpeechRef.current) {
-                // Delay static fallback to give AI time to respond
                 const timer = setTimeout(() => {
+                    // Don't overwrite proximity or page-change reactions
+                    if (proximityActiveRef.current || pageReactionActiveRef.current) return;
                     if (text !== lastSpeechRef.current) {
                         lastSpeechRef.current = text;
                         showSpeechBubble(text, reaction.speechBubble.type, 6000);
                     }
-                }, 3000);
+                }, MOOD_SPEECH_DELAY);
                 return () => clearTimeout(timer);
             }
         }
-    }, [reaction, showSpeechBubble]);
+    }, [reaction, showSpeechBubble, proximityActiveRef, pageReactionActiveRef]);
 
     return { reaction, healthScore, loading };
 }

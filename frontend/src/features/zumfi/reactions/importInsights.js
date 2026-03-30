@@ -178,3 +178,26 @@ export function generateImportInsight(zoneId, data) {
     if (!generator || !data) return null;
     return generator(data);
 }
+
+export function importPageSummary(data) {
+    const { view, step, hasFile } = data;
+
+    if (view === 'documents') {
+        return {
+            text: pick(["Your import library — every statement you've uploaded is here. Ready to add more?", "Browsing your document history. Click 'Import' to add a new statement!"]),
+            type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'idle',
+        };
+    }
+
+    if (step > 0 && hasFile) {
+        return {
+            text: pick([`You're on step ${step + 1} of the import wizard — keep going!`, "Mid-import! Follow the steps and I'll handle the parsing."]),
+            type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'hop',
+        };
+    }
+
+    return {
+        text: pick(["Ready to import! I support PDF, CSV, and Excel bank statements. Drag and drop or browse to get started.", "Upload your next bank statement — I'll auto-detect the format and parse all transactions."]),
+        type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'wave',
+    };
+}

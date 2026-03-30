@@ -284,3 +284,34 @@ export function generateSettingsInsight(zoneId, data) {
     if (!generator || !data) return null;
     return generator(data);
 }
+
+export function settingsPageSummary(data) {
+    const { accountCreated, signupDate, firstTransaction, userStats, preferredCurrency } = data || {};
+
+    const startDate = accountCreated || signupDate || firstTransaction;
+    let monthsUsing = 0;
+    if (startDate) {
+        const start = new Date(startDate);
+        const now = new Date();
+        if (!isNaN(start.getTime())) {
+            monthsUsing = Math.max(0, (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()));
+        }
+    }
+
+    const totalTx = userStats?.totalTransactions || userStats?.transactionCount || 0;
+
+    if (monthsUsing > 0 && totalTx > 0) {
+        return {
+            text: pick([
+                `Settings — you've been with me for ${monthsUsing} month${monthsUsing !== 1 ? 's' : ''} and tracked ${totalTx} transactions! Fine-tune your experience here.`,
+                `${monthsUsing} months and ${totalTx} transactions later — let's make sure everything is set up just right for you.`,
+            ]),
+            type: 'positive', expression: 'happy', mouth: 'smile', animation: 'wave',
+        };
+    }
+
+    return {
+        text: pick(["Welcome to settings! Customize your currency, language, and navigation preferences here.", "Your control panel — set up Zumfi exactly how you like it."]),
+        type: 'neutral', expression: 'happy', mouth: 'smile', animation: 'wave',
+    };
+}
