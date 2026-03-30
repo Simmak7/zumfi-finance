@@ -47,6 +47,7 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 
 ### Bank Statement Parsing
 - **Upload and parse** bank statements, stock statements, and savings account statements
+- **Multi-currency support** with automatic conversion
 - **Automatic PDF parsing** for Czech banks:
   - Raiffeisen CZ
   - CSOB / Ceska Sporitelna
@@ -76,7 +77,6 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 - **Goal tracking** with target amounts and deadlines
 - **Allocation wizard** - distribute surplus income across goals
 - **Progress visualization** with contribution history
-- **Multi-currency support** with automatic conversion
 
 ### Bills and Mortgages
 - **Recurring bill tracker** with due date reminders
