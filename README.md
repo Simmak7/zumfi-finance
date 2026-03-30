@@ -29,7 +29,7 @@
 
 ## What is Zumfi?
 
-Zumfi is a **full-stack, self-hosted personal finance application** that helps you take complete control of your money. Upload bank statements, automatically categorize transactions, set budgets and savings goals, track your portfolio, and get AI-powered financial insights - all running on your own infrastructure with your data never leaving your server.
+Zumfi is a **full-stack, self-hosted personal finance application** that helps you take complete control of your money. Upload bank statements, automatically categorize transactions, track your expenses, set budgets and savings goals, track your mortgage as well as your portfolio (stocks, savings accounts, property values), and get AI-powered financial insights — all running on your own infrastructure with your data never leaving your server.
 
 **Your data stays yours.** No cloud subscriptions, no third-party analytics, no data selling. Everything runs locally via Docker.
 
