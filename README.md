@@ -128,7 +128,7 @@ Already using an AI coding agent? Just give it this prompt and let it handle the
 ```
 Clone https://github.com/Simmak7/zumfi-finance.git and set it up:
 create .env from .env.example, generate a secure SECRET_KEY,
-and run docker-compose up -d --build. Then tell me the URL to open.
+and run docker compose up -d --build. Then tell me the URL to open.
 ```
 
 **OpenAI Codex / ChatGPT:**
@@ -147,18 +147,18 @@ The AI will clone, configure, build, and start everything. You just open **local
 
 ### Manual Setup
 
-### Prerequisites
+#### Prerequisites
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
 - 4 GB RAM minimum (8 GB recommended for AI features)
 
-### 1. Clone the repository
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Simmak7/zumfi-finance.git
 cd zumfi-finance
 ```
 
-### 2. Configure environment
+#### 2. Configure environment
 
 ```bash
 cp .env.example .env
@@ -169,10 +169,10 @@ Edit `.env` and set a strong `SECRET_KEY`:
 SECRET_KEY=your-random-32-character-string-here
 ```
 
-### 3. Start all services
+#### 3. Start all services
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 This starts:
@@ -185,11 +185,11 @@ This starts:
 | **Ollama** | Local AI (optional) | 11435 |
 | **Celery** | Background tasks | - |
 
-### 4. Open the app
+#### 4. Open the app
 
 Navigate to **http://localhost:3001** and create your account.
 
-### 5. Optional - Enable AI insights
+#### 5. Optional — Enable AI insights
 
 Pull a model into Ollama for AI-powered analysis:
 ```bash
