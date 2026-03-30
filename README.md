@@ -51,6 +51,7 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
   - Raiffeisen CZ
   - CSOB / Ceska Sporitelna
   - Revolut
+  - UniCredit
   - Czech Universal format
 - **CSV and Excel import** wizard with column mapping
 - **Multi-account support** with automatic statement linking
