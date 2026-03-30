@@ -59,12 +59,10 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 > **Your bank missing?** See [Contributing](#contributing) — we're building the world's most complete open-source bank parser, and every new format helps everyone.
 
 ### Smart Categorization
-- **4-tier intelligent categorization system:**
-  1. User-defined rules (highest priority)
-  2. AI-learned patterns from your corrections
-  3. Keyword-based matching
-  4. Fuzzy fallback classification
-- **Drag-and-drop category editor** with custom sections
+- **Intelligent categorization system:**
+  - User-defined rules (highest priority)
+  - AI-learned patterns from your corrections
+  - Keyword-based matching
 - **Auto-learning** - correcting a category teaches the system for next time
 
 ### Budgets
