@@ -58,7 +58,12 @@ export const ZumfiMascot = React.memo(function ZumfiMascot() {
         }
     }, [reaction, idleState, clickAnim]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const handlePointerDown = useCallback(() => {
+        document.body.classList.add('zumfi-dragging');
+    }, []);
+
     const handleDragStart = useCallback(() => {
+        // Class already added by pointerDown — ensure it's there
         document.body.classList.add('zumfi-dragging');
     }, []);
 
@@ -67,7 +72,6 @@ export const ZumfiMascot = React.memo(function ZumfiMascot() {
     }, [checkProximity, motionX, motionY]);
 
     const handleDragEnd = useCallback((event, info) => {
-        document.body.classList.remove('zumfi-dragging');
         clearActiveZone();
         if (isClick(event, info)) {
             // Barely moved — snap back to pre-drag position and play click anim
@@ -135,10 +139,11 @@ export const ZumfiMascot = React.memo(function ZumfiMascot() {
                 top: constraints.top,
                 bottom: constraints.bottom,
             }}
+            onPointerDown={(e) => { handlePointerDown(); wakeUp(); }}
+            onPointerUp={() => document.body.classList.remove('zumfi-dragging')}
             onDragStart={handleDragStart}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
-            onMouseDown={wakeUp}
             onDoubleClick={goHome}
             whileHover={{ scale: 1.05 }}
         >

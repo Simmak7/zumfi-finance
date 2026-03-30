@@ -53,6 +53,9 @@ export function useZumfiProximity() {
         const el = document.querySelector(`[data-zumfi-zone="${zoneId}"]`);
         if (el) {
             el.classList.toggle('zumfi-hover-glow', on);
+        } else if (on === false && activeZoneRef.current === zoneId) {
+            // Zone was removed from DOM while active — clean up
+            activeZoneRef.current = null;
         }
     }, []);
 
