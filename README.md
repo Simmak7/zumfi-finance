@@ -224,6 +224,16 @@ Let's build something that gives everyone, everywhere, full control over their f
 
 ---
 
+## Support the Project
+
+If Zumfi helps you manage your finances, consider supporting the project:
+
+- [GitHub Sponsors](https://github.com/sponsors/mzsim) - Buy a carrot for Zumfi the rabbit!
+- Star this repository
+- Share with friends
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -314,16 +324,6 @@ See `.env.example` for all available configuration options:
 ---
 
 
-
-## Support the Project
-
-If Zumfi helps you manage your finances, consider supporting the project:
-
-- [GitHub Sponsors](https://github.com/sponsors/mzsim) - Buy a carrot for Zumfi the rabbit!
-- Star this repository
-- Share with friends
-
----
 
 ## Roadmap
 
