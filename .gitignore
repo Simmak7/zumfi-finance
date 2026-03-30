@@ -82,8 +82,8 @@ test_cs_run.py
 
 # Playwright root config & tests
 playwright.config.js
-package.json
-package-lock.json
+/package.json
+/package-lock.json
 /tests/
 
 # Seed demo script (contains test credentials)
