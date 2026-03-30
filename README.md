@@ -198,6 +198,32 @@ docker exec finance_ollama ollama pull llama3.2
 
 ---
 
+## Contributing
+
+**Our vision: the first truly universal open-source personal finance app** — one that can parse bank statements from any bank in the world, in any language, in any format.
+
+We already support several Czech banks and Revolut, but the world has thousands of banks. Every parser to support new bank statement analysis and transaction uploads you contribute unlocks Zumfi for an entire country or institution. That's the power of open source.
+
+### How you can help
+
+**Add your bank's parser for your bank statements** — This is the single highest-impact contribution. Upload a sample statement (anonymized), write a parser, and suddenly every user of that bank can use Zumfi. We have a modular parser architecture that makes adding new banks straightforward.
+
+**Improve existing features** — Better charts, smarter categorization, new languages, accessibility improvements — all welcome.
+
+**Report bugs and suggest ideas** — Open an issue. Even "this doesn't work with my bank's PDF" is valuable feedback.
+
+### Getting started
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Let's build something that gives everyone, everywhere, full control over their finances.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -287,31 +313,7 @@ See `.env.example` for all available configuration options:
 
 ---
 
-## Contributing
 
-**Our vision: the first truly universal open-source personal finance app** - one that can parse bank statements from any bank in the world, in any language, in any format.
-
-We already support several Czech banks and Revolut, but the world has thousands of banks. Every parser you contribute unlocks Zumfi for an entire country or institution. That's the power of open source.
-
-### How you can help
-
-**Add your bank's parser** - This is the single highest-impact contribution. Upload a sample statement (anonymized), write a parser, and suddenly every user of that bank can use Zumfi. We have a modular parser architecture that makes adding new banks straightforward.
-
-**Improve existing features** - Better charts, smarter categorization, new languages, accessibility improvements - all welcome.
-
-**Report bugs and suggest ideas** - Open an issue. Even "this doesn't work with my bank's PDF" is valuable feedback.
-
-### Getting started
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-Let's build something that gives everyone, everywhere, full control over their finances.
-
----
 
 ## Support the Project
 
