@@ -270,6 +270,22 @@ function zumiInsight(data) {
     };
 }
 
+// ── Donate / Buy a Carrot ─────────────────────────────────────────────────
+function donateInsight() {
+    return {
+        text: pick([
+            "Oh, a carrot?! For ME?! I'm literally hopping with excitement! Carrots are my absolute favorite — crunchy, orange, and full of vitamins. Just like good financial data!",
+            "Did someone say carrot?! 🥕 I've been SO hungry watching all these numbers all day. A carrot would really keep my energy up for more budget analysis!",
+            "You're looking at the carrot section! Fun fact: I run entirely on carrots and good financial decisions. One carrot = one happy rabbit giving you better insights!",
+            "I smell carrots! My favorite food in the whole world! Every carrot you buy fuels my ability to analyze your spending patterns. It's science. Rabbit science.",
+            "Ooh ooh ooh! The carrot page! I've been dreaming about this. You know what pairs well with a carrot? A balanced budget. And I see you have both!",
+            "CARROTS! My nose is twitching! Did you know rabbits can eat up to 10 carrots a day? I'm not saying I need that many... but I wouldn't say no either.",
+        ]),
+        type: 'positive', expression: 'excited', mouth: 'open', animation: 'celebrate',
+        envEffect: 'hearts',
+    };
+}
+
 // ── Main Entry Point ────────────────────────────────────────────────────────
 const ZONE_GENERATORS = {
     'settings-header': headerInsight,
@@ -277,6 +293,7 @@ const ZONE_GENERATORS = {
     'settings-navigation': navigationInsight,
     'settings-appearance': appearanceInsight,
     'settings-zumi': zumiInsight,
+    'donate': donateInsight,
 };
 
 export function generateSettingsInsight(zoneId, data) {
