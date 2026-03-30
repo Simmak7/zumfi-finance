@@ -67,6 +67,12 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
   - Keyword-based matching
 - **Auto-learning** - correcting a category teaches the system for next time
 
+### Bills and Mortgages
+- **Recurring bill tracker** with due date reminders
+- **Mortgage calculator** with amortization schedule
+- **Mortgage event tracking** (extra payments, rate changes)
+- **Bill status checklist** per month
+
 ### Budgets
 - **Monthly budget allocations** per category
 - **Smart suggestions** based on historical spending
@@ -77,12 +83,6 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 - **Goal tracking** with target amounts and deadlines
 - **Allocation wizard** - distribute surplus income across goals
 - **Progress visualization** with contribution history
-
-### Bills and Mortgages
-- **Recurring bill tracker** with due date reminders
-- **Mortgage calculator** with amortization schedule
-- **Mortgage event tracking** (extra payments, rate changes)
-- **Bill status checklist** per month
 
 ### Portfolio Tracker
 - **Savings accounts** with balance and interest tracking
