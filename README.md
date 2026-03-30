@@ -228,7 +228,7 @@ Let's build something that gives everyone, everywhere, full control over their f
 
 If Zumfi helps you manage your finances, consider supporting the project:
 
-- [GitHub Sponsors](https://github.com/sponsors/mzsim) - Buy a carrot for Zumfi the rabbit!
+- [GitHub Sponsors](https://github.com/sponsors/Simmak7) - Buy a carrot for Zumfi the rabbit!
 - Star this repository
 - Share with friends
 
