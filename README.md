@@ -71,9 +71,12 @@ Visit **[zumfi.net](https://zumfi.net)** for more information.
 - **Multi-currency support** with automatic conversion
 - **Automatic PDF parsing** for Czech banks:
   - Raiffeisen CZ
-  - CSOB / Ceska Sporitelna
   - Revolut
+  - CSOB
+  - Ceska Sporitelna
   - UniCredit
+  - FIO Banka
+  - mBank
   - Czech Universal format
 - **CSV and Excel import** wizard with column mapping
 - **Multi-account support** with automatic statement linking
@@ -318,8 +321,11 @@ zumfi-finance/
 |------|--------|--------|
 | Raiffeisen CZ | PDF | Fully supported |
 | Revolut | PDF | Fully supported |
-| CSOB / Ceska Sporitelna | PDF | Fully supported |
+| CSOB | PDF | Fully supported |
+| Ceska Sporitelna | PDF | Fully supported |
 | UniCredit | PDF | Fully supported |
+| FIO Banka | PDF | Fully supported |
+| mBank | PDF | Fully supported |
 | Universal format | PDF | Auto-detection fallback |
 | Any bank | CSV / Excel | Via import wizard |
 
