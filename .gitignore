@@ -1,7 +1,6 @@
 # Environment
 .env
 .env.local
-.env.production
 
 # Python
 __pycache__/
@@ -34,79 +33,37 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
-# Uploads (user data)
+# Uploads
 data/uploads/*.pdf
 
-# ===== PUBLIC REPO SAFETY =====
-
-# Claude AI configuration & docs (private development aids)
-.claude/
-CLAUDE.md
-**/claude.md
-
-# Personal financial data
-data/
-legacy_excel_data/
-legacy/
-work notes/
-
-# Internal planning docs
-docs/plans/
-!docs/screenshots/
-IMPROVEMENT_PLAN.md
-PROJECT_MAP.md
-
-# Debug & analysis scripts (reference local files/bank data)
-analyze_pdf.py
-analyze_pdf_multirow.py
-check_text.py
-check_latest_statement.py
-check_newest_transactions.py
-check_statement_17.py
-check_transactions.py
-debug_row_parsing.py
-debug_tables.py
-list_statements.py
-backend/app/debug_parser.py
-
-# Root-level test scripts (reference local data)
-test_category_editor.py
-test_parse_statement.py
-test_parser_detail.py
-test_sorting.py
-test_text_parsing.py
-test_upload_api.py
-test_pixel_colors.mjs
-test_wizard_colors.mjs
-test_cs_debug.py
-test_cs_run.py
-
-# Playwright root config & tests
-playwright.config.js
-/package.json
-/package-lock.json
-/tests/
-
-# Seed demo script (contains test credentials)
-backend/app/seed_demo.py
-
-# Utility scripts (internal)
-backend/app/apply_dedup_indexes.py
-backend/app/migrate_legacy.py
-mappings.json
-
-# PDF files (may contain bank statements)
+# Legacy data (keep structure, ignore large files)
+legacy_excel_data/*.xlsx
 *.pdf
 
-# Debug artifacts
+# Debug files
 debug_*.json
 *_text.txt
 pdf_analysis.txt
 text_analysis.txt
 
 # Personal / sensitive documents
-Zuzi docs/plans/
-!docs/screenshots/
+Zuzi docs/
+work notes/
+
+# Claude Code — all project-level Claude docs, prompts, agents, settings
+.claude/
+CLAUDE.md
+**/CLAUDE.md
+**/claude.md
+
+# Local planning documents
+docs/plans/
+IMPROVEMENT_PLAN.md
+PROJECT_MAP.md
+
+# Local financial data snapshots (contain real transactions)
+data/*.json
+mappings.json
 
 # Windows artifacts
 nul
@@ -118,8 +75,29 @@ test-results/
 # Temp files
 temp_*
 
-# OCR test images
+# Dev test scripts
+test_pixel_colors.mjs
+test_wizard_colors.mjs
+
+# OCR test images (may contain personal bank data)
 data/*.png
 
-# Memory files (Claude AI)
-memory/
+# Parser debug scripts (reference local PDFs)
+test_cs_debug.py
+test_cs_run.py
+
+# Root-level debug / analysis helpers (reference local PDFs)
+check_*.py
+analyze_*.py
+list_statements.py
+debug_row_parsing.py
+debug_tables.py
+test_category_editor.py
+test_parse_statement.py
+test_parser_detail.py
+test_sorting.py
+test_text_parsing.py
+test_upload_api.py
+
+# Legacy archived code
+legacy/
