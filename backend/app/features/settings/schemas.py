@@ -30,6 +30,7 @@ class UserSettingsUpdate(BaseModel):
     hidden_pages: list[str] | None = None
     show_zumfi_rabbit: bool | None = None
     language: str | None = None
+    category_trend_order: list[str] | None = None
 
     @field_validator("language")
     @classmethod
@@ -76,3 +77,4 @@ class UserSettingsResponse(BaseModel):
     hidden_pages: list[str]
     show_zumfi_rabbit: bool
     language: str
+    category_trend_order: list[str]

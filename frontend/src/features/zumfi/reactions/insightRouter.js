@@ -7,6 +7,7 @@ import { generateBillsInsight, billsPageSummary } from './billsInsights';
 import { generateImportInsight, importPageSummary } from './importInsights';
 import { generatePortfolioInsight, portfolioPageSummary } from './portfolioInsights';
 import { generateSettingsInsight, settingsPageSummary } from './settingsInsights';
+import { generateHelpInsight, helpPageSummary } from './helpInsights';
 
 const PAGE_GENERATORS = {
     dashboard: generateDashboardInsight,
@@ -16,6 +17,7 @@ const PAGE_GENERATORS = {
     import: generateImportInsight,
     portfolio: generatePortfolioInsight,
     settings: generateSettingsInsight,
+    help: generateHelpInsight,
 };
 
 const PAGE_SUMMARY_GENERATORS = {
@@ -26,6 +28,7 @@ const PAGE_SUMMARY_GENERATORS = {
     import: importPageSummary,
     portfolio: portfolioPageSummary,
     settings: settingsPageSummary,
+    help: helpPageSummary,
 };
 
 export function generateInsight(zoneId, data) {

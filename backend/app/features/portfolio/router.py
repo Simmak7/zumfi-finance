@@ -16,7 +16,6 @@ from features.portfolio.schemas import (
     PortfolioSummary, StockBreakdownResponse, StockPnlSummary,
 )
 from features.portfolio.service import PortfolioService
-from core.exchange_rates import get_rates_for_month
 from features.portfolio.conversion import get_stock_currency_breakdown, get_stock_history_converted
 from features.portfolio.pnl_service import get_stock_pnl_summary
 from features.portfolio.property_service import (
@@ -45,7 +44,7 @@ async def get_portfolio_summary(
 
 @router.get("/savings-history")
 async def get_savings_history(
-    months: int = Query(default=12, ge=2, le=36),
+    months: int = Query(default=12, ge=1, le=36),
     end_month: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}$"),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -60,14 +59,16 @@ async def get_savings_history(
 
 @router.get("/portfolio-history")
 async def get_portfolio_history(
-    months: int = Query(default=12, ge=2, le=36),
+    months: int = Query(default=12, ge=1, le=36),
     end_month: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}$"),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
     """Get monthly total portfolio values for development chart."""
+    preferred = user.preferred_currency or "CZK"
     return await PortfolioService.get_portfolio_history(
         db, owner_id=user.id, months=months, end_month=end_month,
+        preferred_currency=preferred,
     )
 
 
@@ -75,7 +76,7 @@ async def get_portfolio_history(
 
 @router.get("/stock-history")
 async def get_stock_holdings_history(
-    months: int = Query(default=12, ge=2, le=36),
+    months: int = Query(default=12, ge=1, le=36),
     end_month: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}$"),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -92,7 +93,7 @@ async def get_stock_holdings_history(
 async def get_stock_detail_history(
     ticker: str,
     currency: str = Query(..., description="Stock currency (USD/EUR)"),
-    months: int = Query(default=60, ge=2, le=120),
+    months: int = Query(default=60, ge=1, le=120),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
@@ -107,7 +108,7 @@ async def get_stock_detail_history(
 
 @router.get("/stock-breakdown", response_model=StockBreakdownResponse)
 async def get_stock_breakdown(
-    months: int = Query(default=12, ge=2, le=36),
+    months: int = Query(default=12, ge=1, le=36),
     month: str | None = Query(default=None, description="YYYY-MM for historical breakdown"),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -123,6 +124,74 @@ async def get_stock_breakdown(
     return {**breakdown, "monthly_history": history}
 
 
+# ── Stock Buys (from statement transactions) ──
+
+@router.get("/stock-buys")
+async def get_stock_buys(
+    month: str | None = Query(default=None, description="YYYY-MM to filter by month"),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Get stock buy transactions extracted from uploaded stock statements."""
+    from features.statements.models import Statement
+    from features.statements.parsers.revolut_stocks import RevolutStockParser
+
+    query = select(Statement).where(
+        Statement.owner_id == user.id,
+        Statement.statement_type == "stock",
+    )
+    if month:
+        y, m = int(month[:4]), int(month[5:7])
+        from calendar import monthrange
+        first_day = date(y, m, 1)
+        _, last = monthrange(y, m)
+        last_day = date(y, m, last)
+        query = query.where(
+            Statement.period_start <= last_day,
+            Statement.period_end >= first_day,
+        )
+    query = query.order_by(Statement.period_start)
+
+    result = await db.execute(query)
+    statements = result.scalars().all()
+
+    buys = []
+    seen = set()
+    parser = RevolutStockParser()
+    for stmt in statements:
+        if not stmt.file_path:
+            continue
+        try:
+            parsed = parser.parse(stmt.file_path)
+        except Exception:
+            continue
+        for section in parsed.get("sections", []):
+            currency = section.get("currency", "USD")
+            for tx in section.get("transactions", []):
+                if tx["type"] != "BUY":
+                    continue
+                tx_month = f"{tx['date'].year}-{tx['date'].month:02d}"
+                if month and tx_month != month:
+                    continue
+                # Deduplicate by (ticker, date, quantity, price)
+                key = (tx["ticker"], str(tx["date"]), round(float(tx["quantity"]), 4), round(float(tx["price"]), 2))
+                if key in seen:
+                    continue
+                seen.add(key)
+                buys.append({
+                    "ticker": tx["ticker"],
+                    "date": tx["date"].isoformat(),
+                    "quantity": round(float(tx["quantity"]), 4),
+                    "price": round(float(tx["price"]), 2),
+                    "value": round(float(tx["value"]), 2),
+                    "fees": round(float(tx.get("fees", 0)), 2),
+                    "currency": currency,
+                })
+
+    total_invested = sum(b["value"] + b["fees"] for b in buys)
+    return {"buys": buys, "total_invested": round(total_invested, 2)}
+
+
 # ── Stock P&L (Realized Trades + Dividends) ──
 
 @router.get("/stock-pnl", response_model=StockPnlSummary)
@@ -132,7 +201,68 @@ async def get_stock_pnl(
     user: User = Depends(get_current_user),
 ):
     """Get realized stock trades and dividends from P&L statements."""
-    return await get_stock_pnl_summary(db, owner_id=user.id, month=month)
+    preferred = user.preferred_currency or "CZK"
+    return await get_stock_pnl_summary(db, owner_id=user.id, month=month, preferred_currency=preferred)
+
+
+@router.get("/stock-pnl/history")
+async def get_stock_pnl_history(
+    months: int = Query(default=12, ge=1, le=24),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Get monthly realized P&L totals for trend chart."""
+    from features.portfolio.models import StockTrade, StockDividend
+    from sqlalchemy import func, case
+
+    today = date.today()
+    target_months = []
+    for i in range(months - 1, -1, -1):
+        y, m = today.year, today.month - i
+        while m <= 0:
+            m += 12
+            y -= 1
+        target_months.append(f"{y}-{m:02d}")
+
+    # Get monthly trade P&L
+    trade_result = await db.execute(
+        select(
+            func.to_char(StockTrade.date_sold, 'YYYY-MM').label('month'),
+            func.coalesce(func.sum(StockTrade.gross_pnl), 0).label('trade_pnl'),
+            func.count(StockTrade.id).label('trade_count'),
+        ).where(
+            StockTrade.owner_id == user.id,
+            StockTrade.date_sold.isnot(None),
+        ).group_by('month')
+    )
+    trade_by_month = {r[0]: {'pnl': float(r[1]), 'count': int(r[2])} for r in trade_result}
+
+    # Get monthly dividends
+    div_result = await db.execute(
+        select(
+            func.to_char(StockDividend.date, 'YYYY-MM').label('month'),
+            func.coalesce(func.sum(StockDividend.net_amount), 0).label('dividends'),
+        ).where(
+            StockDividend.owner_id == user.id,
+        ).group_by('month')
+    )
+    div_by_month = {r[0]: float(r[1]) for r in div_result}
+
+    history = []
+    for m in target_months:
+        trade_data = trade_by_month.get(m, {'pnl': 0, 'count': 0})
+        dividends = div_by_month.get(m, 0)
+        total = trade_data['pnl'] + dividends
+        if trade_data['count'] > 0 or dividends > 0:
+            history.append({
+                'month': m,
+                'trade_pnl': round(trade_data['pnl'], 2),
+                'dividends': round(dividends, 2),
+                'total': round(total, 2),
+                'trade_count': trade_data['count'],
+            })
+
+    return {'history': history}
 
 
 @router.post("/stock-pnl/deduplicate")
@@ -393,26 +523,13 @@ async def list_properties(
 ):
     """List all active property investments with computed metrics."""
     properties = await PropertyService.get_all(db, owner_id=user.id)
-    preferred = user.preferred_currency or "CZK"
-    current_month = date.today().strftime("%Y-%m")
-    rates = await get_rates_for_month(db, current_month)
-    convert = PortfolioService._convert_amount
     result = []
     for prop in properties:
         metrics = compute_property_metrics(prop)
-        currency = prop.currency or "CZK"
-        raw_value = metrics.get("display_value") or float(prop.purchase_price)
-        raw_cost = float(prop.purchase_price)
-        raw_gain = metrics.get("gain_loss")
-        data = {
+        result.append({
             **{c.name: getattr(prop, c.name) for c in prop.__table__.columns},
             **metrics,
-            "converted_value": convert(raw_value, currency, preferred, rates),
-            "converted_purchase_price": convert(raw_cost, currency, preferred, rates),
-            "converted_gain_loss": convert(raw_gain, currency, preferred, rates) if raw_gain is not None else None,
-            "display_currency": preferred,
-        }
-        result.append(data)
+        })
     return result
 
 
@@ -476,7 +593,7 @@ async def delete_property(
 
 @router.get("/properties-history")
 async def get_all_properties_history(
-    months: int = Query(default=120, ge=2, le=240),
+    months: int = Query(default=120, ge=1, le=240),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
@@ -489,7 +606,7 @@ async def get_all_properties_history(
 @router.get("/properties/{property_id}/history")
 async def get_property_history(
     property_id: int,
-    months: int = Query(default=120, ge=2, le=240),
+    months: int = Query(default=120, ge=1, le=240),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
@@ -498,86 +615,3 @@ async def get_property_history(
         db, owner_id=user.id, property_id=property_id, months=months,
     )
     return {"property_id": property_id, "history": history}
-
-
-# ── Seed Demo Snapshots ──
-
-@router.post("/seed-demo-snapshots")
-async def seed_demo_snapshots(
-    request: dict,
-    db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    """Seed historical portfolio + stock holding snapshots for demo data.
-
-    Accepts:
-    {
-        "portfolio_snapshots": [
-            {"month": "2025-09", "total_savings": ..., "total_investments": ..., "total_stocks": ..., "total_properties": ...},
-        ],
-        "stock_snapshots": [
-            {"month": "2025-09", "ticker": "AAPL", "currency": "USD", "name": "Apple Inc.",
-             "holding_type": "stock", "shares": 8, "price": 195.50},
-        ]
-    }
-    """
-    from decimal import Decimal as D
-    from features.portfolio.models import StockHoldingSnapshot, PortfolioSnapshot
-
-    created_portfolio = 0
-    created_stocks = 0
-
-    for ps in request.get("portfolio_snapshots", []):
-        month = ps["month"]
-        y, m = int(month[:4]), int(month[5:7])
-        _, last = monthrange(y, m)
-        snap_date = date(y, m, last)
-        await PortfolioService.create_or_update_snapshot(
-            db, user.id, snap_date,
-            ps["total_savings"], ps["total_investments"],
-            ps.get("total_stocks", 0), ps.get("total_properties", 0),
-        )
-        created_portfolio += 1
-
-    for ss in request.get("stock_snapshots", []):
-        month = ss["month"]
-        shares = float(ss["shares"])
-        price = float(ss["price"])
-        market_value = round(shares * price, 2)
-        total_invested = round(shares * float(ss.get("avg_cost", price)), 2)
-
-        result = await db.execute(
-            select(StockHoldingSnapshot).where(
-                StockHoldingSnapshot.owner_id == user.id,
-                StockHoldingSnapshot.ticker == ss["ticker"],
-                StockHoldingSnapshot.currency == ss["currency"],
-                StockHoldingSnapshot.snapshot_month == month,
-            )
-        )
-        snap = result.scalar_one_or_none()
-        if snap:
-            snap.shares = D(str(shares))
-            snap.price = D(str(price))
-            snap.market_value = D(str(market_value))
-            snap.total_invested = D(str(total_invested))
-            snap.name = ss["name"]
-            snap.holding_type = ss.get("holding_type", "stock")
-        else:
-            snap = StockHoldingSnapshot(
-                owner_id=user.id,
-                ticker=ss["ticker"],
-                currency=ss["currency"],
-                snapshot_month=month,
-                name=ss["name"],
-                holding_type=ss.get("holding_type", "stock"),
-                shares=D(str(shares)),
-                price=D(str(price)),
-                market_value=D(str(market_value)),
-                total_invested=D(str(total_invested)),
-            )
-            db.add(snap)
-        created_stocks += 1
-
-    await db.flush()
-    await db.commit()
-    return {"portfolio_snapshots": created_portfolio, "stock_snapshots": created_stocks}

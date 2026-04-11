@@ -17,7 +17,6 @@ import { CategoryDonutChart } from './CategoryDonutChart';
 import { TopCategories } from '../../../components/TopCategories';
 import { WelcomeCard } from './WelcomeCard';
 import { MonthCloseWizard, isMonthClosed } from './MonthCloseWizard';
-import { FirstTimeModal, shouldShowFirstTimeModal } from './FirstTimeModal';
 import { IncomeBreakdownModal } from './IncomeBreakdownModal';
 import { formatMonthLabel } from '../../../utils/dates';
 import { MonthPicker } from '../../../components/MonthPicker';
@@ -43,19 +42,12 @@ export function DashboardPage() {
     const [showAllocInfo, setShowAllocInfo] = useState(false);
     const [showMonthClose, setShowMonthClose] = useState(false);
     const [showIncomeBreakdown, setShowIncomeBreakdown] = useState(false);
-    const [showFirstTime, setShowFirstTime] = useState(false);
     const [hiddenCategories, setHiddenCategories] = useState(new Set());
     const { addToast } = useToast();
     const { setPageData } = useZumfi();
     const { user } = useAuth();
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
-
-    // Scroll to top on page load/refresh
-    useEffect(() => {
-        const main = document.querySelector('.app-main');
-        if (main) main.scrollTo(0, 0);
-    }, []);
 
     // Auto-open allocation wizard when navigated with ?allocate=1
     useEffect(() => {
@@ -65,13 +57,6 @@ export function DashboardPage() {
             setSearchParams(searchParams, { replace: true });
         }
     }, [searchParams, summary]);
-
-    // First-time intro modal — show once when no data exists
-    useEffect(() => {
-        if (summary && summary.total_income === 0 && summary.total_expenses === 0 && shouldShowFirstTimeModal()) {
-            setShowFirstTime(true);
-        }
-    }, [summary]);
 
     // Welcome toast — once per login session
     useEffect(() => {
@@ -93,15 +78,18 @@ export function DashboardPage() {
         const handleCategoryUpdate = () => fetchAll();
         const handleSettingsUpdate = () => fetchAll();
         const handlePullRefresh = () => fetchAll();
+        const handleStatementsUpdate = () => fetchAll();
         window.addEventListener('goals-updated', handleGoalUpdate);
         window.addEventListener('categories-updated', handleCategoryUpdate);
         window.addEventListener('settings-updated', handleSettingsUpdate);
         window.addEventListener('pull-to-refresh', handlePullRefresh);
+        window.addEventListener('statements-updated', handleStatementsUpdate);
         return () => {
             window.removeEventListener('goals-updated', handleGoalUpdate);
             window.removeEventListener('categories-updated', handleCategoryUpdate);
             window.removeEventListener('settings-updated', handleSettingsUpdate);
             window.removeEventListener('pull-to-refresh', handlePullRefresh);
+            window.removeEventListener('statements-updated', handleStatementsUpdate);
         };
     }, [selectedMonth]);
 
@@ -114,22 +102,29 @@ export function DashboardPage() {
             const filteredTopCats = hiddenCategories.size > 0
                 ? topCategories.filter(c => !hiddenCategories.has(c.category))
                 : topCategories;
+            const hasData = summary.total_income > 0 || summary.total_expenses > 0;
+            const monthClosed = hasData && isMonthClosed(selectedMonth, user?.id);
             setPageData({
                 _page: 'dashboard',
                 totalIncome: summary.total_income,
                 totalExpenses: summary.total_expenses,
                 savingsRate: summary.savings_rate,
                 remainingBudget: summary.remaining_budget,
+                alreadyAllocated: summary.already_allocated || 0,
                 expenseBreakdown: filteredBreakdown,
                 topCategories: filteredTopCats,
                 monthlyHistory,
                 forecast,
                 anomalies,
+                goals,
+                hasData,
+                monthClosed,
                 selectedMonth,
+                maxMonth,
             });
         }
         return () => setPageData(null);
-    }, [summary, topCategories, monthlyHistory, forecast, anomalies, selectedMonth, hiddenCategories, setPageData]);
+    }, [summary, goals, topCategories, monthlyHistory, forecast, anomalies, selectedMonth, maxMonth, hiddenCategories, user?.id, setPageData]);
 
     const fetchAll = async () => {
         setError(null);
@@ -151,12 +146,16 @@ export function DashboardPage() {
             const [an, forc, top, history] = await Promise.all([
                 getAnomalies(selectedMonth), getForecast(),
                 getTopCategories(selectedMonth),
-                getMonthlyHistory(10),
+                getMonthlyHistory(12),
             ]);
             setAnomalies(an || []);
             setForecast(forc || null);
             setTopCategories(top || []);
-            setMonthlyHistory(history || []);
+            // Filter out months with no data (both income and expenses are 0)
+            const filtered = (history || []).filter(
+                d => d.total_income > 0 || d.total_expenses > 0
+            );
+            setMonthlyHistory(filtered);
         } catch (smartErr) {
             console.warn("Smart features failed:", smartErr);
         }
@@ -165,6 +164,7 @@ export function DashboardPage() {
     const fetchGoals = async () => {
         try { setGoals(await getGoals()); } catch (e) { console.error(e); }
     };
+
 
     if (error) return <div className="error-screen">{t('dashboard.failedToLoad')}</div>;
     if (!summary) return (
@@ -189,19 +189,28 @@ export function DashboardPage() {
                     <p>{t('dashboard.overviewFor', { month: monthLabel })}</p>
                 </div>
                 <div className="header-actions">
-                    <button
-                        className={`month-close-btn${isMonthClosed(selectedMonth) ? ' month-close-btn-dimmed' : ''}`}
-                        onClick={() => setShowMonthClose(true)}
-                    >
-                        <CalendarCheck size={18} />
-                        <span>{isMonthClosed(selectedMonth) ? t('dashboard.monthOverview') : t('dashboard.closeMonth')}</span>
-                    </button>
-                    {summary && summary.remaining_budget > 0 && (() => {
-                        const fullyAllocated = (summary.already_allocated || 0) >= summary.remaining_budget;
-                        const dimmed = fullyAllocated || isMonthClosed(selectedMonth);
+                    {(() => {
+                        const hasData = summary && (summary.total_income > 0 || summary.total_expenses > 0);
+                        const closed = hasData && isMonthClosed(selectedMonth, user?.id);
                         return (
                             <button
-                                className={`allocate-btn${dimmed ? ' allocate-btn-dimmed' : ''}`}
+                                className={`month-close-btn${closed ? ' month-close-btn-dimmed' : ''}`}
+                                data-zumfi-zone="close-month-btn"
+                                onClick={() => setShowMonthClose(true)}
+                                disabled={!hasData}
+                                style={!hasData ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
+                            >
+                                <CalendarCheck size={18} />
+                                <span>{closed ? t('dashboard.monthOverview') : t('dashboard.closeMonth')}</span>
+                            </button>
+                        );
+                    })()}
+                    {summary && summary.remaining_budget > 0 && (() => {
+                        const fullyAllocated = (summary.already_allocated || 0) >= summary.remaining_budget;
+                        return (
+                            <button
+                                className={`allocate-btn${fullyAllocated ? ' allocate-btn-dimmed' : ''}`}
+                                data-zumfi-zone="allocate-savings-btn"
                                 onClick={() => fullyAllocated ? setShowAllocInfo(true) : setShowAllocation(true)}
                             >
                                 <PiggyBank size={18} />
@@ -209,12 +218,16 @@ export function DashboardPage() {
                             </button>
                         );
                     })()}
-                    <MonthPicker value={selectedMonth} onChange={setSelectedMonth} max={maxMonth} />
+                    <div data-zumfi-zone="month-picker">
+                        <MonthPicker value={selectedMonth} onChange={setSelectedMonth} max={maxMonth} />
+                    </div>
                 </div>
             </header>
 
             {summary.total_income === 0 && summary.total_expenses === 0 && (
-                <WelcomeCard summary={summary} />
+                <div data-zumfi-zone="welcome-card">
+                    <WelcomeCard summary={summary} userId={user?.id} />
+                </div>
             )}
 
             <KpiCards
@@ -281,6 +294,7 @@ export function DashboardPage() {
             {showMonthClose && (
                 <MonthCloseWizard
                     month={selectedMonth}
+                    userId={user?.id}
                     onClose={() => {
                         setShowMonthClose(false);
                         fetchAll();
@@ -295,10 +309,6 @@ export function DashboardPage() {
                     onClose={() => setShowIncomeBreakdown(false)}
                     currency={currency}
                 />
-            )}
-
-            {showFirstTime && (
-                <FirstTimeModal onClose={() => setShowFirstTime(false)} />
             )}
         </div>
     );

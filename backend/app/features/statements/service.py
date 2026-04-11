@@ -83,31 +83,102 @@ class StatementService:
                 db, owner_id, actual_path, statement,
             )
         elif statement.statement_type == "savings":
-            # Savings statements update portfolio only — no transactions
-            p_start, p_end = extract_statement_period(actual_path)
-            if p_start and p_end:
-                statement.period_start = p_start
-                statement.period_end = p_end
-            else:
-                from calendar import monthrange
-                today = date.today()
-                statement.period_start = date(today.year, today.month, 1)
-                _, last_day = monthrange(today.year, today.month)
-                statement.period_end = date(today.year, today.month, last_day)
+            # Savings statements: extract balance only, never import transactions.
+            # Transactions on savings accounts are internal transfers already
+            # captured by the main bank account statement.
+            #
+            # Some banks (FIO SK term deposits, etc.) expose a richer
+            # `extract_savings_info` method that also returns the account
+            # currency, product type, account number, and a human-readable
+            # suggested name. Prefer it when available so the created
+            # SavingsAccount carries the correct currency and shows up in
+            # the portfolio as the correct product type.
+            savings_info: dict | None = None
+            if hasattr(parser, "extract_savings_info"):
+                try:
+                    savings_info = parser.extract_savings_info(actual_path)
+                except Exception as e:
+                    logger.warning(
+                        f"{statement.bank_name}: savings info extraction failed: {e}"
+                    )
 
-            balance = extract_closing_balance(actual_path)
+            balance = None
+            link_currency = None
+            link_name = None
+            link_notes = None
+
+            if savings_info is not None:
+                cb = savings_info.get("closing_balance")
+                if cb is not None:
+                    balance = Decimal(str(round(float(cb), 2)))
+                link_currency = savings_info.get("currency")
+                link_name = savings_info.get("suggested_name")
+                link_notes = savings_info.get("notes")
+
+                # Period from the savings info block (authoritative).
+                if savings_info.get("period_start"):
+                    statement.period_start = savings_info["period_start"]
+                if savings_info.get("period_end"):
+                    statement.period_end = savings_info["period_end"]
+
+            # Fallback to the shared balance extractor if the bank-specific
+            # path produced nothing.
+            if balance is None:
+                balance = extract_closing_balance(actual_path)
+
             if balance is not None:
                 statement.closing_balance = balance
                 from features.statements.linkers import link_savings_account
                 await link_savings_account(
                     db, owner_id, statement.bank_name, balance, statement,
+                    currency=link_currency,
+                    suggested_name=link_name,
+                    notes=link_notes,
                 )
+
+            # Fallback period extraction when the parser didn't provide one.
+            if not statement.period_start:
+                p_start, p_end = extract_statement_period(actual_path)
+                if p_start and p_end:
+                    statement.period_start = p_start
+                    statement.period_end = p_end
+                else:
+                    from calendar import monthrange
+                    today = date.today()
+                    statement.period_start = date(today.year, today.month, 1)
+                    _, last_day = monthrange(today.year, today.month)
+                    statement.period_end = date(today.year, today.month, last_day)
+
+            # Historical monthly snapshots: if the parser supports extracting
+            # month-end balances (multi-month savings statements), create a
+            # portfolio snapshot for each historical month with the savings
+            # balance at that point in time.
+            if hasattr(parser, "extract_monthly_balances"):
+                from features.portfolio.service import PortfolioService
+                monthly_bals = parser.extract_monthly_balances(actual_path)
+                if monthly_bals:
+                    for month_key, month_bal in sorted(monthly_bals.items()):
+                        y, m = int(month_key[:4]), int(month_key[5:7])
+                        from calendar import monthrange as mr
+                        _, last = mr(y, m)
+                        snapshot_date = date(y, m, last)
+                        await PortfolioService.create_or_update_snapshot(
+                            db, owner_id, snapshot_date,
+                            total_savings=float(month_bal),
+                        )
+                    logger.info(
+                        f"Created historical snapshots for "
+                        f"{len(monthly_bals)} months from savings statement"
+                    )
         else:
-            # Save transactions with deduplication and track date range
+            # Bank statements: save transactions with deduplication
             min_date = None
             max_date = None
 
-            # Batch load existing transactions for dedup (single query instead of N)
+            # Count-based dedup: allows legitimate same-key transactions
+            # (e.g. two identical transfers on the same day) while still
+            # preventing re-import of already-uploaded statements.
+            from collections import Counter
             existing_result = await db.execute(
                 select(
                     Transaction.original_description,
@@ -117,24 +188,32 @@ class StatementService:
                     Transaction.currency,
                 ).where(Transaction.owner_id == owner_id)
             )
-            existing_keys = {
+            existing_counts = Counter(
                 (row[0], row[1], float(row[2]), row[3], row[4])
                 for row in existing_result.all()
-            }
+            )
 
+            # Count occurrences in the file being imported
+            file_keys = []
             for tx_data in raw_transactions:
                 currency = tx_data.get("currency", "CZK")
-                dedup_key = (
+                file_keys.append((
                     tx_data["original_description"],
                     tx_data["date"],
                     float(tx_data["amount"]),
                     tx_data["type"],
                     currency,
-                )
-                if dedup_key in existing_keys:
+                ))
+            file_counts = Counter(file_keys)
+
+            # Track how many of each key we've imported so far in this batch
+            imported_counts = Counter()
+
+            for tx_data, dedup_key in zip(raw_transactions, file_keys):
+                imported_counts[dedup_key] += 1
+                # Skip if DB already has at least this many of this key
+                if imported_counts[dedup_key] <= existing_counts.get(dedup_key, 0):
                     continue
-                # Mark as seen so duplicates within the same file are caught
-                existing_keys.add(dedup_key)
 
                 cat_section, category_name, confidence, category_id = await CategoryService.classify(
                     db, owner_id=owner_id, description=tx_data["original_description"]
@@ -543,8 +622,14 @@ class StatementService:
     async def delete_statement(
         db: AsyncSession, owner_id: int, statement_id: int
     ) -> bool:
-        """Delete a statement and all its transactions."""
-        # First check if the statement exists and belongs to the user
+        """Delete a statement and cascade-clean all linked data."""
+        from sqlalchemy import delete as sql_delete
+        from features.portfolio.models import (
+            StockTrade, StockDividend, StockHoldingSnapshot,
+            PortfolioSnapshot, SavingsAccount,
+        )
+        from features.portfolio.service import PortfolioService
+
         result = await db.execute(
             select(Statement).where(
                 Statement.id == statement_id,
@@ -555,14 +640,17 @@ class StatementService:
         if not statement:
             return False
 
-        # Delete all transactions associated with this statement
-        from sqlalchemy import delete as sql_delete
+        stmt_type = statement.statement_type
+        period_month = None
+        if statement.period_end:
+            period_month = f"{statement.period_end.year}-{statement.period_end.month:02d}"
+
+        # 1. Delete transactions (bank statements)
         await db.execute(
             sql_delete(Transaction).where(Transaction.statement_id == statement_id)
         )
 
-        # Delete P&L records (trades + dividends) linked to this statement
-        from features.portfolio.models import StockTrade, StockDividend
+        # 2. Delete P&L records (trades + dividends)
         await db.execute(
             sql_delete(StockTrade).where(StockTrade.statement_id == statement_id)
         )
@@ -570,16 +658,152 @@ class StatementService:
             sql_delete(StockDividend).where(StockDividend.statement_id == statement_id)
         )
 
-        # Delete the stored file
+        # 3. Revert savings account balance if this was a savings statement.
+        #    If no other savings statements reference this account, delete it
+        #    entirely to avoid phantom zero-balance accounts.
+        if stmt_type == "savings" and statement.linked_savings_id:
+            savings_id = statement.linked_savings_id
+            # Find the previous savings statement for this account
+            prev_result = await db.execute(
+                select(Statement).where(
+                    Statement.linked_savings_id == savings_id,
+                    Statement.id != statement_id,
+                    Statement.closing_balance.isnot(None),
+                ).order_by(Statement.period_end.desc()).limit(1)
+            )
+            prev_stmt = prev_result.scalar_one_or_none()
+            savings_result = await db.execute(
+                select(SavingsAccount).where(SavingsAccount.id == savings_id)
+            )
+            savings = savings_result.scalar_one_or_none()
+            if savings:
+                if prev_stmt:
+                    savings.balance = prev_stmt.closing_balance
+                else:
+                    # No remaining statements → delete the savings account
+                    await db.delete(savings)
+
+        # 4. Delete stock holding snapshots for ALL months covered by this
+        #    statement (link_stock_holdings creates historical snapshots from
+        #    transaction replay across the full period, not just period_end).
+        from features.portfolio.models import StockHolding
+        from calendar import monthrange
+
+        affected_months = set()  # dates for snapshot recalculation
+
+        if stmt_type == "stock":
+            if statement.period_start and statement.period_end:
+                start_m = f"{statement.period_start.year}-{statement.period_start.month:02d}"
+                end_m = f"{statement.period_end.year}-{statement.period_end.month:02d}"
+                await db.execute(
+                    sql_delete(StockHoldingSnapshot).where(
+                        StockHoldingSnapshot.owner_id == owner_id,
+                        StockHoldingSnapshot.snapshot_month >= start_m,
+                        StockHoldingSnapshot.snapshot_month <= end_m,
+                    )
+                )
+                # Collect all affected months for recalculation
+                y, m = statement.period_start.year, statement.period_start.month
+                ey, em = statement.period_end.year, statement.period_end.month
+                while (y, m) <= (ey, em):
+                    _, last = monthrange(y, m)
+                    affected_months.add(date(y, m, last))
+                    m += 1
+                    if m > 12:
+                        m = 1
+                        y += 1
+            elif period_month:
+                await db.execute(
+                    sql_delete(StockHoldingSnapshot).where(
+                        StockHoldingSnapshot.owner_id == owner_id,
+                        StockHoldingSnapshot.snapshot_month == period_month,
+                    )
+                )
+
+            # Check if any other stock statements remain for this owner
+            other_stock_stmts = await db.execute(
+                select(func.count(Statement.id)).where(
+                    Statement.owner_id == owner_id,
+                    Statement.id != statement_id,
+                    Statement.statement_type == "stock",
+                )
+            )
+            remaining_stock_count = other_stock_stmts.scalar() or 0
+            if remaining_stock_count == 0:
+                # No stock statements left — delete all holdings and remaining snapshots
+                await db.execute(
+                    sql_delete(StockHolding).where(
+                        StockHolding.owner_id == owner_id,
+                    )
+                )
+                await db.execute(
+                    sql_delete(StockHoldingSnapshot).where(
+                        StockHoldingSnapshot.owner_id == owner_id,
+                    )
+                )
+
+        # 5. For savings statements with multi-month data, also collect
+        #    all months in the period range (historical monthly balances
+        #    create snapshots for each month from period_start to period_end).
+        if stmt_type == "savings" and statement.period_start and statement.period_end:
+            y, m = statement.period_start.year, statement.period_start.month
+            ey, em = statement.period_end.year, statement.period_end.month
+            while (y, m) <= (ey, em):
+                _, last = monthrange(y, m)
+                affected_months.add(date(y, m, last))
+                m += 1
+                if m > 12:
+                    m = 1
+                    y += 1
+
+        # 6. Delete portfolio snapshots for all affected months.
+        #    For stock/savings statements with ranges, this covers the full period.
+        #    For other types, just the period_end month.
+        if affected_months:
+            earliest = min(affected_months)
+            latest = max(affected_months)
+            first_day = date(earliest.year, earliest.month, 1)
+            await db.execute(
+                sql_delete(PortfolioSnapshot).where(
+                    PortfolioSnapshot.owner_id == owner_id,
+                    PortfolioSnapshot.snapshot_date >= first_day,
+                    PortfolioSnapshot.snapshot_date <= latest,
+                )
+            )
+        elif period_month:
+            pe = statement.period_end
+            first_day = date(pe.year, pe.month, 1)
+            _, last = monthrange(pe.year, pe.month)
+            last_day = date(pe.year, pe.month, last)
+            await db.execute(
+                sql_delete(PortfolioSnapshot).where(
+                    PortfolioSnapshot.owner_id == owner_id,
+                    PortfolioSnapshot.snapshot_date >= first_day,
+                    PortfolioSnapshot.snapshot_date <= last_day,
+                )
+            )
+            affected_months.add(pe)
+
+        # 7. Delete the stored file
         if statement.file_path and os.path.exists(statement.file_path):
             try:
                 os.remove(statement.file_path)
             except OSError:
                 pass
 
-        # Delete the statement
+        # 8. Delete the statement itself
         await db.delete(statement)
         await db.flush()
+
+        # 9. Recalculate snapshots for all affected months from remaining data
+        for snap_date in sorted(affected_months):
+            try:
+                await PortfolioService.record_snapshot_for_date(
+                    db, owner_id, snap_date,
+                )
+            except Exception:
+                pass  # If no remaining data, snapshot stays deleted
+
         return True
 
     @staticmethod

@@ -14,22 +14,43 @@ from features.statements.models import Transaction
 from features.goals.models import Goal, GoalContribution
 from features.auth.models import User
 from features.categories.models import Category
+from features.portfolio.models import PortfolioSnapshot
 from features.bills.service import BillService
 from features.goals.service import GoalService
+from core.exchange_rates import get_rates_for_month, convert_amount
 
 
 class DashboardService:
     @staticmethod
     async def get_last_data_month(db: AsyncSession, owner_id: int) -> str | None:
-        """Return the latest YYYY-MM that has at least one transaction, or None."""
-        result = await db.execute(
+        """Return the latest YYYY-MM that has any financial data.
+
+        Checks both transactions (from bank statements) and portfolio
+        snapshots (from savings/stock statements that don't create
+        transactions).  Returns the most recent month across both sources.
+        """
+        tx_result = await db.execute(
             select(func.max(Transaction.date)).where(
                 Transaction.owner_id == owner_id,
             )
         )
-        latest_date = result.scalar()
-        if not latest_date:
+        latest_tx = tx_result.scalar()
+
+        snap_result = await db.execute(
+            select(func.max(PortfolioSnapshot.snapshot_date)).where(
+                PortfolioSnapshot.owner_id == owner_id,
+                (PortfolioSnapshot.total_savings > 0)
+                | (PortfolioSnapshot.total_investments > 0)
+                | (PortfolioSnapshot.total_stocks > 0)
+                | (PortfolioSnapshot.total_properties > 0),
+            )
+        )
+        latest_snap = snap_result.scalar()
+
+        candidates = [d for d in (latest_tx, latest_snap) if d is not None]
+        if not candidates:
             return None
+        latest_date = max(candidates)
         return f"{latest_date.year}-{latest_date.month:02d}"
 
     @staticmethod
@@ -45,36 +66,47 @@ class DashboardService:
         user = user_result.scalar_one()
         preferred_currency = user.preferred_currency or "CZK"
 
-        # Total income for the month (FILTERED BY CURRENCY)
+        # Exchange rates for converting non-preferred currencies
+        rates = await get_rates_for_month(db, month)
+
+        def _conv(amount: float, cur: str) -> float:
+            return convert_amount(amount, cur, preferred_currency, rates)
+
+        # Total income for the month (all currencies, converted)
         income_result = await db.execute(
-            select(func.coalesce(func.sum(Transaction.amount), 0)).where(
+            select(
+                Transaction.currency,
+                func.coalesce(func.sum(Transaction.amount), 0),
+            ).where(
                 Transaction.owner_id == owner_id,
                 Transaction.type == "income",
                 Transaction.section != "in_and_out",
-                Transaction.currency == preferred_currency,
                 extract("year", Transaction.date) == int(year),
                 extract("month", Transaction.date) == int(mon),
-            )
+            ).group_by(Transaction.currency)
         )
-        total_income = float(income_result.scalar())
+        total_income = sum(_conv(float(amt), cur) for cur, amt in income_result.all())
 
-        # Total expenses for the month (FILTERED BY CURRENCY)
+        # Total expenses for the month (all currencies, converted)
         expense_result = await db.execute(
-            select(func.coalesce(func.sum(Transaction.amount), 0)).where(
+            select(
+                Transaction.currency,
+                func.coalesce(func.sum(Transaction.amount), 0),
+            ).where(
                 Transaction.owner_id == owner_id,
                 Transaction.type == "expense",
                 Transaction.section != "in_and_out",
-                Transaction.currency == preferred_currency,
                 extract("year", Transaction.date) == int(year),
                 extract("month", Transaction.date) == int(mon),
-            )
+            ).group_by(Transaction.currency)
         )
-        total_expenses = float(expense_result.scalar())
+        total_expenses = sum(_conv(float(amt), cur) for cur, amt in expense_result.all())
 
-        # Expense breakdown by category (FILTERED BY CURRENCY)
+        # Expense breakdown by category (all currencies, converted and merged)
         category_result = await db.execute(
             select(
                 Transaction.category_name,
+                Transaction.currency,
                 func.sum(Transaction.amount).label("total"),
                 Category.color,
             )
@@ -83,22 +115,28 @@ class DashboardService:
                 Transaction.owner_id == owner_id,
                 Transaction.type == "expense",
                 Transaction.section != "in_and_out",
-                Transaction.currency == preferred_currency,
                 extract("year", Transaction.date) == int(year),
                 extract("month", Transaction.date) == int(mon),
             )
-            .group_by(Transaction.category_name, Category.color)
-            .order_by(func.sum(Transaction.amount).desc())
+            .group_by(Transaction.category_name, Transaction.currency, Category.color)
         )
-        expense_breakdown = [
-            {"category": row.category_name or "Unknown", "amount": float(row.total), "color": row.color}
-            for row in category_result.all()
-        ]
+        exp_map: dict[str, dict] = {}
+        for row in category_result.all():
+            cat = row.category_name or "Unknown"
+            converted = _conv(float(row.total), row.currency)
+            if cat in exp_map:
+                exp_map[cat]["amount"] += converted
+            else:
+                exp_map[cat] = {"category": cat, "amount": converted, "color": row.color}
+        expense_breakdown = sorted(exp_map.values(), key=lambda x: x["amount"], reverse=True)
+        for item in expense_breakdown:
+            item["amount"] = round(item["amount"], 2)
 
-        # Income breakdown by category (FILTERED BY CURRENCY)
+        # Income breakdown by category (all currencies, converted and merged)
         income_cat_result = await db.execute(
             select(
                 Transaction.category_name,
+                Transaction.currency,
                 func.sum(Transaction.amount).label("total"),
                 Category.color,
             )
@@ -107,16 +145,22 @@ class DashboardService:
                 Transaction.owner_id == owner_id,
                 Transaction.type == "income",
                 Transaction.section != "in_and_out",
-                Transaction.currency == preferred_currency,
                 extract("year", Transaction.date) == int(year),
                 extract("month", Transaction.date) == int(mon),
             )
-            .group_by(Transaction.category_name, Category.color)
+            .group_by(Transaction.category_name, Transaction.currency, Category.color)
         )
-        income_breakdown = [
-            {"category": row.category_name or "Unknown", "amount": float(row.total), "color": row.color}
-            for row in income_cat_result.all()
-        ]
+        inc_map: dict[str, dict] = {}
+        for row in income_cat_result.all():
+            cat = row.category_name or "Unknown"
+            converted = _conv(float(row.total), row.currency)
+            if cat in inc_map:
+                inc_map[cat]["amount"] += converted
+            else:
+                inc_map[cat] = {"category": cat, "amount": converted, "color": row.color}
+        income_breakdown = list(inc_map.values())
+        for item in income_breakdown:
+            item["amount"] = round(item["amount"], 2)
 
         # Goals summary
         goals_result = await db.execute(
@@ -200,9 +244,11 @@ class DashboardService:
 
         month_col = func.to_char(Transaction.date, "YYYY-MM").label("month")
 
+        # Group by month AND currency so we can convert each currency's totals
         result = await db.execute(
             select(
                 month_col,
+                Transaction.currency,
                 func.coalesce(
                     func.sum(
                         case(
@@ -231,25 +277,38 @@ class DashboardService:
             .where(
                 Transaction.owner_id == owner_id,
                 Transaction.section != "in_and_out",
-                Transaction.currency == preferred_currency,
                 Transaction.date >= start_date,
             )
-            .group_by(month_col)
+            .group_by(month_col, Transaction.currency)
             .order_by(month_col)
         )
-        rows = {row.month: row for row in result.all()}
+
+        # Merge per-currency rows into per-month totals with conversion
+        rates_cache: dict[str, dict] = {}
+        month_totals: dict[str, dict] = {}
+        for row in result.all():
+            m_key = row.month
+            cur = row.currency
+            if m_key not in rates_cache:
+                rates_cache[m_key] = await get_rates_for_month(db, m_key)
+            rates = rates_cache[m_key]
+            inc = convert_amount(float(row.total_income), cur, preferred_currency, rates)
+            exp = convert_amount(float(row.total_expenses), cur, preferred_currency, rates)
+            if m_key not in month_totals:
+                month_totals[m_key] = {"total_income": 0.0, "total_expenses": 0.0}
+            month_totals[m_key]["total_income"] += inc
+            month_totals[m_key]["total_expenses"] += exp
 
         # Fill gaps so chart has continuous data points
         history = []
         y, m = start_year, start_month
         for _ in range(months):
             key = f"{y}-{m:02d}"
-            if key in rows:
-                r = rows[key]
+            if key in month_totals:
                 history.append({
                     "month": key,
-                    "total_income": round(float(r.total_income), 2),
-                    "total_expenses": round(float(r.total_expenses), 2),
+                    "total_income": round(month_totals[key]["total_income"], 2),
+                    "total_expenses": round(month_totals[key]["total_expenses"], 2),
                 })
             else:
                 history.append({
@@ -297,10 +356,12 @@ class DashboardService:
 
         month_col = func.to_char(Transaction.date, "YYYY-MM").label("month")
 
+        # Group by month, category, AND currency for cross-currency conversion
         result = await db.execute(
             select(
                 month_col,
                 Transaction.category_name,
+                Transaction.currency,
                 Category.color,
                 func.sum(Transaction.amount).label("total"),
             )
@@ -309,11 +370,10 @@ class DashboardService:
                 Transaction.owner_id == owner_id,
                 Transaction.type == "expense",
                 Transaction.section != "in_and_out",
-                Transaction.currency == preferred_currency,
                 Transaction.date >= start_date,
                 Transaction.date < end_date,
             )
-            .group_by(month_col, Transaction.category_name, Category.color)
+            .group_by(month_col, Transaction.category_name, Transaction.currency, Category.color)
             .order_by(month_col)
         )
         rows = result.all()
@@ -328,15 +388,20 @@ class DashboardService:
                 m = 1
                 y += 1
 
-        # Group by category
+        # Group by category, converting each currency row to preferred
+        rates_cache: dict[str, dict] = {}
         cat_map: dict[str, dict] = {}
         months_with_data: set[str] = set()
         for row in rows:
             cat_name = row.category_name or "Unknown"
+            m_key = row.month
+            if m_key not in rates_cache:
+                rates_cache[m_key] = await get_rates_for_month(db, m_key)
+            converted = convert_amount(float(row.total), row.currency, preferred_currency, rates_cache[m_key])
             if cat_name not in cat_map:
                 cat_map[cat_name] = {"category": cat_name, "color": row.color, "months": {}}
-            cat_map[cat_name]["months"][row.month] = float(row.total)
-            months_with_data.add(row.month)
+            cat_map[cat_name]["months"][m_key] = cat_map[cat_name]["months"].get(m_key, 0) + converted
+            months_with_data.add(m_key)
 
         # Rebuild month range: 12 months starting from first month with data
         if months_with_data:

@@ -111,6 +111,53 @@
     background: linear-gradient(135deg, #6366f1, #4f46e5);
 }
 
+@media (max-width: 768px) {
+    .carrot-donation {
+        padding: 16px;
+    }
+
+    .carrot-donation-icon {
+        font-size: 28px;
+    }
+
+    .carrot-donation-title {
+        font-size: 0.95rem;
+    }
+
+    .carrot-donation-subtitle {
+        font-size: 0.78rem;
+    }
+
+    .carrot-tiers {
+        gap: 8px;
+    }
+
+    .carrot-tier {
+        padding: 10px 4px;
+        gap: 4px;
+    }
+
+    .tier-carrots {
+        font-size: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1px;
+    }
+
+    .tier-price {
+        font-size: 0.95rem;
+    }
+
+    .tier-label {
+        font-size: 0.65rem;
+    }
+
+    .carrot-checkout-btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+}
+
 /* Donation success page */
 .donate-success-page {
     display: flex;

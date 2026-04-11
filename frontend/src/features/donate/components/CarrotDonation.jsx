@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, ExternalLink } from 'lucide-react';
 import { useTranslation } from '../../../i18n';
+import { useSettings } from '../../../context/SettingsContext';
 import { createDonateCheckout, getDonateConfig } from '../../../services/api';
 import { CarrotRain } from './CarrotRain';
 import './CarrotDonation.css';
@@ -14,14 +15,32 @@ const PAYMENT_LINKS = {
     5: 'https://buy.stripe.com/7sY28t3BWdTOaIJgy1dAk04',
 };
 
+// Tier structure — carrots and label keys are stable across currencies.
+// The displayed price text is computed per currency at render time.
 const TIERS = [
-    { id: 1, carrots: 1, price: '$2', label: 'donate.tier1' },
-    { id: 3, carrots: 3, price: '$5', label: 'donate.tier3' },
-    { id: 5, carrots: 5, price: '$10', label: 'donate.tier5' },
+    { id: 1, carrots: 1, label: 'donate.tier1' },
+    { id: 3, carrots: 3, label: 'donate.tier3' },
+    { id: 5, carrots: 5, label: 'donate.tier5' },
 ];
+
+// Per-currency price labels shown on each tier. Stripe still charges the
+// underlying product price regardless of what we display here — this is a
+// visual localization for users who think in CZK / EUR.
+const TIER_PRICES = {
+    CZK: { 1: '25 Kč', 3: '50 Kč', 5: '100 Kč' },
+    EUR: { 1: '2 €',  3: '5 €',  5: '10 €' },
+    USD: { 1: '$2',   3: '$5',   5: '$10' },
+};
+
+function priceForTier(tierId, currency) {
+    const table = TIER_PRICES[currency] || TIER_PRICES.USD;
+    return table[tierId] || TIER_PRICES.USD[tierId];
+}
 
 export function CarrotDonation() {
     const { t } = useTranslation();
+    const { settings } = useSettings();
+    const currency = settings?.preferred_currency || 'USD';
     const [selectedTier, setSelectedTier] = useState(1);
     const [loading, setLoading] = useState(false);
     const [config, setConfig] = useState(null);
@@ -96,7 +115,7 @@ export function CarrotDonation() {
                                 <span key={i}>{'\u{1F955}'}</span>
                             ))}
                         </span>
-                        <span className="tier-price">{tier.price}</span>
+                        <span className="tier-price">{priceForTier(tier.id, currency)}</span>
                         <span className="tier-label">{t(tier.label)}</span>
                     </motion.button>
                 ))}

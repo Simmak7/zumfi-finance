@@ -35,6 +35,7 @@ export function SettingsProvider({ children }) {
                 hidden_pages: [],
                 show_zumfi_rabbit: true,
                 language: 'en',
+                category_trend_order: [],
             });
         } finally {
             setLoading(false);

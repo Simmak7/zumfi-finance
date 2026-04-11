@@ -346,16 +346,8 @@ class PortfolioService:
         preferred_currency: str, rates: dict[str, float],
     ) -> float:
         """Convert amount to preferred currency using exchange rates."""
-        if from_currency == preferred_currency:
-            return amount
-        if preferred_currency == "CZK":
-            rate = rates.get(from_currency)
-            return round(amount * rate, 2) if rate else amount
-        from_rate = rates.get(from_currency)
-        to_rate = rates.get(preferred_currency)
-        if from_rate and to_rate and to_rate > 0:
-            return round(amount * from_rate / to_rate, 2)
-        return amount
+        from core.exchange_rates import convert_amount
+        return convert_amount(amount, from_currency, preferred_currency, rates)
 
     @staticmethod
     def _sum_stocks_converted(
@@ -398,10 +390,8 @@ class PortfolioService:
             result["is_closed"] = await PortfolioService._is_month_closed(db, owner_id, month)
             return result
 
-        # Ensure a snapshot exists for this month (lazy monthly update)
-        await PortfolioService.record_current_snapshot(
-            db, owner_id=owner_id, preferred_currency=preferred_currency,
-        )
+        # Don't auto-create snapshots here — snapshots are created only
+        # when the user explicitly adds/updates data (CRUD) or uploads statements.
 
         savings = await PortfolioService.get_all_savings(db, owner_id)
         investments = await PortfolioService.get_all_investments(db, owner_id)
@@ -595,14 +585,11 @@ class PortfolioService:
         for prop, pm, conv_value, conv_cost in prop_with_metrics:
             currency = prop.currency or "CZK"
             rate_used = rates.get(currency) if currency != preferred_currency else None
-            raw_gl = pm.get("gain_loss")
-            conv_gl = round(conv_value - conv_cost, 2) if raw_gl is not None else None
             prop_responses.append({
                 **{c.name: getattr(prop, c.name) for c in prop.__table__.columns},
                 **pm,
                 "converted_value": round(conv_value, 2),
                 "converted_cost": round(conv_cost, 2),
-                "converted_gain_loss": conv_gl,
                 "exchange_rate": round(rate_used, 4) if rate_used else None,
                 "target_currency": preferred_currency,
             })
@@ -772,7 +759,6 @@ class PortfolioService:
             rate_used = rates.get(currency) if currency != preferred_currency else None
             p["converted_value"] = round(conv_val, 2)
             p["converted_cost"] = round(conv_cost, 2)
-            p["converted_gain_loss"] = round(conv_val - conv_cost, 2) if p.get("gain_loss") is not None else None
             p["exchange_rate"] = round(rate_used, 4) if rate_used else None
             p["target_currency"] = preferred_currency
         tp = round(tp_converted, 2)
@@ -876,6 +862,39 @@ class PortfolioService:
     # ── Snapshot CRUD ──
 
     @staticmethod
+    async def _get_savings_for_month(
+        db: AsyncSession, owner_id: int, month_str: str,
+    ) -> float:
+        """Derive total savings for a month from statement closing balances.
+
+        Only includes savings backed by a statement whose period_end falls
+        in the target month.  Returns 0.0 when no savings statements exist
+        for that month — preventing ghost data from current live balances.
+        """
+        from features.statements.models import Statement
+
+        y, m = int(month_str[:4]), int(month_str[5:7])
+        first_day = date(y, m, 1)
+        _, last = monthrange(y, m)
+        last_day = date(y, m, last)
+
+        result = await db.execute(
+            select(
+                Statement.linked_savings_id,
+                func.max(Statement.closing_balance),
+            ).where(
+                Statement.owner_id == owner_id,
+                Statement.statement_type == "savings",
+                Statement.closing_balance.isnot(None),
+                Statement.linked_savings_id.isnot(None),
+                Statement.period_end >= first_day,
+                Statement.period_end <= last_day,
+            ).group_by(Statement.linked_savings_id)
+        )
+        rows = result.all()
+        return sum(float(row[1]) for row in rows if row[1] is not None)
+
+    @staticmethod
     async def _get_snapshot_for_month(
         db: AsyncSession, owner_id: int, year: int, month: int,
     ) -> PortfolioSnapshot | None:
@@ -897,9 +916,16 @@ class PortfolioService:
     @staticmethod
     async def create_or_update_snapshot(
         db: AsyncSession, owner_id: int, snapshot_date: date,
-        total_savings: float, total_investments: float,
-        total_stocks: float = 0.0, total_properties: float = 0.0,
+        total_savings: float | None = None,
+        total_investments: float | None = None,
+        total_stocks: float | None = None,
+        total_properties: float | None = None,
     ) -> PortfolioSnapshot:
+        """Create or update a portfolio snapshot.
+
+        Merge semantics: when updating an existing snapshot, None values
+        preserve existing data. When creating a new snapshot, None defaults to 0.
+        """
         result = await db.execute(
             select(PortfolioSnapshot).where(
                 PortfolioSnapshot.owner_id == owner_id,
@@ -908,18 +934,22 @@ class PortfolioService:
         )
         existing = result.scalar_one_or_none()
         if existing:
-            existing.total_savings = Decimal(str(round(total_savings, 2)))
-            existing.total_investments = Decimal(str(round(total_investments, 2)))
-            existing.total_stocks = Decimal(str(round(total_stocks, 2)))
-            existing.total_properties = Decimal(str(round(total_properties, 2)))
+            if total_savings is not None:
+                existing.total_savings = Decimal(str(round(total_savings, 2)))
+            if total_investments is not None:
+                existing.total_investments = Decimal(str(round(total_investments, 2)))
+            if total_stocks is not None:
+                existing.total_stocks = Decimal(str(round(total_stocks, 2)))
+            if total_properties is not None:
+                existing.total_properties = Decimal(str(round(total_properties, 2)))
         else:
             existing = PortfolioSnapshot(
                 owner_id=owner_id,
                 snapshot_date=snapshot_date,
-                total_savings=Decimal(str(round(total_savings, 2))),
-                total_investments=Decimal(str(round(total_investments, 2))),
-                total_stocks=Decimal(str(round(total_stocks, 2))),
-                total_properties=Decimal(str(round(total_properties, 2))),
+                total_savings=Decimal(str(round(total_savings or 0, 2))),
+                total_investments=Decimal(str(round(total_investments or 0, 2))),
+                total_stocks=Decimal(str(round(total_stocks or 0, 2))),
+                total_properties=Decimal(str(round(total_properties or 0, 2))),
             )
             db.add(existing)
         await db.flush()
@@ -956,14 +986,44 @@ class PortfolioService:
     @staticmethod
     async def get_portfolio_history(
         db: AsyncSession, owner_id: int, months: int = 12,
-        end_month: str | None = None,
+        end_month: str | None = None, preferred_currency: str = "CZK",
     ) -> list[dict]:
-        """Return total portfolio value per month for trend chart."""
+        """Return total portfolio value per month for trend chart.
+
+        Properties are always included (self-calculated) even if no
+        portfolio snapshot exists for that month. Savings, investments
+        and stocks only appear from uploaded/manually-added data.
+        Property values are converted to preferred_currency.
+        """
+        from features.portfolio.property_service import PropertyService
+
         if end_month:
             anchor_year, anchor_month = int(end_month[:4]), int(end_month[5:7])
         else:
             today = date.today()
             anchor_year, anchor_month = today.year, today.month
+
+        # Pre-load property history with per-property breakdown for currency conversion
+        prop_history = await PropertyService.get_all_properties_history(db, owner_id, months)
+        prop_currencies = prop_history.get("currencies", {})
+        prop_by_month: dict[str, list[dict]] = {}
+        for h in prop_history.get("history", []):
+            prop_by_month[h["month"]] = h.get("properties", [])
+
+        # Pre-load exchange rates for each month to avoid repeated DB calls.
+        # Also fetch latest rates as fallback for currencies missing in older months
+        # (e.g. UAH only appears in the "other currencies" feed stored from a later date).
+        rates_cache: dict[str, dict] = {}
+        from core.exchange_rates import get_exchange_rates
+        latest_rates = await get_exchange_rates(db)
+
+        # Collect all property currencies that need conversion
+        needed_currencies = {
+            prop_currencies.get(p["name"], "CZK")
+            for props in prop_by_month.values()
+            for p in props
+        } - {preferred_currency}
+
         points = []
         for i in range(months - 1, -1, -1):
             y = anchor_year
@@ -971,16 +1031,35 @@ class PortfolioService:
             while m <= 0:
                 m += 12
                 y -= 1
+            month_str = f"{y}-{m:02d}"
             snap = await PortfolioService._get_snapshot_for_month(db, owner_id, y, m)
             if snap:
                 ts = float(snap.total_savings)
                 ti = float(snap.total_investments)
                 tst = float(snap.total_stocks)
-                tp = float(snap.total_properties) if snap.total_properties else 0.0
             else:
-                ts, ti, tst, tp = 0.0, 0.0, 0.0, 0.0
+                ts, ti, tst = 0.0, 0.0, 0.0
+            # Properties are always self-calculated from PropertySnapshot,
+            # not from PortfolioSnapshot (which may be stale or missing).
+            # Convert each property value to preferred_currency.
+            month_props = prop_by_month.get(month_str, [])
+            tp = 0.0
+            if month_props:
+                if month_str not in rates_cache:
+                    rates_cache[month_str] = await get_rates_for_month(db, month_str)
+                rates = rates_cache[month_str]
+                # Supplement missing currencies from latest rates
+                for cur in needed_currencies:
+                    if cur not in rates and cur in latest_rates:
+                        rates[cur] = latest_rates[cur]
+                for p in month_props:
+                    currency = prop_currencies.get(p["name"], "CZK")
+                    tp += PortfolioService._convert_amount(
+                        p["estimated_value"], currency, preferred_currency, rates,
+                    )
+                tp = round(tp, 2)
             points.append({
-                "month": f"{y}-{m:02d}",
+                "month": month_str,
                 "total_savings": ts,
                 "total_investments": ti,
                 "total_stocks": tst,
@@ -1062,15 +1141,15 @@ class PortfolioService:
             by_stock.setdefault(key, []).append((s.snapshot_month, snap_data))
             last_snap_month[key] = s.snapshot_month
 
-        # For each target month, carry forward the latest snapshot per stock
+        # For each target month, only use snapshots from months that have
+        # actual data — no carry-forward beyond last uploaded snapshot.
         result = []
         for month_str in target_months:
             holdings = []
             total_value = 0.0
             for key, snap_list in by_stock.items():
-                # For sold stocks (not in active_stocks), only carry forward
-                # up to their last snapshot month — don't project beyond
-                if key not in active_stocks and month_str > last_snap_month[key]:
+                # Don't carry forward beyond the stock's last actual snapshot
+                if month_str > last_snap_month[key]:
                     continue
 
                 # Find latest snapshot on or before this month
@@ -1148,15 +1227,26 @@ class PortfolioService:
     ) -> None:
         """Compute live portfolio totals and save a snapshot.
 
-        When *target_date* is given the snapshot is stored for that date
-        (useful when updating historical months).  Otherwise today is used.
+        When *target_date* is given (historical month edit via
+        PUT /savings/{id}?month=YYYY-MM), only total_savings is updated
+        for that month.  Current stocks/investments/properties are NOT
+        injected into the historical snapshot.
 
-        Stock values are converted to preferred_currency using the
-        target month's average exchange rate so snapshots stay
-        consistent with historical re-computation.
+        Without target_date, snapshots today with full live data.
         """
         snap_date = target_date or date.today()
         snap_month = f"{snap_date.year}-{snap_date.month:02d}"
+
+        if target_date is not None:
+            # Historical month: only update savings (the field the user
+            # just edited). Don't inject current stocks/investments/properties.
+            savings = await PortfolioService.get_all_savings(db, owner_id)
+            total_savings = sum(float(a.balance) for a in savings)
+            await PortfolioService.create_or_update_snapshot(
+                db, owner_id, snap_date,
+                total_savings=total_savings,
+            )
+            return
 
         savings = await PortfolioService.get_all_savings(db, owner_id)
         investments = await PortfolioService.get_all_investments(db, owner_id)
@@ -1188,10 +1278,12 @@ class PortfolioService:
 
     @staticmethod
     async def recalculate_all_snapshots(db: AsyncSession) -> int:
-        """Recalculate total_stocks and total_properties in all PortfolioSnapshots.
+        """Recalculate total_savings, total_stocks, and total_properties in all PortfolioSnapshots.
 
-        Uses monthly average exchange rates so historical values are consistent.
-        Called once on startup to fix snapshots that were stored with single-day rates.
+        Savings are re-derived from Statement.closing_balance (statement-driven).
+        Stocks use StockHoldingSnapshots with monthly average exchange rates.
+        Properties use PropertySnapshots with monthly average exchange rates.
+        Called once on startup to fix ghost data and rate inconsistencies.
         Returns the number of snapshots updated.
         """
         import logging
@@ -1235,20 +1327,15 @@ class PortfolioService:
                         StockHoldingSnapshot.shares > Decimal("0.0001"),
                     )
                 )
-                stock_rows = list(stock_snaps.scalars())
-                if stock_rows:
-                    new_total_stocks = 0.0
-                    for ss in stock_rows:
-                        mv = float(ss.market_value) if ss.market_value is not None else None
-                        ti = float(ss.total_invested) if ss.total_invested is not None else 0
-                        raw_value = mv if mv is not None else ti
-                        new_total_stocks += PortfolioService._convert_amount(
-                            float(raw_value), ss.currency, preferred, rates,
-                        )
-                    new_total_stocks = round(new_total_stocks, 2)
-                else:
-                    # No stock snapshots for this month — preserve existing value
-                    new_total_stocks = float(snap.total_stocks)
+                new_total_stocks = 0.0
+                for ss in stock_snaps.scalars():
+                    mv = float(ss.market_value) if ss.market_value is not None else None
+                    ti = float(ss.total_invested) if ss.total_invested is not None else 0
+                    raw_value = mv if mv is not None else ti
+                    new_total_stocks += PortfolioService._convert_amount(
+                        float(raw_value), ss.currency, preferred, rates,
+                    )
+                new_total_stocks = round(new_total_stocks, 2)
 
                 # Recalculate total_properties from PropertySnapshots + conversion
                 prop_snaps = await db.execute(
@@ -1259,39 +1346,48 @@ class PortfolioService:
                         PropertySnapshot.snapshot_month == month_str,
                     )
                 )
-                prop_rows = prop_snaps.all()
-                if prop_rows:
-                    new_total_props = 0.0
-                    for ps, prop in prop_rows:
-                        raw_value = float(ps.estimated_value)
-                        currency = prop.currency or "CZK"
-                        new_total_props += PortfolioService._convert_amount(
-                            raw_value, currency, preferred, rates,
-                        )
-                    new_total_props = round(new_total_props, 2)
-                else:
-                    # No PropertySnapshot records — compute from live properties
-                    all_props = await PropertyService.get_all(db, user_id)
-                    new_total_props = 0.0
-                    for prop in all_props:
-                        v = compute_property_value(prop)
-                        raw = float(v) if v else float(prop.purchase_price)
-                        new_total_props += PortfolioService._convert_amount(
-                            raw, prop.currency or "CZK", preferred, rates,
-                        )
-                    new_total_props = round(new_total_props, 2)
+                new_total_props = 0.0
+                for ps, prop in prop_snaps.all():
+                    raw_value = float(ps.estimated_value)
+                    currency = prop.currency or "CZK"
+                    new_total_props += PortfolioService._convert_amount(
+                        raw_value, currency, preferred, rates,
+                    )
+                new_total_props = round(new_total_props, 2)
+
+                # Recalculate total_savings from statement closing balances
+                new_total_savings = await PortfolioService._get_savings_for_month(
+                    db, user_id, month_str,
+                )
+
+                # Delete all-zero snapshots (ghost data with no backing information)
+                old_inv = float(snap.total_investments)
+                all_zero = (
+                    new_total_savings < 0.01
+                    and old_inv < 0.01
+                    and new_total_stocks < 0.01
+                    and new_total_props < 0.01
+                )
+                if all_zero:
+                    await db.delete(snap)
+                    updated += 1
+                    continue
 
                 # Update if changed
+                old_savings = float(snap.total_savings)
                 old_stocks = float(snap.total_stocks)
                 old_props = float(snap.total_properties) if snap.total_properties else 0.0
-                if abs(new_total_stocks - old_stocks) > 0.01 or abs(new_total_props - old_props) > 0.01:
+                if (abs(new_total_savings - old_savings) > 0.01
+                        or abs(new_total_stocks - old_stocks) > 0.01
+                        or abs(new_total_props - old_props) > 0.01):
+                    snap.total_savings = Decimal(str(new_total_savings))
                     snap.total_stocks = Decimal(str(new_total_stocks))
                     snap.total_properties = Decimal(str(new_total_props))
                     updated += 1
 
         if updated:
             await db.flush()
-            logger.info(f"Recalculated {updated} portfolio snapshots with monthly average rates")
+            logger.info(f"Recalculated {updated} portfolio snapshots (includes ghost data cleanup)")
         return updated
 
     @staticmethod
@@ -1299,63 +1395,44 @@ class PortfolioService:
         db: AsyncSession, owner_id: int, target_date: date,
         preferred_currency: str = "CZK",
     ) -> None:
-        """Create/update a snapshot for a specific date using statement data.
+        """Create/update a snapshot for a specific date using statement data only.
 
-        Stock values are converted to preferred_currency using the rates
-        valid for the target month.
+        Savings: from Statement.closing_balance for the target month (not live balances).
+        Stocks: from StockHoldingSnapshots for the target month (not current holdings).
+        Investments: not touched (preserved via merge semantics).
+        Properties: not touched (preserved via merge semantics).
+
+        This ensures snapshots only reflect data that was actually imported
+        for the specific month — no ghost data from current live values.
         """
-        from features.statements.models import Statement
-
         y, m = target_date.year, target_date.month
-        first_day = date(y, m, 1)
-        _, last = monthrange(y, m)
-        last_day = date(y, m, last)
-
         month_str = f"{y}-{m:02d}"
         rates = await get_rates_for_month(db, month_str)
 
-        result = await db.execute(
-            select(Statement).where(
-                Statement.owner_id == owner_id,
-                Statement.statement_type == "savings",
-                Statement.closing_balance.isnot(None),
-                Statement.period_end >= first_day,
-                Statement.period_end <= last_day,
-            )
-        )
-        month_stmts = list(result.scalars().all())
-
-        # Keep only latest statement per savings account (handles re-uploads)
-        by_account: dict[int, Statement] = {}
-        for s in month_stmts:
-            key = s.linked_savings_id or s.id
-            if key not in by_account or (s.period_end and s.period_end > by_account[key].period_end):
-                by_account[key] = s
-
-        total_savings = sum(float(s.closing_balance) for s in by_account.values())
-
-        investments = await PortfolioService.get_all_investments(db, owner_id)
-        total_inv = 0.0
-        for inv in investments:
-            metrics = PortfolioService.compute_investment_metrics(inv)
-            total_inv += metrics["current_value"] if metrics["current_value"] is not None else metrics["total_invested"]
-
-        stocks = await PortfolioService.get_all_stocks(db, owner_id)
-        total_stocks, _ = PortfolioService._sum_stocks_converted(
-            stocks, preferred_currency, rates,
+        # Savings: derive from statement closing_balance for this month only.
+        # Returns 0.0 when no savings statement covers this month.
+        total_savings = await PortfolioService._get_savings_for_month(
+            db, owner_id, month_str,
         )
 
-        # Compute property values (same logic as record_current_snapshot)
-        all_props = await PropertyService.get_all(db, owner_id)
-        total_properties = 0.0
-        for prop in all_props:
-            v = compute_property_value(prop)
-            raw = float(v) if v else float(prop.purchase_price)
-            total_properties += PortfolioService._convert_amount(
-                raw, prop.currency or "CZK", preferred_currency, rates,
+        # Stocks: from StockHoldingSnapshots for the target month.
+        stock_snaps_result = await db.execute(
+            select(StockHoldingSnapshot).where(
+                StockHoldingSnapshot.owner_id == owner_id,
+                StockHoldingSnapshot.snapshot_month == month_str,
+                StockHoldingSnapshot.shares > Decimal("0.0001"),
             )
-        total_properties = round(total_properties, 2)
+        )
+        total_stocks = 0.0
+        for ss in stock_snaps_result.scalars():
+            mv = float(ss.market_value) if ss.market_value is not None else None
+            ti_val = float(ss.total_invested) if ss.total_invested is not None else 0
+            raw_value = mv if mv is not None else ti_val
+            total_stocks += PortfolioService._convert_amount(
+                float(raw_value), ss.currency, preferred_currency, rates,
+            )
+        total_stocks = round(total_stocks, 2)
 
         await PortfolioService.create_or_update_snapshot(
-            db, owner_id, target_date, total_savings, total_inv, total_stocks, total_properties,
+            db, owner_id, target_date, total_savings, None, total_stocks,
         )

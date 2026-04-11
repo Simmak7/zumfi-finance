@@ -5,8 +5,9 @@ import {
 } from 'recharts';
 import { getStockHoldingsHistory } from '../../../services/api';
 import { formatMonthShort } from '../../../utils/dates';
-import { formatMoney } from '../../../utils/currencies';
+import { formatCurrency } from '../../../utils/currencies';
 import { useMonth } from '../../../context/MonthContext';
+import { useSettings } from '../../../context/SettingsContext';
 
 const TOOLTIP_STYLE = {
     backgroundColor: '#1e1e2d',
@@ -22,14 +23,14 @@ function formatAmount(value) {
     return Math.round(value).toLocaleString();
 }
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label, currency = 'CZK' }) {
     if (!active || !payload?.length) return null;
     return (
         <div style={TOOLTIP_STYLE}>
             <p style={{ marginBottom: '0.25rem', fontWeight: 600 }}>{label}</p>
             {payload.map((entry) => (
                 <p key={entry.name} style={{ color: entry.color, margin: '0.1rem 0' }}>
-                    {entry.name}: {formatMoney(entry.value)}
+                    {entry.name}: {formatCurrency(entry.value, currency)}
                 </p>
             ))}
         </div>
@@ -39,12 +40,14 @@ function CustomTooltip({ active, payload, label }) {
 export function StockTrendChart() {
     const [data, setData] = useState([]);
     const [holdingKeys, setHoldingKeys] = useState([]);
-    const { maxMonth } = useMonth();
+    const { lastDataMonth } = useMonth();
+    const { settings } = useSettings();
+    const currency = settings?.preferred_currency || 'CZK';
 
     useEffect(() => {
         const load = async () => {
             try {
-                const history = await getStockHoldingsHistory(12, maxMonth);
+                const history = await getStockHoldingsHistory(12, lastDataMonth);
                 // Build chart data: each month has total + per-holding values
                 // Pick top holdings by latest month's value
                 const latestWithData = [...history].reverse().find(m => m.total_value > 0);
@@ -58,8 +61,12 @@ export function StockTrendChart() {
                     .sort((a, b) => Number(b.market_value || 0) - Number(a.market_value || 0));
                 const topKeys = sorted.slice(0, 5).map(h => `${h.ticker}_${h.currency}`);
 
+                const displayKeys = sorted.slice(0, 5).map(h => h.ticker);
+
                 const chartData = history.map(m => {
                     const row = { month: formatMonthShort(m.month) };
+                    // Initialize all keys to 0 so Recharts gets numeric values
+                    for (const k of displayKeys) row[k] = 0;
                     let otherVal = 0;
                     for (const h of m.holdings) {
                         const key = `${h.ticker}_${h.currency}`;
@@ -70,14 +77,16 @@ export function StockTrendChart() {
                             otherVal += val;
                         }
                     }
-                    if (otherVal > 0) row['Other'] = otherVal;
+                    if (sorted.length > 5) row['Other'] = otherVal;
                     return row;
                 });
 
-                const keys = sorted.slice(0, 5).map(h => h.ticker);
+                const keys = [...displayKeys];
                 if (sorted.length > 5) keys.push('Other');
 
-                setData(chartData);
+                // Filter out leading months with no data (all zeros)
+                const filtered = chartData.filter(d => keys.some(k => d[k] > 0));
+                setData(filtered.length > 0 ? filtered : chartData.slice(-1));
                 setHoldingKeys(keys);
             } catch (err) {
                 console.error('Error loading stock history:', err);
@@ -88,7 +97,7 @@ export function StockTrendChart() {
         const handleUpdate = () => load();
         window.addEventListener('portfolio-updated', handleUpdate);
         return () => window.removeEventListener('portfolio-updated', handleUpdate);
-    }, [maxMonth]);
+    }, [lastDataMonth]);
 
     const hasData = data.filter(d => {
         return holdingKeys.some(k => d[k] > 0);
@@ -130,7 +139,7 @@ export function StockTrendChart() {
                         tickFormatter={formatAmount}
                         width={55}
                     />
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip content={(props) => <CustomTooltip {...props} currency={currency} />} />
                     {holdingKeys.map((key, i) => (
                         <Area
                             key={key}

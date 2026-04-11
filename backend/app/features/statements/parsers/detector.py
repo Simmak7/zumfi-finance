@@ -19,11 +19,14 @@ IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.tiff', '.tif', '.bmp', '.webp', '
 
 # ---------- Lazy imports to avoid circular deps ----------
 
-from .revolut import RevolutParser
-from .raiffeisen import RaiffeisenParser
-from .fio import FioParser
-from .csob import CeskaSporitelnaParser
-from .czech_universal import CzechUniversalParser
+from .banks.revolut import RevolutParser
+from .banks.raiffeisen import RaiffeisenParser
+from .banks.fio import FioParser
+from .banks.ceska_sporitelna import CeskaSporitelnaParser
+from .banks.czech_universal import CzechUniversalParser
+from .banks.unicredit import UniCreditParser
+from .banks.mbank import MBankParser
+from .banks.csob import CsobParser
 
 
 def _czech(bank_name: str):
@@ -54,9 +57,9 @@ BANK_SIGNATURES = [
     (["česká exportní", "ceska exportni", "exportní banka", "/8090"],
      _czech("ceb")),
 
-    # ČSOB — Československá obchodní banka (bank code 0300)
+    # ČSOB — Československá obchodní banka (bank code 0300) — dedicated parser
     (["československá obchodní", "ceskoslovenska obchodni",
-      "čsob", "csob", "/0300"], _czech("csob")),
+      "čsob", "csob", "/0300"], CsobParser),
 
     # ČSOB Stavební spořitelna (bank code 7910)
     (["čsob stavební", "csob stavebni", "čmss", "cmss", "/7910"],
@@ -101,8 +104,11 @@ BANK_SIGNATURES = [
     # Trinity Bank (bank code 2070)
     (["trinity bank", "trinity banka", "/2070"], _czech("trinity_bank")),
 
-    # UniCredit Bank Czech Republic (bank code 2700)
-    (["unicredit", "uni credit", "/2700"], _czech("unicredit")),
+    # UniCredit Bank Czech Republic (bank code 2700) — dedicated parser
+    (["unicredit", "uni credit", "/2700"], UniCreditParser),
+
+    # mBank S.A. (bank code 6210) — dedicated parser
+    (["mbank", "m bank", "mbank.cz", "/6210"], MBankParser),
 
     # Všeobecná úverová banka — VÚB (Slovak, bank code 6700)
     (["všeobecná úverová", "vseobecna uverova", "vúb", "vub banka", "/6700"],
@@ -134,6 +140,11 @@ SAVINGS_KEYWORDS = [
     "termínovaný vklad", "terminovany vklad",
     "úrokový výpis", "urokovy vypis",
     "stavební spoření", "stavebni sporeni",
+    # mBank savings products (with and without diacritics)
+    "mspoření", "msporeni",         # mBank "mSpoření" savings account
+    "m spoření", "m sporeni",
+    "cílové spoření", "cilove sporeni",  # mBank goal-based savings
+    "cílový účet", "cilovy ucet",   # mBank goal account
     # English
     "savings account", "savings statement",
     "fixed deposit", "term deposit",
@@ -239,6 +250,9 @@ def _best_effort_parser(file_path: str) -> BaseParser:
         RaiffeisenParser(),
         FioParser(),
         CeskaSporitelnaParser(),
+        UniCreditParser(),
+        MBankParser(),
+        CsobParser(),
         CzechUniversalParser(bank_name="czech_universal"),
         RevolutParser(),
         GenericParser(),

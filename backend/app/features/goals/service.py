@@ -137,11 +137,13 @@ class GoalService:
         if available <= 0:
             return []
 
-        # Get all active goals
+        # Get active goals that existed during this month
+        cutoff = GoalService._month_cutoff(month)
         result = await db.execute(
             select(Goal).where(
                 Goal.owner_id == owner_id,
                 Goal.status == "active",
+                Goal.created_at < cutoff,
             )
         )
         goals = list(result.scalars().all())
@@ -188,16 +190,18 @@ class GoalService:
                 detail=f"Total allocation ({total_alloc}) exceeds available surplus ({surplus_data['available_surplus']})",
             )
 
+        cutoff = GoalService._month_cutoff(month)
         updated_goals = []
         for alloc in allocations:
             if Decimal(str(alloc["amount"])) <= 0:
                 continue
 
-            # Find goal
+            # Find goal (must have existed during this month)
             result = await db.execute(
                 select(Goal).where(
                     Goal.id == alloc["goal_id"],
                     Goal.owner_id == owner_id,
+                    Goal.created_at < cutoff,
                 )
             )
             goal = result.scalar_one_or_none()

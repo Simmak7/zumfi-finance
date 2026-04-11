@@ -10,11 +10,11 @@ import './LoginPage.css';
 
 const GOOGLE_ENABLED = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-export function LoginPage() {
+export function LoginPage({ defaultRegister = false }) {
     const { login, register, needs2FA, verify2FA } = useAuth();
     const { addToast } = useToast();
     const { t } = useTranslation();
-    const [isRegister, setIsRegister] = useState(false);
+    const [isRegister, setIsRegister] = useState(defaultRegister);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');

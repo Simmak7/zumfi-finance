@@ -1,7 +1,5 @@
-from datetime import datetime, timezone
-
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -157,21 +155,3 @@ async def delete_goal(
     await GoalService.delete(db, owner_id=user.id, goal_id=goal_id)
     await GoalService.record_goal_snapshots(db, owner_id=user.id)
     return {"message": "Goal deleted successfully"}
-
-
-@router.post("/seed-backdate")
-async def seed_backdate_goals(
-    request: dict,
-    db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    """Backdate all user's goals created_at to a given date (for demo seeding)."""
-    date_str = request.get("created_at", "2025-08-15T10:00:00")
-    target_dt = datetime.fromisoformat(date_str).replace(tzinfo=timezone.utc)
-    await db.execute(
-        update(Goal)
-        .where(Goal.owner_id == user.id)
-        .values(created_at=target_dt)
-    )
-    await db.commit()
-    return {"backdated_to": date_str}

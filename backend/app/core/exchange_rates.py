@@ -229,47 +229,18 @@ async def get_rates_for_month(db: AsyncSession, year_month: str) -> dict[str, fl
     for row in result:
         rates[row[0]] = round(float(row[1]), 6)
 
-    if not rates:
-        # Fallback: no rates for this month — use the most recent day before it
-        latest = await db.execute(
-            select(func.max(ExchangeRate.rate_date)).where(
-                ExchangeRate.rate_date < first_day
-            )
-        )
-        max_date = latest.scalar()
-        if max_date:
-            rates = await _load_from_db(db, max_date)
-
-    # Fill in any missing currencies using their nearest available rate
-    # (handles currencies added to the DB after the requested month, e.g. UAH)
-    all_codes_result = await db.execute(
-        select(ExchangeRate.currency_code).distinct()
-    )
-    all_codes = {row[0] for row in all_codes_result}
-    missing = all_codes - set(rates.keys())
-    for code in missing:
-        # Try closest date before the month
-        before = await db.execute(
-            select(ExchangeRate.rate_to_czk)
-            .where(ExchangeRate.currency_code == code, ExchangeRate.rate_date < first_day)
-            .order_by(ExchangeRate.rate_date.desc())
-            .limit(1)
-        )
-        val = before.scalar()
-        if val is None:
-            # Try closest date after the month
-            after = await db.execute(
-                select(ExchangeRate.rate_to_czk)
-                .where(ExchangeRate.currency_code == code, ExchangeRate.rate_date >= first_day)
-                .order_by(ExchangeRate.rate_date.asc())
-                .limit(1)
-            )
-            val = after.scalar()
-        if val is not None:
-            rates[code] = float(val)
-
     if rates:
         return rates
+
+    # Fallback: no rates for this month — use the most recent day before it
+    latest = await db.execute(
+        select(func.max(ExchangeRate.rate_date)).where(
+            ExchangeRate.rate_date < first_day
+        )
+    )
+    max_date = latest.scalar()
+    if max_date:
+        return await _load_from_db(db, max_date)
 
     # Last resort: fetch current rates
     return await get_exchange_rates(db)
@@ -283,14 +254,34 @@ async def convert_to_preferred(
         return amount
 
     rates = await get_exchange_rates(db)
+    return convert_amount(amount, from_currency, preferred_currency, rates)
 
-    if preferred_currency == "CZK":
-        rate = rates.get(from_currency)
-        return round(amount * rate, 2) if rate else amount
 
-    # Cross-rate: from_currency → CZK → preferred_currency
+def convert_amount(
+    amount: float, from_currency: str, to_currency: str,
+    rates: dict[str, float],
+) -> float:
+    """Convert amount between currencies using CZK-based rates.
+
+    Rates dict maps currency code → CZK value (e.g. EUR → 25.5 means 1 EUR = 25.5 CZK).
+    Handles all directions: CZK→foreign, foreign→CZK, foreign→foreign.
+    """
+    if from_currency == to_currency:
+        return amount
+
+    # CZK → foreign: divide by target rate
+    if from_currency == "CZK":
+        to_rate = rates.get(to_currency)
+        return round(amount / to_rate, 2) if to_rate and to_rate > 0 else amount
+
+    # Foreign → CZK: multiply by source rate
+    if to_currency == "CZK":
+        from_rate = rates.get(from_currency)
+        return round(amount * from_rate, 2) if from_rate else amount
+
+    # Foreign → foreign: cross-rate via CZK
     from_rate = rates.get(from_currency)
-    to_rate = rates.get(preferred_currency)
+    to_rate = rates.get(to_currency)
     if from_rate and to_rate and to_rate > 0:
         return round(amount * from_rate / to_rate, 2)
 

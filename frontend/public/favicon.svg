@@ -1,41 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="45%" r="50%">
+    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#818cf8"/>
       <stop offset="100%" stop-color="#6366f1"/>
-    </radialGradient>
+    </linearGradient>
   </defs>
-  <!-- Background circle -->
-  <circle cx="32" cy="32" r="31" fill="url(#bg)"/>
-  <!-- Left ear -->
-  <ellipse cx="22" cy="14" rx="6" ry="16" fill="#e8e0ff" stroke="#c4b5fd" stroke-width="0.5"/>
-  <ellipse cx="22" cy="14" rx="3" ry="11" fill="#d4b896" opacity="0.7"/>
-  <!-- Right ear (golden) -->
-  <g transform="rotate(6 42 14)">
-    <ellipse cx="42" cy="14" rx="6" ry="16" fill="#e8e0ff" stroke="#c4b5fd" stroke-width="0.5"/>
-    <ellipse cx="42" cy="14" rx="3" ry="11" fill="#d4a843" opacity="0.8"/>
-    <ellipse cx="42" cy="12" rx="2" ry="8" fill="#f0d78c" opacity="0.4"/>
-  </g>
+  <circle cx="50" cy="50" r="48" fill="url(#fg)"/>
+  <!-- Ears -->
+  <ellipse cx="36" cy="22" rx="8" ry="18" fill="#fff"/>
+  <ellipse cx="36" cy="22" rx="4.5" ry="12" fill="#f5deb3" opacity="0.5"/>
+  <ellipse cx="64" cy="22" rx="8" ry="18" fill="#fff"/>
+  <ellipse cx="64" cy="22" rx="4.5" ry="12" fill="#f5deb3" opacity="0.5"/>
   <!-- Head -->
-  <ellipse cx="32" cy="36" rx="18" ry="16" fill="#ede5ff"/>
-  <ellipse cx="30" cy="33" rx="8" ry="6" fill="#f5f0ff" opacity="0.5"/>
+  <ellipse cx="50" cy="56" rx="28" ry="26" fill="#fff"/>
   <!-- Eyes -->
-  <ellipse cx="26" cy="34" rx="2.5" ry="3" fill="#2a2438"/>
-  <ellipse cx="38" cy="34" rx="2.5" ry="3" fill="#2a2438"/>
-  <circle cx="27" cy="33" r="1" fill="#fff"/>
-  <circle cx="39" cy="33" r="1" fill="#fff"/>
+  <circle cx="40" cy="50" r="4" fill="#1a1a2e"/>
+  <circle cx="60" cy="50" r="4" fill="#1a1a2e"/>
+  <circle cx="42" cy="48" r="1.6" fill="#fff"/>
+  <circle cx="62" cy="48" r="1.6" fill="#fff"/>
   <!-- Nose -->
-  <ellipse cx="32" cy="39" rx="2" ry="1.4" fill="#d4a0b0"/>
-  <ellipse cx="31.5" cy="38.7" rx="0.8" ry="0.5" fill="#fff" opacity="0.3"/>
-  <!-- Mouth + teeth -->
-  <path d="M29 42 Q32 45 35 42" stroke="#2a2438" stroke-width="0.6" fill="none"/>
-  <rect x="30" y="42" width="2" height="2.5" rx="0.5" fill="#fff" stroke="#e0d8ee" stroke-width="0.3"/>
-  <rect x="32" y="42" width="2" height="2.5" rx="0.5" fill="#fff" stroke="#e0d8ee" stroke-width="0.3"/>
-  <!-- Cheek blush -->
-  <circle cx="21" cy="38" r="3.5" fill="#e8c8d8" opacity="0.3"/>
-  <circle cx="43" cy="38" r="3.5" fill="#e8c8d8" opacity="0.3"/>
-  <!-- Gold crown sparkle -->
-  <circle cx="32" cy="20" r="1.5" fill="#f0d78c" opacity="0.6"/>
-  <circle cx="28" cy="21.5" r="0.8" fill="#f0d78c" opacity="0.4"/>
-  <circle cx="36" cy="21.5" r="0.8" fill="#f0d78c" opacity="0.4"/>
+  <ellipse cx="50" cy="60" rx="3.5" ry="2.5" fill="#f0b0b0"/>
+  <!-- Cheeks -->
+  <circle cx="34" cy="62" r="5" fill="#f0a0c0" opacity="0.3"/>
+  <circle cx="66" cy="62" r="5" fill="#f0a0c0" opacity="0.3"/>
+  <!-- Teeth -->
+  <rect x="46" y="65" width="4" height="5" rx="1" fill="#fff" stroke="#e0d8ee" stroke-width="0.5"/>
+  <rect x="50" y="65" width="4" height="5" rx="1" fill="#fff" stroke="#e0d8ee" stroke-width="0.5"/>
 </svg>

@@ -29,6 +29,40 @@ body {
   min-height: 100vh;
 }
 
+@media (max-width: 768px) {
+  html, body, #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Prevent layout containers from causing horizontal scroll.
+     Do NOT include chart-card or recharts elements — SVGs need overflow visible. */
+  .page-container,
+  .portfolio-page,
+  .portfolio-section,
+  .portfolio-section-full,
+  .portfolio-cards,
+  .portfolio-card,
+  .kpi-grid,
+  .kpi-card,
+  .kpi-card-hero,
+  .goal-charts-grid,
+  .goal-chart-card,
+  .dashboard-breakdown-row,
+  .bills-recurring-content,
+  .bills-total-card,
+  .bill-list,
+  .bill-row,
+  .tx-row,
+  .tx-list,
+  .ctm-modal,
+  .mcw-modal,
+  .cat-sheet {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 #root {
   width: 100%;
   min-height: 100vh;

@@ -6,11 +6,16 @@ from datetime import date
 from decimal import Decimal
 
 BALANCE_PATTERNS = [
-    # Czech: "Konečný zůstatek: 123 456,78" or "718 600.17"
+    # Czech: "Konečný zůstatek: 123 456,78" or concatenated "Konečnýzůstatek:"
     re.compile(
-        r"(?:Konečný\s+zůstatek|Konecny\s+zustatek|Zůstatek\s+na\s+účtu|"
-        r"Zustatek\s+na\s+uctu|Konečný\s+zůstatek\s+ke\s+dni|Konečný\s+zustatek)"
+        r"(?:Konečný\s*zůstatek|Konecny\s*zustatek|Zůstatek\s+na\s+účtu|"
+        r"Zustatek\s+na\s+uctu|Zůstatek\s+ke\s+dni|Konečný\s*zustatek)"
         r"\s*:?\s*([\d\s]+[,.]\d{2})\s*([A-Z]{3})?",
+        re.IGNORECASE,
+    ),
+    # Slovak (FIO SK branch): "Nový zostatok 10 070,86"
+    re.compile(
+        r"Nový\s+zostatok\s*:?\s*(-?[\d\s]+[,.]\d{2})\s*([A-Z]{3})?",
         re.IGNORECASE,
     ),
     # English: "Closing Balance: 1,234.56 CZK"
@@ -68,9 +73,8 @@ def extract_closing_balance(file_path: str) -> Decimal | None:
     full_text = "\n".join(page.extract_text() or "" for page in doc.pages)
 
     for pattern in BALANCE_PATTERNS:
-        matches = list(pattern.finditer(full_text))
-        if matches:
-            match = matches[-1]  # Take LAST match (closing balance appears after opening)
+        match = pattern.search(full_text)
+        if match:
             amount_str = match.group(1)
             amount = _parse_balance_amount(amount_str)
             if amount > 0:
@@ -85,6 +89,12 @@ PERIOD_RANGE_PATTERNS = [
     # Czech: "za období 01.01.2025 - 31.01.2025" or with em-dash
     re.compile(
         r"za\s+obdob[ií]\s+(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\s*[-–]\s*"
+        r"(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})",
+        re.IGNORECASE,
+    ),
+    # Slovak (FIO SK): "Výpis za obdobie 1.1.2026-31.3.2026"
+    re.compile(
+        r"za\s+obdobie\s+(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\s*[-–]\s*"
         r"(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})",
         re.IGNORECASE,
     ),

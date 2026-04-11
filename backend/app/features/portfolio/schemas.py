@@ -354,10 +354,6 @@ class PropertyResponse(BaseModel):
     display_value: float | None = None
     gain_loss: float | None = None
     gain_loss_pct: float | None = None
-    converted_value: float | None = None
-    converted_purchase_price: float | None = None
-    converted_gain_loss: float | None = None
-    display_currency: str | None = None
     created_at: datetime
     updated_at: datetime
 

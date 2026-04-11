@@ -44,6 +44,7 @@ export function useZumfiProximity() {
     const cooldownMapRef = useRef({});
     const lastCheckRef = useRef(0);
     const holdTimerRef = useRef(null);
+    const mismatchCountRef = useRef(0);  // zone-exit hysteresis counter
 
     const isOnCooldown = useCallback((zoneId) => {
         const last = cooldownMapRef.current[zoneId];
@@ -59,6 +60,7 @@ export function useZumfiProximity() {
 
     // Hard reset — called on drag end. No timers, no conditions.
     const clearActiveZone = useCallback(() => {
+        mismatchCountRef.current = 0;
         // Remove glow from any active zone
         if (activeZoneRef.current) {
             setGlow(activeZoneRef.current, false);
@@ -87,8 +89,17 @@ export function useZumfiProximity() {
 
         const newZone = detectZone(x, y);
 
-        // Same zone as before — nothing to do
-        if (newZone === activeZoneRef.current) return;
+        // Same zone as before — nothing to do, reset hysteresis
+        if (newZone === activeZoneRef.current) {
+            mismatchCountRef.current = 0;
+            return;
+        }
+
+        // Zone changed — require 2 consecutive mismatches before transitioning.
+        // Prevents rapid flicker when rabbit is on the boundary between two zones.
+        mismatchCountRef.current++;
+        if (mismatchCountRef.current < 2) return;
+        mismatchCountRef.current = 0;
 
         // Left previous zone — remove glow
         if (activeZoneRef.current) {

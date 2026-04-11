@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
     Search, ChevronDown, ChevronRight, Lightbulb,
     LayoutDashboard, Receipt, PiggyBank, Target, FileCheck, Wallet,
@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../../../i18n';
 import { useGuidedTour } from '../GuidedTourContext';
+import { useZumfi } from '../../zumfi/context/ZumfiContext';
 import { TOUR_PHASES } from '../tourSteps';
 import './HelpPage.css';
 
@@ -274,6 +275,7 @@ export function HelpPage() {
     const [search, setSearch] = useState('');
     const { t } = useTranslation();
     const { startTour } = useGuidedTour();
+    const { setPageData } = useZumfi();
 
     const totalSteps = TOUR_PHASES.reduce((sum, p) => sum + p.steps.length, 0);
     const searchTerm = search.toLowerCase().trim();
@@ -291,6 +293,20 @@ export function HelpPage() {
         );
     }, [searchTerm]);
 
+    // Feed help data to Zumfi for proximity interactions
+    useEffect(() => {
+        setPageData({
+            _page: 'help',
+            searchTerm,
+            expandedId,
+            visibleCount: visibleSections.length,
+            totalCount: SECTIONS.length,
+            phases: TOUR_PHASES.length,
+            totalSteps,
+        });
+        return () => setPageData(null);
+    }, [searchTerm, expandedId, visibleSections.length, totalSteps, setPageData]);
+
     // Auto-expand all when searching
     const getExpanded = (id) => {
         if (searchTerm) return true;
@@ -299,14 +315,18 @@ export function HelpPage() {
 
     return (
         <div className="page-container">
-            <header className="page-header">
+            <header className="page-header" data-zumfi-zone="help-header">
                 <div>
                     <h1 className="page-title">{t('help.title')}</h1>
                     <p className="page-subtitle">{t('help.subtitle')}</p>
                 </div>
             </header>
 
-            <button className="tour-start-btn" onClick={startTour}>
+            <button
+                className="tour-start-btn"
+                data-zumfi-zone="help-tour-btn"
+                onClick={startTour}
+            >
                 <Play size={18} />
                 <div className="tour-start-content">
                     <span className="tour-start-label">{t('help.startTour')}</span>
@@ -316,7 +336,7 @@ export function HelpPage() {
                 </div>
             </button>
 
-            <div className="help-search">
+            <div className="help-search" data-zumfi-zone="help-search">
                 <Search size={16} />
                 <input
                     type="text"
@@ -335,7 +355,7 @@ export function HelpPage() {
                 <div className="help-empty">{t('help.noResults')}</div>
             )}
 
-            <div className="help-sections">
+            <div className="help-sections" data-zumfi-zone="help-sections">
                 {visibleSections.map(section => (
                     <HelpSection
                         key={section.id}

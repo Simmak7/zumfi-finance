@@ -90,6 +90,7 @@ class ZumiInsightRequest(BaseModel):
     budget_pct: float | None = None
     goals_reached: int = 0
     goal_count: int = 0
+    language: str | None = None  # "en", "cs", "uk" — falls back to user.language
 
 
 @router.post("/zumi-insight")
@@ -99,6 +100,10 @@ async def get_zumi_insight_endpoint(
     user: User = Depends(get_current_user),
 ):
     """Generate AI-powered speech bubble text for Zumi mascot."""
+    # Prefer the language the client explicitly sent; fall back to the
+    # user's saved preference; default to English.
+    language = (request.language or getattr(user, "language", None) or "en").lower()
+
     insight = await get_zumi_insight(
         mood=request.mood,
         income=request.income,
@@ -109,6 +114,7 @@ async def get_zumi_insight_endpoint(
         budget_pct=request.budget_pct,
         goals_reached=request.goals_reached,
         goal_count=request.goal_count,
+        language=language,
     )
 
     return {"insight": insight}

@@ -7,7 +7,7 @@ const translations = { en, cs, uk };
 
 export const LANGUAGES = [
   { code: 'en', name: 'English', flag: 'GB' },
-  { code: 'cs', name: 'Cestina', flag: 'CZ' },
+  { code: 'cs', name: 'Čeština', flag: 'CZ' },
   { code: 'uk', name: 'Ukrainska', flag: 'UA' },
 ];
 

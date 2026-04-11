@@ -8,12 +8,14 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from features.portfolio.models import StockTrade, StockDividend
+from core.exchange_rates import get_exchange_rates, convert_amount
 
 logger = logging.getLogger(__name__)
 
 
 async def get_stock_pnl_summary(
     db: AsyncSession, owner_id: int, month: str | None = None,
+    preferred_currency: str = "CZK",
 ) -> dict:
     """Get realized trades and dividends for a user.
 
@@ -60,9 +62,17 @@ async def get_stock_pnl_summary(
     total_dividends = sum(float(d.net_amount) for d in dividends)
     total_tax = sum(float(d.withholding_tax) for d in dividends)
 
+    # Convert CZK totals to preferred currency
+    total_pnl_preferred = total_pnl_czk
+    if preferred_currency != "CZK" and total_pnl_czk != 0:
+        rates = await get_exchange_rates(db)
+        total_pnl_preferred = convert_amount(
+            total_pnl_czk, "CZK", preferred_currency, rates,
+        )
+
     return {
         "total_realized_pnl": round(total_pnl, 2),
-        "total_realized_pnl_czk": round(total_pnl_czk, 2),
+        "total_realized_pnl_czk": round(total_pnl_preferred, 2),
         "total_cost_basis": round(total_cost, 2),
         "total_proceeds": round(total_proceeds, 2),
         "total_fees": round(total_fees, 2),

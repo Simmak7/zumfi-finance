@@ -1,0 +1,277 @@
+/* --- Floating trigger button --- */
+.feedback-trigger {
+    position: fixed;
+    top: 12px;
+    right: 80px;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 24px;
+    color: #f87171;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    backdrop-filter: blur(8px);
+    letter-spacing: 0.02em;
+}
+
+.feedback-trigger:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* --- Overlay --- */
+.feedback-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    animation: feedbackFadeIn 0.2s ease;
+}
+
+@keyframes feedbackFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* --- Modal --- */
+.feedback-modal {
+    width: min(520px, 95vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: feedbackSlideUp 0.25s ease;
+}
+
+@keyframes feedbackSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.feedback-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.feedback-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.15s;
+}
+
+.feedback-close:hover {
+    color: #fff;
+}
+
+.feedback-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0.25rem 0 1.25rem;
+    line-height: 1.4;
+}
+
+/* --- Form --- */
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.feedback-field label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.02em;
+}
+
+.feedback-field input,
+.feedback-field select,
+.feedback-field textarea {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: #fff;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.feedback-field input:focus,
+.feedback-field select:focus,
+.feedback-field textarea:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.feedback-field textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.feedback-field select option {
+    background: #1a1a2e;
+    color: #fff;
+}
+
+.feedback-field-hint {
+    display: block;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 0.25rem;
+}
+
+/* --- File attachments --- */
+.feedback-file-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.feedback-attach-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.55rem 0.85rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 0.4rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.feedback-attach-btn:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.feedback-attach-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.feedback-file-hint {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.feedback-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+}
+
+.feedback-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.3rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.feedback-file-item button {
+    background: none;
+    border: none;
+    color: rgba(239, 68, 68, 0.6);
+    cursor: pointer;
+    padding: 2px;
+}
+
+.feedback-file-item button:hover {
+    color: #ef4444;
+}
+
+/* --- Submit --- */
+.feedback-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0.8rem;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none;
+    border-radius: 0.5rem;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.25rem;
+}
+
+.feedback-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+}
+
+.feedback-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.feedback-sending {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+    .feedback-trigger {
+        top: auto;
+        bottom: 80px;
+        right: 12px;
+    }
+
+    .feedback-trigger span {
+        display: none;
+    }
+
+    .feedback-trigger {
+        padding: 8px;
+        border-radius: 50%;
+    }
+
+    .feedback-modal {
+        padding: 1.25rem;
+        max-height: 85vh;
+    }
+}

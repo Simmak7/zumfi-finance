@@ -142,6 +142,23 @@ export function CategoryDonutChart({ expenseBreakdown, selectedMonth, hiddenCate
                         onClose={() => setShowTrends(false)}
                     />
                 )}
+                {showCategoryEditor && (
+                    <div className="cem-overlay" onClick={() => setShowCategoryEditor(false)}>
+                        <div className="cem-modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="cem-header">
+                                <h2>Manage Categories</h2>
+                                <button className="mcw-close" onClick={() => setShowCategoryEditor(false)}>
+                                    <X size={18} />
+                                </button>
+                            </div>
+                            <div className="cem-body">
+                                <CategoryEditorErrorBoundary>
+                                    <CategoryEditor onSuccess={() => window.dispatchEvent(new Event('categories-updated'))} />
+                                </CategoryEditorErrorBoundary>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }

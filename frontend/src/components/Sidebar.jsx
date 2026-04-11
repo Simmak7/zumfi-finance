@@ -86,6 +86,7 @@ export function Sidebar() {
                     <LogOut size={18} className="logout-icon" onClick={logout} style={{ cursor: 'pointer' }} />
                 </div>
             )}
+            <div className="sidebar-version">v1.1</div>
         </aside>
     );
 }

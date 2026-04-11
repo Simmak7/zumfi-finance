@@ -127,7 +127,7 @@ export function AllocationWizard({ month, onClose }) {
                         </div>
 
                         {step === 1 && (
-                            <div className="wizard-step alloc-step">
+                            <div className="wizard-step">
                                 <h3>{t('monthClose.surplus')}</h3>
                                 <div className="surplus-summary">
                                     <div className="surplus-row">
@@ -162,7 +162,7 @@ export function AllocationWizard({ month, onClose }) {
                         )}
 
                         {step === 2 && (
-                            <div className="wizard-step alloc-step">
+                            <div className="wizard-step">
                                 <div className="distribute-header">
                                     <h3>{t('allocation.subtitle')}</h3>
                                     <button className="suggest-btn" onClick={fillSuggestions}>
@@ -171,13 +171,9 @@ export function AllocationWizard({ month, onClose }) {
                                 </div>
 
                                 <div className="remaining-banner">
-                                    <span className="remaining-banner-label">
-                                        {remaining > 0 ? t('allocation.remaining') || 'Remaining' : t('allocation.allocated') || 'Allocated'}
-                                    </span>
-                                    <span className={`remaining-banner-amount${remaining < 0 ? ' over' : ''}${remaining === 0 && totalAllocated > 0 ? ' done' : ''}`}>
-                                        {remaining > 0
-                                            ? formatAmount(remaining)
-                                            : `${formatAmount(totalAllocated)} / ${formatAmount(available)}`}
+                                    <span className="remaining-banner-label">{t('allocation.available')}</span>
+                                    <span className={`remaining-banner-amount${remaining < 0 ? ' over' : ''}${Math.round(remaining * 100) === 0 && totalAllocated > 0 ? ' done' : ''}`}>
+                                        {formatAmount(Math.round(remaining * 100) === 0 ? 0 : remaining)}
                                     </span>
                                 </div>
 
@@ -229,7 +225,7 @@ export function AllocationWizard({ month, onClose }) {
                         )}
 
                         {step === 3 && (
-                            <div className="wizard-step alloc-step">
+                            <div className="wizard-step">
                                 <h3>{t('common.confirm')} {t('allocation.title')}</h3>
                                 <div className="confirm-list">
                                     {suggestions

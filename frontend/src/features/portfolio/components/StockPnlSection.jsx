@@ -4,9 +4,12 @@ import { getStockPnl } from '../../../services/api';
 import { formatCurrency, formatMoney } from '../../../utils/currencies';
 import { formatDate } from '../../../utils/dates';
 import { useTranslation } from '../../../i18n';
+import { useSettings } from '../../../context/SettingsContext';
 
 export function StockPnlSection({ selectedMonth }) {
     const { t } = useTranslation();
+    const { settings } = useSettings();
+    const preferredCurrency = settings?.preferred_currency || 'CZK';
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -43,7 +46,7 @@ export function StockPnlSection({ selectedMonth }) {
                 </h2>
                 {hasTrades && (
                     <span className={`pnl-total ${isPositive ? 'text-green' : 'text-red'}`}>
-                        {isPositive ? '+' : ''}{formatCurrency(data.total_realized_pnl_czk, 'CZK')}
+                        {isPositive ? '+' : ''}{formatCurrency(data.total_realized_pnl_czk, preferredCurrency)}
                     </span>
                 )}
             </div>
@@ -87,7 +90,7 @@ export function StockPnlSection({ selectedMonth }) {
                                     {formatCurrency(trade.gross_pnl, trade.currency)}
                                     {trade.gross_pnl_czk != null && (
                                         <span className="pnl-czk-hint">
-                                            {formatCurrency(trade.gross_pnl_czk, 'CZK')}
+                                            {formatCurrency(trade.gross_pnl_czk, preferredCurrency)}
                                         </span>
                                     )}
                                 </span>

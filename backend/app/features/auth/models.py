@@ -15,6 +15,7 @@ class User(Base):
     hidden_pages = Column(Text, nullable=True)
     show_zumfi_rabbit = Column(Boolean, default=True, nullable=False)
     language = Column(String(5), default="en", nullable=False)
+    category_trend_order = Column(Text, nullable=True)
 
     # Google OAuth
     google_id = Column(String(255), unique=True, nullable=True, index=True)

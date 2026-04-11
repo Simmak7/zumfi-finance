@@ -95,7 +95,7 @@ export function ImportWizardPage() {
                     <h1 className="page-title">{t('import.title')}</h1>
                     <p className="page-subtitle">{t('import.subtitle')}</p>
                 </div>
-                <div className="view-toggle">
+                <div className="view-toggle" data-zumfi-zone="import-view-toggle">
                     <button
                         className={`toggle-btn ${view === 'wizard' ? 'active' : ''}`}
                         onClick={() => setView('wizard')}

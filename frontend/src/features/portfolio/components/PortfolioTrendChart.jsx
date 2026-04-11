@@ -5,8 +5,9 @@ import {
 } from 'recharts';
 import { getPortfolioHistory } from '../../../services/api';
 import { formatMonthShort } from '../../../utils/dates';
-import { formatMoney } from '../../../utils/currencies';
+import { formatCurrency } from '../../../utils/currencies';
 import { useMonth } from '../../../context/MonthContext';
+import { useSettings } from '../../../context/SettingsContext';
 
 const TOOLTIP_STYLE = {
     backgroundColor: '#1e1e2d',
@@ -20,7 +21,7 @@ function formatAmount(value) {
     return Math.round(value).toLocaleString();
 }
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label, currency = 'CZK' }) {
     if (!active || !payload?.length) return null;
     const total = payload.reduce((sum, entry) => sum + (entry.value || 0), 0);
     return (
@@ -28,11 +29,11 @@ function CustomTooltip({ active, payload, label }) {
             <p style={{ marginBottom: '0.5rem', fontWeight: 600 }}>{label}</p>
             {payload.map((entry) => (
                 <p key={entry.name} style={{ color: entry.color, margin: '0.15rem 0', fontSize: '0.8rem' }}>
-                    {entry.name}: {formatMoney(entry.value)}
+                    {entry.name}: {formatCurrency(entry.value, currency)}
                 </p>
             ))}
             <p style={{ marginTop: '0.4rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.4rem', fontWeight: 700 }}>
-                Total: {formatMoney(total)}
+                Total: {formatCurrency(total, currency)}
             </p>
         </div>
     );
@@ -40,13 +41,17 @@ function CustomTooltip({ active, payload, label }) {
 
 export function PortfolioTrendChart() {
     const [data, setData] = useState([]);
-    const { maxMonth } = useMonth();
+    const { lastDataMonth } = useMonth();
+    const { settings } = useSettings();
+    const currency = settings?.preferred_currency || 'CZK';
 
     useEffect(() => {
         const load = async () => {
             try {
-                const history = await getPortfolioHistory(12, maxMonth);
-                setData(history);
+                const history = await getPortfolioHistory(12, lastDataMonth);
+                // Only show months that have actual data (non-zero portfolio value)
+                const filtered = history.filter(d => d.total_portfolio > 0);
+                setData(filtered);
             } catch (err) {
                 console.error('Error loading portfolio history:', err);
             }
@@ -56,9 +61,9 @@ export function PortfolioTrendChart() {
         const handleUpdate = () => load();
         window.addEventListener('portfolio-updated', handleUpdate);
         return () => window.removeEventListener('portfolio-updated', handleUpdate);
-    }, [maxMonth]);
+    }, [lastDataMonth]);
 
-    const hasData = data.filter(d => d.total_portfolio > 0).length >= 2;
+    const hasData = data.filter(d => d.total_portfolio > 0).length >= 1;
     if (!hasData) {
         return (
             <div className="chart-card">
@@ -108,7 +113,7 @@ export function PortfolioTrendChart() {
                         tickFormatter={formatAmount}
                         width={65}
                     />
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip content={(props) => <CustomTooltip {...props} currency={currency} />} />
                     <Legend
                         wrapperStyle={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}
                     />

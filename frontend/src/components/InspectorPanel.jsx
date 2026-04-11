@@ -8,6 +8,7 @@ import { TransactionDetail } from '../features/transactions/components/Transacti
 
 import { InvestmentForm } from '../features/portfolio/components/InvestmentForm';
 import { StockHoldingForm } from '../features/portfolio/components/StockHoldingForm';
+import { PropertyForm } from '../features/portfolio/components/PropertyForm';
 import { formatMoney, formatCurrency } from '../utils/currencies';
 import { useSettings } from '../context/SettingsContext';
 import { useTranslation } from '../i18n';
@@ -116,6 +117,7 @@ export function InspectorPanel() {
 
         if (content?.type === 'portfolio-investment-form') return content.data?.investment ? t('inspector.editInvestment') : t('inspector.addInvestment');
         if (content?.type === 'portfolio-stock-form') return content.data?.stock ? t('inspector.editStockHolding') : t('inspector.addStockHolding');
+        if (content?.type === 'portfolio-property-form') return content.data?.property ? t('inspector.editProperty') : t('inspector.addProperty');
         if (content?.type) return content.type.charAt(0).toUpperCase() + content.type.slice(1);
         return t('inspector.details');
     };
@@ -193,12 +195,16 @@ export function InspectorPanel() {
                             <StockHoldingForm stock={content.data?.stock} />
                         )}
 
+                        {content.type === 'portfolio-property-form' && (
+                            <PropertyForm property={content.data?.property} />
+                        )}
+
                         {/* Default Rendering for Income/Expenses/Others */}
                         {content.type !== 'add-goal' && content.type !== 'edit-goal' && content.type !== 'goal' && content.type !== 'transaction-detail' &&
                          content.type !== 'add-bill' && content.type !== 'edit-bill' &&
                          content.type !== 'add-mortgage' && content.type !== 'edit-mortgage' &&
                          content.type !== 'portfolio-investment-form' &&
-                         content.type !== 'portfolio-stock-form' && (
+                         content.type !== 'portfolio-stock-form' && content.type !== 'portfolio-property-form' && (
                             <>
                                 {content.data.total && (
                                     <div className="detail-hero">

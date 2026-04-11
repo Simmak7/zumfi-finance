@@ -353,3 +353,39 @@
     color: #059669;
     font-weight: 500;
 }
+
+@media (max-width: 768px) {
+    .document-list {
+        padding: 0.75rem;
+    }
+
+    .document-list-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .document-card {
+        padding: 1rem;
+    }
+
+    .document-info h3 {
+        font-size: 0.85rem;
+    }
+
+    .document-meta {
+        font-size: 0.78rem;
+    }
+
+    .document-actions {
+        flex-wrap: wrap;
+    }
+
+    .document-filters {
+        gap: 0.35rem;
+    }
+
+    .document-filter {
+        font-size: 0.78rem;
+        padding: 0.35rem 0.65rem;
+    }
+}

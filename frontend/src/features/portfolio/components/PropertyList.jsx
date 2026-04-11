@@ -1,12 +1,11 @@
-import { useState } from 'react';
 import { Building2, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useInspector } from '../../../context/InspectorContext';
 import { formatMoney } from '../../../utils/currencies';
-import { PropertyForm } from './PropertyForm';
 
 const TYPE_LABELS = { flat: 'Flat', house: 'House' };
 
 export function PropertyList({ properties, onRefresh, fullWidth, readOnly }) {
-    const [editProperty, setEditProperty] = useState(null);
+    const { openInspector } = useInspector();
 
     return (
         <div className={`portfolio-section ${fullWidth ? 'portfolio-section-full' : ''}`}>
@@ -32,7 +31,7 @@ export function PropertyList({ properties, onRefresh, fullWidth, readOnly }) {
                             <div
                                 key={prop.id}
                                 className="portfolio-card property-card"
-                                onClick={readOnly ? undefined : () => setEditProperty(prop)}
+                                onClick={readOnly ? undefined : () => openInspector('portfolio-property-form', { property: prop })}
                             >
                                 <div className="card-top-row">
                                     <div className="card-color-dot" style={{ background: prop.color || '#f97316' }} />
@@ -52,15 +51,15 @@ export function PropertyList({ properties, onRefresh, fullWidth, readOnly }) {
                                 </div>
                                 <div className="card-balance">
                                     {hasValue
-                                        ? `${formatMoney(prop.converted_value ?? prop.display_value)} ${prop.target_currency || prop.display_currency || prop.currency}`
-                                        : `${formatMoney(prop.converted_cost ?? prop.converted_purchase_price ?? prop.purchase_price)} ${prop.target_currency || prop.display_currency || prop.currency} (cost)`
+                                        ? `${formatMoney(prop.display_value)} ${prop.currency}`
+                                        : `${formatMoney(prop.purchase_price)} ${prop.currency} (cost)`
                                     }
                                 </div>
                                 {hasValue ? (
                                     <div className={`card-gain ${isPositive ? 'positive' : 'negative'}`}>
                                         {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                                         <span>
-                                            {isPositive ? '+' : ''}{formatMoney(prop.converted_gain_loss ?? prop.gain_loss)} ({isPositive ? '+' : ''}{prop.gain_loss_pct}%)
+                                            {isPositive ? '+' : ''}{formatMoney(prop.gain_loss)} ({isPositive ? '+' : ''}{prop.gain_loss_pct}%)
                                         </span>
                                     </div>
                                 ) : (
@@ -73,13 +72,6 @@ export function PropertyList({ properties, onRefresh, fullWidth, readOnly }) {
                         );
                     })}
                 </div>
-            )}
-
-            {editProperty && (
-                <PropertyForm
-                    property={editProperty}
-                    onClose={() => setEditProperty(null)}
-                />
             )}
         </div>
     );

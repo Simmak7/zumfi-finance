@@ -33,22 +33,10 @@ const cs = {
   welcome: {
     title: 'Vítejte v ZumFi!',
     subtitle: 'Začněte ve 3 jednoduchých krocích',
-    step1: 'Nahrajte bankovní výpis',
-    step2: 'Zkontrolujte transakce',
-    step3: 'Nastavte platby',
+    step1: 'Nastavte kategorie',
+    step2: 'Nahrajte bankovní výpis',
+    step3: 'Zkontrolujte transakce',
     dismiss: 'Zavřít',
-  },
-
-  firstTime: {
-    title: 'Vítejte v ZumFi!',
-    subtitle: 'Zde je návod, jak začít se sledováním financí.',
-    step1Title: 'Vytvořte si kategorie',
-    step1Desc: 'Nastavte kategorie výdajů podle vašeho životního stylu',
-    step2Title: 'Nahrajte bankovní výpis',
-    step2Desc: 'Importujte transakce z PDF nebo CSV souboru',
-    step3Title: 'Roztřiďte transakce',
-    step3Desc: 'Zkontrolujte a označte transakce pro přehledy',
-    gotIt: 'Rozumím, prozkoumám to sám',
   },
 
   kpi: {
@@ -599,7 +587,7 @@ const cs = {
 
   import: {
     title: 'Import transakcí',
-    subtitle: 'Import z CSV, Excel, PDF nebo Word souborů',
+    subtitle: 'Importujte PDF bankovní výpis, výpis spořicího účtu nebo výpis akcií/zisku a ztrát',
     importWizard: 'Průvodce importem',
     viewDocuments: 'Zobrazit dokumenty',
     upload: 'Nahrát',
@@ -742,6 +730,23 @@ const cs = {
     orEnterManually: 'Nebo zadejte ručně:',
   },
 
+  landing: {
+    signIn: 'Přihlásit se',
+    heroLine1: 'Vaše finance.',
+    heroLine2: 'Jeden import stačí.',
+    heroSubtitle: 'Nahrajte bankovní výpis a Zumfi se postará o zbytek — roztřídí výdaje, sleduje investice a hlídá rozpočet.',
+    getStarted: 'Začít zdarma',
+    free: 'Navždy zdarma. Žádná karta.',
+    fImportTitle: 'Import výpisů',
+    fImportDesc: 'Nahrajte PDF z banky. Transakce se automaticky rozpoznají a roztřídí.',
+    fPortfolioTitle: 'Přehled portfolia',
+    fPortfolioDesc: 'Akcie, spořicí účty, nemovitosti — vše na jednom místě s aktuálními trendy.',
+    fBudgetTitle: 'Rozpočty a cíle',
+    fBudgetDesc: 'Nastavte limity výdajů a spořicí cíle. Přesně vidíte, kam peníze odcházejí.',
+    fSecureTitle: 'Soukromé a bezpečné',
+    fSecureDesc: 'Vaše data zůstávají vaše. 2FA, šifrované tokeny, možnost vlastního hostování.',
+  },
+
   auth: {
     signIn: 'Přihlásit se',
     createAccount: 'Vytvořit účet',
@@ -812,8 +817,6 @@ const cs = {
     alreadyAllocated: 'Již přiděleno',
     allocate: 'Rozdělit',
     allocating: 'Rozděluji...',
-    remaining: 'Zbývá',
-    allocated: 'Přiděleno',
     done: 'Hotovo',
     fullyAllocated: 'Plně přiděleno',
     fullyAllocatedDesc: 'Již jste přidělili všechny dostupné úspory za tento měsíc.',
@@ -1042,6 +1045,29 @@ const cs = {
     cancelTitle: 'Třeba příště!',
     cancelMessage: 'Zumi trpělivě počká na mrkve. Žádný tlak!',
     sponsorOnGithub: 'Podpořit na GitHubu',
+  },
+
+  feedback: {
+    fixMe: 'Oprav mě',
+    reportIssue: 'Nahlásit problém',
+    title: 'Nahlásit problém',
+    subtitle: 'Pomozte nám zlepšit aplikaci nahlášením problému. Každé hlášení prověřujeme.',
+    page: 'Kde je problém?',
+    selectPage: 'Vyberte stránku...',
+    subject: 'Co se stalo?',
+    subjectPlaceholder: 'Stručný popis problému',
+    description: 'Řekněte nám víc',
+    descriptionPlaceholder: 'Popište co se stalo, co jste očekávali a jak problém reprodukovat...',
+    attachments: 'Snímky obrazovky',
+    addScreenshot: 'Přidat snímek',
+    fileHint: 'Max {max} obrázků, {mb} MB každý',
+    email: 'Váš email (nepovinné)',
+    emailPlaceholder: 'vas@email.cz',
+    emailHint: 'Zanechte email, pokud chcete, abychom vás kontaktovali ohledně tohoto problému.',
+    send: 'Odeslat hlášení',
+    sending: 'Odesílám...',
+    success: 'Děkujeme! Váš problém byl nahlášen. Už se na to díváme.',
+    error: 'Nepodařilo se odeslat hlášení. Zkuste to prosím později.',
   },
 };
 

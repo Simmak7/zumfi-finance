@@ -6,6 +6,7 @@ import {
 import { getCategoryTrends } from '../../../services/api';
 import { formatCurrency } from '../../../utils/currencies';
 import { SkeletonLoader } from '../../../components/SkeletonLoader';
+import { useSettings } from '../../../context/SettingsContext';
 import './CategoryTrendModal.css';
 
 const FALLBACK_COLORS = [
@@ -21,21 +22,7 @@ const TOOLTIP_STYLE = {
     fontSize: '0.8rem',
 };
 
-const ORDER_KEY = 'ctrend_category_order';
-
-function getSavedOrder() {
-    try {
-        const raw = localStorage.getItem(ORDER_KEY);
-        return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
-}
-
-function saveOrder(categories) {
-    localStorage.setItem(ORDER_KEY, JSON.stringify(categories.map(c => c.category)));
-}
-
-function applySavedOrder(data) {
-    const order = getSavedOrder();
+function applySavedOrder(data, order) {
     if (!order || order.length === 0) return data;
     const map = Object.fromEntries(data.map(c => [c.category, c]));
     const ordered = [];
@@ -65,13 +52,16 @@ export function CategoryTrendModal({ month, onClose }) {
     const [dragIdx, setDragIdx] = useState(null);
     const [overIdx, setOverIdx] = useState(null);
     const dragNode = useRef(null);
+    const { settings, saveSettings } = useSettings();
+    const currency = settings?.preferred_currency || 'CZK';
 
     useEffect(() => {
         const fetchTrends = async () => {
             setLoading(true);
             try {
                 const data = await getCategoryTrends(month, 12);
-                setTrends(applySavedOrder(data || []));
+                const order = settings?.category_trend_order || [];
+                setTrends(applySavedOrder(data || [], order));
             } catch (err) {
                 console.error('Failed to load category trends:', err);
             } finally {
@@ -79,7 +69,7 @@ export function CategoryTrendModal({ month, onClose }) {
             }
         };
         fetchTrends();
-    }, [month]);
+    }, [month, settings?.category_trend_order]);
 
     const handleDragStart = useCallback((e, idx) => {
         setDragIdx(idx);
@@ -105,12 +95,12 @@ export function CategoryTrendModal({ month, onClose }) {
             const updated = [...prev];
             const [moved] = updated.splice(dragIdx, 1);
             updated.splice(idx, 0, moved);
-            saveOrder(updated);
+            saveSettings({ category_trend_order: updated.map(c => c.category) });
             return updated;
         });
         setDragIdx(null);
         setOverIdx(null);
-    }, [dragIdx]);
+    }, [dragIdx, saveSettings]);
 
     const handleDragEnd = useCallback(() => {
         dragNode.current?.classList.remove('ctrend-dragging');
@@ -160,7 +150,7 @@ export function CategoryTrendModal({ month, onClose }) {
                                         <span className="ctrend-cat-dot" style={{ background: color }} />
                                         <span className="ctrend-cat-name">{cat.category}</span>
                                         <span className="ctrend-cat-avg">
-                                            avg {formatCurrency(avg)}/mo
+                                            avg {formatCurrency(avg, currency)}/mo
                                         </span>
                                     </div>
                                     <ResponsiveContainer width="100%" height={140}>
@@ -183,7 +173,7 @@ export function CategoryTrendModal({ month, onClose }) {
                                             <Tooltip
                                                 contentStyle={TOOLTIP_STYLE}
                                                 labelFormatter={formatMonthShort}
-                                                formatter={(value) => [formatCurrency(value), 'Spent']}
+                                                formatter={(value) => [formatCurrency(value, currency), 'Spent']}
                                                 cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                                             />
                                             <Bar

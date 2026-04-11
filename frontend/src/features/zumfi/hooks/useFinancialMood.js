@@ -8,6 +8,7 @@ import {
     buildMonthlySnapshot, buildHistoricalContext, computeHealthScore,
     evaluateMoods, loadMemory, saveMemory, updateMemory,
 } from '../reactions';
+import { getZumiLanguage } from '../reactions/lang';
 import { useZumfi } from '../context/ZumfiContext';
 
 const POLL_INTERVAL = 10 * 60 * 1000; // 10 minutes
@@ -27,6 +28,12 @@ const FINANCIAL_EVENTS = [
     'bills-updated',
     'settings-updated',
     'categories-updated',
+    // Re-evaluate when Zumi's language flips so the AI insight + mood
+    // speech are refreshed in the new language. The mood's `text` field
+    // is a lazy getter so the static path doesn't strictly need a re-run,
+    // but the AI insight (which hits Ollama) needs to be re-fetched in
+    // the new language — so we still evaluate().
+    'zumi-language-changed',
 ];
 
 export function useFinancialMood() {
@@ -137,23 +144,35 @@ export function useFinancialMood() {
         };
     }, [evaluate]);
 
-    // Fallback: show static speech bubble if AI didn't fire
-    // Respects proximity and page-reaction priority
+    // Fallback: show static speech bubble if AI didn't fire.
+    // Respects proximity and page-reaction priority.
+    //
+    // Text resolution is LAZY — we read `speechBubble.text` inside the
+    // timeout callback (not when the effect mounts) so the lazy getter on
+    // the mood reaction picks up the *current* language at display time.
+    // This matters when the page just loaded: the mood is evaluated with
+    // Zumi's language still defaulted to 'en' because SettingsContext
+    // hasn't resolved yet, and we want the actual bubble shown 4s later
+    // to reflect the user's real language once settings have loaded.
     useEffect(() => {
-        if (reaction?.speechBubble) {
-            const text = reaction.speechBubble.text;
-            if (text !== lastSpeechRef.current) {
-                const timer = setTimeout(() => {
-                    // Don't overwrite proximity or page-change reactions
-                    if (proximityActiveRef.current || pageReactionActiveRef.current) return;
-                    if (text !== lastSpeechRef.current) {
-                        lastSpeechRef.current = text;
-                        showSpeechBubble(text, reaction.speechBubble.type, 6000);
-                    }
-                }, MOOD_SPEECH_DELAY);
-                return () => clearTimeout(timer);
-            }
-        }
+        if (!reaction?.speechBubble) return;
+        const bubble = reaction.speechBubble;
+        // Dedup key for cross-language transitions: keyed on English text
+        // (stable across languages) so switching EN→CS still triggers a
+        // new bubble rather than being suppressed as "same text".
+        const dedupKey = bubble.key || bubble.text;
+        if (dedupKey === lastSpeechRef.current) return;
+
+        const timer = setTimeout(() => {
+            if (proximityActiveRef.current || pageReactionActiveRef.current) return;
+            // Read text HERE, not outside the timeout — the getter resolves
+            // the current language at this moment.
+            const text = bubble.text;
+            if (!text) return;
+            lastSpeechRef.current = dedupKey;
+            showSpeechBubble(text, bubble.type, 6000);
+        }, MOOD_SPEECH_DELAY);
+        return () => clearTimeout(timer);
     }, [reaction, showSpeechBubble, proximityActiveRef, pageReactionActiveRef]);
 
     return { reaction, healthScore, loading };
@@ -175,6 +194,9 @@ async function fetchAiInsight(snapshot, score, mood) {
             budget_pct: snapshot.budgetTotal > 0 ? snapshot.budgetPct * 100 : null,
             goals_reached: snapshot.goalsReachedCount,
             goal_count: snapshot.goalCount,
+            // Pass the current Zumi language so the backend LLM prompt can
+            // instruct Ollama to respond in Czech / Ukrainian / etc.
+            language: getZumiLanguage(),
         });
         return result?.insight || null;
     } catch {

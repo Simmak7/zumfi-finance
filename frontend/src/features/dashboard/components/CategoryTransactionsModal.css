@@ -140,15 +140,39 @@
     color: rgba(255, 255, 255, 0.35);
 }
 
-.ctm-modal.property-modal {
-    max-width: 640px;
-    max-height: 85vh;
-}
-
 @media (max-width: 768px) {
+    .ctm-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
     .ctm-modal {
-        width: 95%;
+        width: 100%;
         max-width: none;
-        max-height: 85vh;
+        max-height: 92vh;
+        max-height: 92dvh;
+        border-radius: 1rem 1rem 0 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .ctm-header {
+        padding: 1rem;
+    }
+
+    .ctm-body {
+        padding: 0.5rem 1rem;
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+        min-height: 0;
+        flex: 1 1 0%;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure forms inside modals don't break scroll */
+    .ctm-body .portfolio-form,
+    .ctm-body form {
+        display: flex;
+        flex-direction: column;
     }
 }

@@ -231,28 +231,27 @@ class CategoryService:
     async def seed_defaults(db: AsyncSession, owner_id: int):
         """Seed default categories with general, fixed, and in_and_out sections."""
         general_defaults = {
-            "Maks": ["salary", "maksym zaiats"],
-            "Zuzi": ["zuzana", "salary zuzi"],
-            "Revolut CZ": ["apple pay top-up", "revolut top-up"],
-            "Groceries": ["tesco", "albert", "lidl", "billa", "rohlik"],
-            "Eating out": ["starbucks", "mcdonald", "kfc", "restaurant"],
-            "Entertainment": ["microsoft store", "epic games", "steam", "playstation"],
-            "Transport": ["bolt", "uber", "dpp", "petrol", "shell"],
-            "Our flat": ["our flat"],
-            "Investment": ["investment", "etoro", "trading", "xtb", "degiro", "portu"],
+            "Salary": ["salary", "wages", "payroll"],
+            "Other Income": ["refund", "cashback", "reimbursement"],
+            "Groceries": ["tesco", "albert", "lidl", "billa", "rohlik", "kaufland"],
+            "Restaurants": ["starbucks", "mcdonald", "kfc", "restaurant", "cafe"],
+            "Entertainment": ["netflix", "spotify", "cinema", "steam", "playstation"],
+            "Health & Medical": ["pharmacy", "doctor", "hospital", "dentist"],
+            "Home": ["furniture", "ikea", "household"],
+            "Clothes": ["zara", "h&m", "clothes", "shoes"],
+            "Cosmetics/supplements": ["cosmetics", "dm drogerie", "supplements"],
+            "Travelling": ["booking", "airbnb", "hotel", "flight"],
+            "Gifts": ["gift", "present"],
+            "Investments": ["investment", "etoro", "trading", "xtb", "degiro", "portu"],
         }
 
         fixed_defaults = {
-            "Fixed bills": ["fixed bills"],
-            "Electricity": ["electricity"],
-            "Mortgage": ["mortgage"],
-            "Internet": ["internet", "o2", "t-mobile"],
-            "Phone": ["phone", "vodafone"],
-            "Water": ["water"],
-            "Gas": ["gas"],
+            "Fixed Bills": ["fixed bills"],
+            "Mortgage": ["mortgage", "hypotéka"],
         }
 
         in_and_out_defaults = {
+            "Between Accounts": ["between accounts", "own account"],
             "Saving account": ["spořicí", "spoření", "saving account"],
         }
 
@@ -334,16 +333,18 @@ class CategoryService:
     @staticmethod
     async def reorder(db: AsyncSession, owner_id: int, category_ids: list[int]) -> bool:
         """Set sort_order for categories based on the provided ID order."""
-        for idx, cat_id in enumerate(category_ids):
-            result = await db.execute(
-                select(Category).where(
-                    Category.id == cat_id,
-                    Category.owner_id == owner_id,
-                )
-            )
-            cat = result.scalar_one_or_none()
-            if cat:
-                cat.sort_order = idx
+        from sqlalchemy import update, case
+        if not category_ids:
+            return True
+        # Single bulk UPDATE instead of N individual queries
+        await db.execute(
+            update(Category)
+            .where(Category.owner_id == owner_id, Category.id.in_(category_ids))
+            .values(sort_order=case(
+                *[(Category.id == cat_id, idx) for idx, cat_id in enumerate(category_ids)],
+                else_=Category.sort_order,
+            ))
+        )
         await db.flush()
         return True
 

@@ -10,7 +10,7 @@ services:
     volumes:
       - finance_db_data:/var/lib/postgresql/data
     ports:
-      - "127.0.0.1:5433:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
@@ -24,7 +24,7 @@ services:
     volumes:
       - finance_redis_data:/data
     ports:
-      - "127.0.0.1:6380:6379"
+      - "6380:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -38,7 +38,7 @@ services:
     volumes:
       - finance_ollama_data:/root/.ollama
     ports:
-      - "127.0.0.1:11435:11434"
+      - "11435:11434"
     deploy:
       resources:
         reservations:
@@ -52,7 +52,7 @@ services:
     container_name: finance_backend
     restart: always
     ports:
-      - "127.0.0.1:${BACKEND_PORT:-8001}:8000"
+      - "${BACKEND_PORT:-8001}:8000"
     volumes:
       - ./backend/app:/app
       - finance_uploaded_files:/app/uploads
@@ -68,6 +68,9 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      FEEDBACK_EMAIL: ${FEEDBACK_EMAIL:-}
     depends_on:
       db:
         condition: service_healthy
@@ -99,8 +102,12 @@ services:
     build: ./frontend
     container_name: finance_frontend
     restart: always
+    # Dev mode: run the Vite dev server directly so source-file edits
+    # hot-reload in the browser. Overrides the Dockerfile CMD which
+    # uses `vite preview` against a frozen production build.
+    command: npx vite --host 0.0.0.0 --port 3001
     ports:
-      - "127.0.0.1:${FRONTEND_PORT:-3001}:3001"
+      - "${FRONTEND_PORT:-3001}:3001"
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/index.html:/app/index.html

@@ -40,6 +40,33 @@ class Settings(BaseSettings):
     STRIPE_PUBLISHABLE_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""
 
+    # Feedback email (SMTP via Gmail app password)
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    FEEDBACK_EMAIL: str = ""
+
+    @property
+    def smtp_host(self) -> str:
+        return self.SMTP_HOST
+
+    @property
+    def smtp_port(self) -> int:
+        return self.SMTP_PORT
+
+    @property
+    def smtp_user(self) -> str:
+        return self.SMTP_USER
+
+    @property
+    def smtp_password(self) -> str:
+        return self.SMTP_PASSWORD
+
+    @property
+    def feedback_email(self) -> str:
+        return self.FEEDBACK_EMAIL
+
     @model_validator(mode="after")
     def validate_production_secrets(self):
         if self.ENVIRONMENT == "production":

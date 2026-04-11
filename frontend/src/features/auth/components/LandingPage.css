@@ -1,0 +1,334 @@
+/* ── Landing Page ── */
+.landing-page {
+    min-height: 100vh;
+    background: #0a0a12;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ── Ambient orbs ── */
+.landing-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    opacity: 0.35;
+}
+
+.landing-orb-1 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+    top: -200px;
+    right: -100px;
+    animation: orb-float 12s ease-in-out infinite alternate;
+}
+
+.landing-orb-2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+    bottom: -150px;
+    left: -100px;
+    animation: orb-float 10s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes orb-float {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, -20px) scale(1.08); }
+}
+
+/* ── Content wrapper ── */
+.landing-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* ── Navigation ── */
+.landing-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 0;
+}
+
+.landing-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+
+.landing-brand .logo-zum {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.landing-brand .logo-fi {
+    color: #f59e0b;
+}
+
+.brand-label {
+    margin-left: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    align-self: center;
+}
+
+.landing-nav-signin {
+    padding: 0.5rem 1.4rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.landing-nav-signin:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Hero ── */
+.landing-hero {
+    text-align: center;
+    padding: 6rem 0 4rem;
+}
+
+.landing-title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 0 1.2rem;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.landing-title-accent {
+    background: linear-gradient(135deg, #6366f1, #a855f7, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.landing-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+}
+
+.landing-cta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.landing-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.85rem 2rem;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.landing-cta-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.35);
+}
+
+.landing-cta-hint {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Features ── */
+.landing-features {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+    padding-bottom: 4rem;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.feature-card:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.feature-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.fi-import  { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.fi-portfolio { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.fi-budget  { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.fi-secure  { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+
+.feature-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.feature-card p {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ── Auth Modal Overlay ── */
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: overlay-in 0.2s ease-out;
+}
+
+@keyframes overlay-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.auth-modal {
+    position: relative;
+    animation: modal-in 0.25s ease-out;
+}
+
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.auth-modal-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+/* Override LoginPage styles inside modal */
+.auth-modal .login-page {
+    min-height: auto;
+    background: transparent;
+}
+
+.auth-modal .login-card {
+    max-width: 400px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .landing-features {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .landing-hero {
+        padding: 3.5rem 0 3rem;
+    }
+
+    .landing-title {
+        font-size: 2rem;
+    }
+
+    .landing-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .landing-cta-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .landing-features {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .feature-card {
+        padding: 1.2rem;
+    }
+
+    .auth-overlay {
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+
+    .auth-modal .login-card {
+        max-width: calc(100vw - 2rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .landing-content {
+        padding: 0 1rem;
+    }
+
+    .landing-title {
+        font-size: 1.7rem;
+    }
+
+    .brand-label {
+        display: none;
+    }
+}

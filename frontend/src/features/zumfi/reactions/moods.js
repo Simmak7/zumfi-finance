@@ -1,6 +1,16 @@
 // 12 Mood Definitions for Zumfi's Monthly Reaction Engine
 // Each mood has: id, priority, visual state, evaluate function, and speech lines.
 
+import { tr } from './lang';
+
+// Pick a random bilingual speech pair { en, cs } from the mood's speeches.
+// Caller resolves the language LAZILY (via tr()) at display time, because
+// buildReaction may run before Zumi's language has been synced from Settings.
+function pickBilingual(speeches) {
+    if (!speeches || speeches.length === 0) return null;
+    return speeches[Math.floor(Math.random() * speeches.length)];
+}
+
 const MOODS = [
     // 1. Crisis — financial emergency
     {
@@ -12,13 +22,15 @@ const MOODS = [
         accessory: null,
         animation: 'idle',
         speeches: [
-            "Tough month... let's make a plan together.",
-            "We've been spending more than we earn. Time to regroup.",
-            "I'm worried, but we can turn this around!",
+            { en: "Tough month... let's make a plan together.",
+              cs: "Těžký měsíc... pojďme spolu udělat plán." },
+            { en: "We've been spending more than we earn. Time to regroup.",
+              cs: "Utrácíme víc, než vyděláváme. Čas se přeskupit." },
+            { en: "I'm worried, but we can turn this around!",
+              cs: "Mám starost, ale otočíme to!" },
         ],
         evaluate: (snapshot, history, health) => {
             if (health.total < 20) return true;
-            // Spending > 150% income for 2+ consecutive months
             const months = history.months || [];
             if (months.length < 2) return false;
             const recent2 = months.slice(-2);
@@ -40,17 +52,19 @@ const MOODS = [
         accessory: null,
         animation: 'celebrate',
         speeches: [
-            "We're absolutely thriving! Keep it up!",
-            "Financial health is excellent. You're amazing!",
-            "Consistent savings, stable spending — perfection!",
+            { en: "We're absolutely thriving! Keep it up!",
+              cs: "Prosperujeme naplno! Pokračuj!" },
+            { en: "Financial health is excellent. You're amazing!",
+              cs: "Finanční zdraví je výborné. Jsi úžasný/á!" },
+            { en: "Consistent savings, stable spending — perfection!",
+              cs: "Pravidelné úspory, stabilní útraty — dokonalost!" },
         ],
         evaluate: (snapshot, history, health, memory) => {
             if (health.total <= 85) return false;
             if (snapshot.savingsRate < 0.25) return false;
-            // Check 3+ months of high health from memory
             const hist = memory?.moodHistory || [];
             const highHealthMonths = hist.filter(h => h.healthScore >= 75).length;
-            return highHealthMonths >= 2; // current + 2 past = 3
+            return highHealthMonths >= 2;
         },
     },
 
@@ -64,9 +78,12 @@ const MOODS = [
         accessory: null,
         animation: 'celebrate',
         speeches: [
-            "Goal reached! You did it!",
-            "Amazing — another goal conquered!",
-            "All that discipline paid off. Celebrating with you!",
+            { en: "Goal reached! You did it!",
+              cs: "Cíl splněný! Dokázal/a jsi to!" },
+            { en: "Amazing — another goal conquered!",
+              cs: "Úžasné — další cíl zdolán!" },
+            { en: "All that discipline paid off. Celebrating with you!",
+              cs: "Všechna ta disciplína se vyplatila. Slavím s tebou!" },
         ],
         evaluate: (snapshot) => {
             return snapshot.goalsReachedCount > 0;
@@ -83,9 +100,12 @@ const MOODS = [
         accessory: null,
         animation: 'idle',
         speeches: [
-            "Spending exceeded income this month. Let's review!",
-            "We're in the red... but there's time to adjust.",
-            "Income isn't covering expenses. Let's find savings.",
+            { en: "Spending exceeded income this month. Let's review!",
+              cs: "Útraty tento měsíc přesáhly příjem. Pojďme to projít!" },
+            { en: "We're in the red... but there's time to adjust.",
+              cs: "Jsme v minusu... ale ještě je čas to napravit." },
+            { en: "Income isn't covering expenses. Let's find savings.",
+              cs: "Příjem nepokrývá výdaje. Pojďme najít úspory." },
         ],
         evaluate: (snapshot) => {
             return snapshot.income > 0 && snapshot.expenses > snapshot.income;
@@ -102,14 +122,17 @@ const MOODS = [
         accessory: null,
         animation: 'hop',
         speeches: [
-            "Things are getting better month by month!",
-            "Great progress — the trend is looking up.",
-            "Your financial health is improving steadily!",
+            { en: "Things are getting better month by month!",
+              cs: "Věci se měsíc od měsíce zlepšují!" },
+            { en: "Great progress — the trend is looking up.",
+              cs: "Skvělý pokrok — trend směřuje nahoru." },
+            { en: "Your financial health is improving steadily!",
+              cs: "Tvé finanční zdraví se stabilně zlepšuje!" },
         ],
         evaluate: (_snapshot, _history, health, memory) => {
             const hist = memory?.moodHistory || [];
             if (hist.length < 2) return false;
-            const oldest = hist[hist.length - 1]; // oldest in last 3
+            const oldest = hist[hist.length - 1];
             return health.total - (oldest?.healthScore || 0) >= 10;
         },
     },
@@ -124,9 +147,12 @@ const MOODS = [
         accessory: null,
         animation: 'idle',
         speeches: [
-            "Financial health has been slipping. Let's course-correct.",
-            "The trend is going the wrong way. Small changes help!",
-            "Things have been declining — let's figure out why.",
+            { en: "Financial health has been slipping. Let's course-correct.",
+              cs: "Finanční zdraví uklouzává. Pojďme to napravit." },
+            { en: "The trend is going the wrong way. Small changes help!",
+              cs: "Trend jde špatným směrem. Pomohou i malé změny!" },
+            { en: "Things have been declining — let's figure out why.",
+              cs: "Situace se zhoršuje — pojďme zjistit proč." },
         ],
         evaluate: (_snapshot, _history, health, memory) => {
             const hist = memory?.moodHistory || [];
@@ -146,9 +172,12 @@ const MOODS = [
         accessory: 'money-tree',
         animation: 'celebrate',
         speeches: [
-            "Portfolio is booming! Great month for investments!",
-            "Investments are up nicely. The market is smiling!",
-            "Strong portfolio gains — well played!",
+            { en: "Portfolio is booming! Great month for investments!",
+              cs: "Portfolio letí nahoru! Skvělý měsíc pro investice!" },
+            { en: "Investments are up nicely. The market is smiling!",
+              cs: "Investice pěkně rostou. Trh se usmívá!" },
+            { en: "Strong portfolio gains — well played!",
+              cs: "Silný růst portfolia — výborně!" },
         ],
         evaluate: (snapshot) => {
             return snapshot.portfolioValue > 0 && snapshot.portfolioChange > 5;
@@ -165,9 +194,12 @@ const MOODS = [
         accessory: null,
         animation: 'idle',
         speeches: [
-            "Markets are down, but stay the course.",
-            "Portfolio dipped — it's normal, don't panic.",
-            "Down months happen. Long-term thinking wins.",
+            { en: "Markets are down, but stay the course.",
+              cs: "Trhy jsou dole, ale drž kurz." },
+            { en: "Portfolio dipped — it's normal, don't panic.",
+              cs: "Portfolio kleslo — je to normální, nepanikař." },
+            { en: "Down months happen. Long-term thinking wins.",
+              cs: "Slabé měsíce se stávají. Dlouhodobé myšlení vítězí." },
         ],
         evaluate: (snapshot) => {
             return snapshot.portfolioValue > 0 && snapshot.portfolioChange < -5;
@@ -184,9 +216,12 @@ const MOODS = [
         accessory: 'sunglasses',
         animation: 'hop',
         speeches: [
-            "Every category under budget — impressive discipline!",
-            "Budget master mode! Everything is under control.",
-            "All green on the budget. You're nailing it!",
+            { en: "Every category under budget — impressive discipline!",
+              cs: "Každá kategorie pod rozpočtem — obdivuhodná disciplína!" },
+            { en: "Budget master mode! Everything is under control.",
+              cs: "Mistr rozpočtu! Všechno pod kontrolou." },
+            { en: "All green on the budget. You're nailing it!",
+              cs: "Rozpočet celý v zeleném. Daří se ti!" },
         ],
         evaluate: (snapshot) => {
             const cats = snapshot.budgetCategories || [];
@@ -205,9 +240,12 @@ const MOODS = [
         accessory: null,
         animation: 'idle',
         speeches: [
-            "A budget category is way over limit!",
-            "Some spending categories need attention.",
-            "Over budget on a category — let's take a look.",
+            { en: "A budget category is way over limit!",
+              cs: "Jedna kategorie rozpočtu je daleko přes limit!" },
+            { en: "Some spending categories need attention.",
+              cs: "Některé kategorie útrat potřebují pozornost." },
+            { en: "Over budget on a category — let's take a look.",
+              cs: "Přečerpaná kategorie — pojďme se podívat." },
         ],
         evaluate: (snapshot) => {
             const cats = snapshot.budgetCategories || [];
@@ -225,10 +263,14 @@ const MOODS = [
         accessory: null,
         animation: 'idle',
         speeches: [
-            "Steady as she goes. Doing great!",
-            "Finances are looking healthy and stable.",
-            "Everything is on track — nice and steady.",
-            "A calm, stable month. Just how I like it!",
+            { en: "Steady as she goes. Doing great!",
+              cs: "Stabilně vpřed. Daří se!" },
+            { en: "Finances are looking healthy and stable.",
+              cs: "Finance vypadají zdravě a stabilně." },
+            { en: "Everything is on track — nice and steady.",
+              cs: "Vše jede podle plánu — pěkně a stabilně." },
+            { en: "A calm, stable month. Just how I like it!",
+              cs: "Klidný, stabilní měsíc. Přesně jak to mám rád!" },
         ],
         evaluate: (_snapshot, _history, health) => {
             return health.total >= 40 && health.total <= 85;
@@ -245,11 +287,14 @@ const MOODS = [
         accessory: null,
         animation: 'idle',
         speeches: [
-            "Hi there! Upload some data and I'll tell you how things look.",
-            "Not enough data yet — but I'm here for you!",
-            "Waiting for more financial info to share insights.",
+            { en: "Hi there! Upload some data and I'll tell you how things look.",
+              cs: "Ahoj! Nahraj nějaká data a řeknu ti, jak to vypadá." },
+            { en: "Not enough data yet — but I'm here for you!",
+              cs: "Zatím málo dat — ale jsem tu pro tebe!" },
+            { en: "Waiting for more financial info to share insights.",
+              cs: "Čekám na víc finančních dat, abych mohl sdílet postřehy." },
         ],
-        evaluate: () => true, // always matches as fallback
+        evaluate: () => true,
     },
 ];
 
@@ -271,19 +316,30 @@ export function evaluateMoods(snapshot, history, healthScore, memory) {
     }
 
     if (matched.length === 0) {
-        // Should never happen since 'neutral' always matches
         return buildReaction(MOODS[MOODS.length - 1]);
     }
 
-    // Sort by priority descending
     matched.sort((a, b) => b.priority - a.priority);
     return buildReaction(matched[0]);
 }
 
 function buildReaction(mood) {
-    const speeches = mood.speeches || [];
-    const text = speeches.length > 0
-        ? speeches[Math.floor(Math.random() * speeches.length)]
+    const pair = pickBilingual(mood.speeches);
+    const type = mood.priority >= 70 ? 'warning' : mood.priority >= 50 ? 'positive' : 'neutral';
+
+    // LAZY language resolution — `text` is a getter so the display path
+    // reads `currentLang` at the moment the bubble is shown, not when the
+    // mood was first built (which often happens before Settings has loaded
+    // on first page render).
+    const speechBubble = pair
+        ? {
+            // Stable key used by lastSpeechRef dedup so language switch
+            // actually re-triggers the bubble. Keyed on the English line
+            // because the English text is stable across languages.
+            key: `${mood.id}:${pair.en}`,
+            get text() { return tr(pair.en, pair.cs); },
+            type,
+        }
         : null;
 
     return {
@@ -294,9 +350,6 @@ function buildReaction(mood) {
         outfit: mood.outfit,
         accessory: mood.accessory,
         animation: mood.animation,
-        speechBubble: text ? {
-            text,
-            type: mood.priority >= 70 ? 'warning' : mood.priority >= 50 ? 'positive' : 'neutral',
-        } : null,
+        speechBubble,
     };
 }

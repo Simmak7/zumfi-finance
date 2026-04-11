@@ -10,6 +10,8 @@ import { zumfiVariants } from '../animations/variants';
 import { ZumfiBody } from './ZumfiBody';
 import { SpeechBubble } from './SpeechBubble';
 import { EnvironmentEffects } from './EnvironmentEffects';
+import { setZumiLanguage, tr } from '../reactions/lang';
+import { useSettings } from '../../../context/SettingsContext';
 import './ZumfiMascot.css';
 import './ZumfiProximity.css';
 
@@ -17,6 +19,19 @@ const CLICK_ANIMATIONS = ['hop', 'wave'];
 
 export const ZumfiMascot = React.memo(function ZumfiMascot() {
     const { visual, speechBubble, prefs, setVisualState, showSpeechBubble, dismissSpeechBubble, proximityActiveRef, pageReactionActiveRef } = useZumfi();
+    const { settings } = useSettings();
+
+    // Keep reaction i18n in sync with app language. Reaction generators are
+    // pure JS functions and can't use hooks — they read a module-level
+    // variable that we update here whenever the user changes language.
+    // Also dispatches a custom event so useFinancialMood (and anyone else)
+    // can refresh their speech bubble content after the language flips.
+    useEffect(() => {
+        const lang = settings?.language || 'en';
+        setZumiLanguage(lang);
+        window.dispatchEvent(new CustomEvent('zumi-language-changed', { detail: { lang } }));
+    }, [settings?.language]);
+
     const { constraints, isClick, position, setPosition, resetPosition } = useZumfiDrag();
     const { reaction } = useFinancialMood();
     const hasReaction = !!reaction;
@@ -84,6 +99,11 @@ export const ZumfiMascot = React.memo(function ZumfiMascot() {
 
     const handleDragEnd = useCallback((event, info) => {
         clearActiveZone();
+        // Delay removing drag protection so the trailing click event
+        // doesn't leak through to underlying interactive elements (e.g. tab buttons).
+        requestAnimationFrame(() => {
+            document.body.classList.remove('zumfi-dragging');
+        });
         if (isClick(event, info)) {
             // Barely moved — snap back to pre-drag position and play click anim
             motionX.set(position.x);
@@ -115,7 +135,7 @@ export const ZumfiMascot = React.memo(function ZumfiMascot() {
             ease: 'easeInOut',
             onComplete: () => resetPosition(),
         });
-        showSpeechBubble("Home sweet home!", 'positive', 2000);
+        showSpeechBubble(tr("Home sweet home!", "Doma je doma!"), 'positive', 2000);
     }, [motionX, motionY, resetPosition, showSpeechBubble]);
 
     // Listen for home icon double-click
@@ -150,8 +170,9 @@ export const ZumfiMascot = React.memo(function ZumfiMascot() {
                 top: constraints.top,
                 bottom: constraints.bottom,
             }}
-            onPointerDown={(e) => { handlePointerDown(); wakeUp(); }}
-            onPointerUp={() => document.body.classList.remove('zumfi-dragging')}
+            onPointerDown={() => { handlePointerDown(); wakeUp(); }}
+            onPointerUp={() => {}}
+            onClick={(e) => e.stopPropagation()}
             onDragStart={handleDragStart}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}

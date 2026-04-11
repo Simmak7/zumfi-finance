@@ -81,6 +81,15 @@ async def get_budget_recommendations(
         return None
 
 
+_LANGUAGE_INSTRUCTIONS = {
+    "en": "Respond in English.",
+    "cs": "Respond in Czech (čeština). Use natural, friendly Czech — "
+          "tykání (informal 'ty'). Keep it short and natural.",
+    "uk": "Respond in Ukrainian (українська). Use natural, friendly "
+          "Ukrainian. Keep it short and natural.",
+}
+
+
 async def get_zumi_insight(
     mood: str,
     income: float,
@@ -91,14 +100,21 @@ async def get_zumi_insight(
     budget_pct: float | None = None,
     goals_reached: int = 0,
     goal_count: int = 0,
+    language: str = "en",
 ) -> str | None:
     """Generate a short, character-appropriate Zumi speech bubble using Ollama."""
     try:
+        lang_key = (language or "en").lower()
+        lang_instruction = _LANGUAGE_INSTRUCTIONS.get(
+            lang_key, _LANGUAGE_INSTRUCTIONS["en"]
+        )
+
         parts = [
             "You are Zumi, a cute wise rabbit mascot in a personal finance app.",
             "Generate exactly ONE short sentence (max 15 words) as a speech bubble.",
             "Be warm, encouraging, specific with numbers, and slightly playful.",
             "Do NOT use emojis. Do NOT use quotation marks around your response.",
+            lang_instruction,
             "",
             f"Current mood: {mood}",
             f"Monthly income: {income:.0f} CZK",

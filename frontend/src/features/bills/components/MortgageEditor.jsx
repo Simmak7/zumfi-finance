@@ -281,38 +281,23 @@ export function MortgageEditor({ mortgage, onSuccess, onClose }) {
                     </select>
                 </div>
 
-                <button type="submit" className="save-btn" disabled={loading}>
-                    {loading ? <Loader2 className="spin" size={18} /> : <Save size={18} />}
-                    <span>{isEdit ? t('mortgageEditor.updateMortgage') : t('mortgageEditor.saveMortgage')}</span>
-                </button>
-
-                {isEdit && (
-                    <button
-                        type="button"
-                        className="delete-btn"
-                        onClick={handleDelete}
-                        disabled={deleting}
-                        style={{
-                            marginTop: '0.75rem',
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '0.5rem',
-                            padding: '0.6rem',
-                            background: 'rgba(244, 63, 94, 0.1)',
-                            border: '1px solid rgba(244, 63, 94, 0.2)',
-                            color: '#f43f5e',
-                            borderRadius: '0.5rem',
-                            cursor: 'pointer',
-                            fontSize: '0.85rem',
-                            fontWeight: 600,
-                        }}
-                    >
-                        <Trash2 size={16} />
-                        <span>{deleting ? t('mortgageEditor.deleting') : t('mortgageEditor.deleteMortgage')}</span>
+                <div className="form-actions">
+                    {isEdit && (
+                        <button
+                            type="button"
+                            className="delete-btn"
+                            onClick={handleDelete}
+                            disabled={deleting}
+                        >
+                            <Trash2 size={16} />
+                            <span>{deleting ? t('mortgageEditor.deleting') : t('mortgageEditor.deleteMortgage')}</span>
+                        </button>
+                    )}
+                    <button type="submit" className="save-btn" disabled={loading}>
+                        {loading ? <Loader2 className="spin" size={18} /> : <Save size={18} />}
+                        <span>{isEdit ? t('mortgageEditor.updateMortgage') : t('mortgageEditor.saveMortgage')}</span>
                     </button>
-                )}
+                </div>
             </form>
         </div>
     );

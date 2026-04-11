@@ -1,8 +1,9 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { InspectorPanel } from '../components/InspectorPanel';
 import { MobileNav } from '../components/MobileNav';
+import { FeedbackButton } from '../components/FeedbackButton';
 import { useInspector } from '../context/InspectorContext';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import clsx from 'clsx';
@@ -11,6 +12,15 @@ import './Layout.css';
 export function Layout() {
     const { isOpen, closeInspector } = useInspector();
     const mainRef = useRef(null);
+    const inspectorColRef = useRef(null);
+
+    // Clear inline styles left by swipe-to-dismiss when inspector closes
+    useEffect(() => {
+        if (!isOpen && inspectorColRef.current) {
+            inspectorColRef.current.style.transform = '';
+            inspectorColRef.current.style.transition = '';
+        }
+    }, [isOpen]);
 
     const handleRefresh = useCallback(() => {
         return new Promise((resolve) => {
@@ -35,10 +45,11 @@ export function Layout() {
                 <Outlet />
             </main>
             {isOpen && <div className="inspector-backdrop" onClick={closeInspector} />}
-            <div className="inspector-col">
+            <div className="inspector-col" ref={inspectorColRef}>
                 <InspectorPanel />
             </div>
             <MobileNav />
+            <FeedbackButton />
         </div>
     );
 }

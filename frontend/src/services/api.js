@@ -607,6 +607,17 @@ export const getStockPnl = async (month) => {
     return response.data;
 };
 
+export const getStockPnlHistory = async (months = 12) => {
+    const response = await api.get('/portfolio/stock-pnl/history', { params: { months } });
+    return response.data;
+};
+
+export const getStockBuys = async (month) => {
+    const params = month ? { month } : {};
+    const response = await api.get('/portfolio/stock-buys', { params });
+    return response.data;
+};
+
 export const getSavingsAccounts = async () => {
     const response = await api.get('/portfolio/savings');
     return response.data;
@@ -721,6 +732,14 @@ export const createDonateCheckout = async (tier, successUrl, cancelUrl) => {
         tier,
         success_url: successUrl,
         cancel_url: cancelUrl,
+    });
+    return response.data;
+};
+
+// --- Feedback ---
+export const submitFeedback = async (formData) => {
+    const response = await api.post('/feedback', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
 };

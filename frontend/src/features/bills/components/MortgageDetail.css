@@ -618,4 +618,27 @@
         width: 100%;
         justify-content: center;
     }
+
+    /* Stick mortgage editor save/delete buttons to bottom of scroll area */
+    .mdm-body .form-actions {
+        position: sticky;
+        bottom: -1rem;
+        background: #1a1a2e;
+        margin: 1rem -1rem -1rem;
+        padding: 0.75rem 1rem;
+        padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .mdm-body .form-actions .save-btn,
+    .mdm-body .form-actions .delete-btn {
+        flex: none;
+        width: 70%;
+        justify-content: center;
+    }
 }

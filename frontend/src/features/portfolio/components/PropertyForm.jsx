@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Trash2, Loader2, X } from 'lucide-react';
+import { Save, Trash2, Loader2 } from 'lucide-react';
+import { useInspector } from '../../../context/InspectorContext';
 import { useToast } from '../../../context/ToastContext';
 import {
     createPropertyInvestment, updatePropertyInvestment,
@@ -8,7 +9,6 @@ import {
 import { formatMoney } from '../../../utils/currencies';
 import { PropertyValueChart } from './PropertyValueChart';
 import { useTranslation } from '../../../i18n';
-import '../../dashboard/components/CategoryTransactionsModal.css';
 
 const PRESET_COLORS = ['#f97316', '#ef4444', '#6366f1', '#3b82f6', '#10b981', '#a855f7', '#f59e0b', '#64748b'];
 const CURRENCIES = ['CZK', 'EUR', 'USD', 'GBP', 'PLN', 'HUF', 'UAH'];
@@ -30,7 +30,8 @@ const FLOORS = [
     { value: 'top', label: 'Top floor' },
 ];
 
-export function PropertyForm({ property, onClose }) {
+export function PropertyForm({ property, onSuccess }) {
+    const { closeInspector } = useInspector();
     const { addToast } = useToast();
     const { t } = useTranslation();
     const isEdit = !!property;
@@ -154,7 +155,8 @@ export function PropertyForm({ property, onClose }) {
                 await createPropertyInvestment(payload);
             }
             window.dispatchEvent(new Event('portfolio-updated'));
-            onClose();
+            if (onSuccess) onSuccess();
+            closeInspector();
         } catch (err) {
             console.error('Error saving property:', err);
             addToast(t('portfolioForm.failedToSave'), 'error');
@@ -169,7 +171,7 @@ export function PropertyForm({ property, onClose }) {
         try {
             await deletePropertyInvestment(property.id);
             window.dispatchEvent(new Event('portfolio-updated'));
-            onClose();
+            closeInspector();
         } catch (err) {
             console.error('Error deleting property:', err);
             addToast(t('portfolioForm.failedToDelete'), 'error');
@@ -188,211 +190,196 @@ export function PropertyForm({ property, onClose }) {
     const hasValuation = computedValue != null;
 
     return (
-        <div className="ctm-overlay" onClick={onClose}>
-            <div
-                className="ctm-modal property-modal"
-                onClick={e => e.stopPropagation()}
-            >
-                <div className="ctm-header">
-                    <div className="ctm-header-title">
-                        <h2>{isEdit ? t('portfolioForm.editProperty') : t('portfolioForm.addProperty')}</h2>
+        <div className="portfolio-form">
+            <h3>{isEdit ? t('portfolioForm.editProperty') : t('portfolioForm.addProperty')}</h3>
+            <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label>{t('portfolioForm.propertyName')}</label>
+                    <input type="text" placeholder="e.g. Prague Flat" value={formData.name}
+                        onChange={e => update('name', e.target.value)} required />
+                </div>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>{t('portfolioForm.type')}</label>
+                        <select value={formData.property_type} onChange={e => update('property_type', e.target.value)}>
+                            {PROPERTY_TYPES.map(tp => <option key={tp.value} value={tp.value}>{tp.label}</option>)}
+                        </select>
                     </div>
-                    <button className="mcw-close" onClick={onClose}><X size={20} /></button>
+                    <div className="form-group">
+                        <label>{t('portfolioForm.rooms')}</label>
+                        <input type="number" min="1" placeholder="3" value={formData.rooms}
+                            onChange={e => update('rooms', e.target.value)} />
+                    </div>
+                </div>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>{t('portfolioForm.country')}</label>
+                        <select value={formData.country} onChange={e => handleCountryChange(e.target.value)}>
+                            <option value="">{t('portfolioForm.selectCountry')}</option>
+                            {countries.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>{t('portfolioForm.city')}</label>
+                        <input
+                            type="text"
+                            list="city-list"
+                            placeholder="Type or select..."
+                            value={formData.city}
+                            onChange={e => handleCityChange(e.target.value)}
+                        />
+                        <datalist id="city-list">
+                            {cities.map(c => <option key={c} value={c} />)}
+                        </datalist>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <label>{t('portfolioForm.addressOptional')}</label>
+                    <input type="text" placeholder="Street and number" value={formData.address}
+                        onChange={e => update('address', e.target.value)} />
+                </div>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>{t('portfolioForm.squareMeters')}</label>
+                        <input type="number" step="0.01" placeholder="75" value={formData.square_meters}
+                            onChange={e => update('square_meters', e.target.value)} required />
+                    </div>
+                    <div className="form-group form-group-small">
+                        <label>{t('portfolioForm.currency')}</label>
+                        <select value={formData.currency} onChange={e => update('currency', e.target.value)}>
+                            {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
                 </div>
 
-                <div className="ctm-body">
-                    <div className="portfolio-form">
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-group">
-                                <label>{t('portfolioForm.propertyName')}</label>
-                                <input type="text" placeholder="e.g. Prague Flat" value={formData.name}
-                                    onChange={e => update('name', e.target.value)} required />
-                            </div>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>{t('portfolioForm.type')}</label>
-                                    <select value={formData.property_type} onChange={e => update('property_type', e.target.value)}>
-                                        {PROPERTY_TYPES.map(tp => <option key={tp.value} value={tp.value}>{tp.label}</option>)}
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>{t('portfolioForm.rooms')}</label>
-                                    <input type="number" min="1" placeholder="3" value={formData.rooms}
-                                        onChange={e => update('rooms', e.target.value)} />
-                                </div>
-                            </div>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>{t('portfolioForm.country')}</label>
-                                    <select value={formData.country} onChange={e => handleCountryChange(e.target.value)}>
-                                        <option value="">{t('portfolioForm.selectCountry')}</option>
-                                        {countries.map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>{t('portfolioForm.city')}</label>
-                                    <input
-                                        type="text"
-                                        list="city-list"
-                                        placeholder="Type or select..."
-                                        value={formData.city}
-                                        onChange={e => handleCityChange(e.target.value)}
-                                    />
-                                    <datalist id="city-list">
-                                        {cities.map(c => <option key={c} value={c} />)}
-                                    </datalist>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>{t('portfolioForm.addressOptional')}</label>
-                                <input type="text" placeholder="Street and number" value={formData.address}
-                                    onChange={e => update('address', e.target.value)} />
-                            </div>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>{t('portfolioForm.squareMeters')}</label>
-                                    <input type="number" step="0.01" placeholder="75" value={formData.square_meters}
-                                        onChange={e => update('square_meters', e.target.value)} required />
-                                </div>
-                                <div className="form-group form-group-small">
-                                    <label>{t('portfolioForm.currency')}</label>
-                                    <select value={formData.currency} onChange={e => update('currency', e.target.value)}>
-                                        {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                </div>
-                            </div>
+                <div className="form-group">
+                    <label>{t('portfolioForm.features')}</label>
+                    <div className="checkbox-row">
+                        <label className="checkbox-label">
+                            <input type="checkbox" checked={formData.has_balcony}
+                                onChange={e => update('has_balcony', e.target.checked)} />
+                            {t('portfolioForm.balcony')}
+                        </label>
+                        <label className="checkbox-label">
+                            <input type="checkbox" checked={formData.has_garden}
+                                onChange={e => update('has_garden', e.target.checked)} />
+                            {t('portfolioForm.garden')}
+                        </label>
+                        <label className="checkbox-label">
+                            <input type="checkbox" checked={formData.has_parking}
+                                onChange={e => update('has_parking', e.target.checked)} />
+                            {t('portfolioForm.parking')}
+                        </label>
+                    </div>
+                </div>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>{t('portfolioForm.renovationState')}</label>
+                        <select value={formData.renovation_state} onChange={e => update('renovation_state', e.target.value)}>
+                            {RENOVATION_STATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                        </select>
+                    </div>
+                    {formData.property_type === 'flat' && (
+                        <div className="form-group">
+                            <label>{t('portfolioForm.floor')}</label>
+                            <select value={formData.floor} onChange={e => update('floor', e.target.value)}>
+                                <option value="">{t('portfolioForm.notSpecified')}</option>
+                                {FLOORS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+                            </select>
+                        </div>
+                    )}
+                </div>
 
-                            <div className="form-group">
-                                <label>{t('portfolioForm.features')}</label>
-                                <div className="checkbox-row">
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={formData.has_balcony}
-                                            onChange={e => update('has_balcony', e.target.checked)} />
-                                        {t('portfolioForm.balcony')}
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={formData.has_garden}
-                                            onChange={e => update('has_garden', e.target.checked)} />
-                                        {t('portfolioForm.garden')}
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={formData.has_parking}
-                                            onChange={e => update('has_parking', e.target.checked)} />
-                                        {t('portfolioForm.parking')}
-                                    </label>
+                <div className="form-group">
+                    <label>{t('portfolioForm.purchasePriceTotal')}</label>
+                    <input type="number" step="0.01" placeholder="5000000" value={formData.purchase_price}
+                        onChange={e => update('purchase_price', e.target.value)} required />
+                </div>
+                <div className="form-group">
+                    <label>{t('portfolioForm.purchaseDate')}</label>
+                    <input type="date" value={formData.purchase_date}
+                        onChange={e => update('purchase_date', e.target.value)} />
+                </div>
+                {/* Valuation -- fully automatic */}
+                <div className="computed-metrics">
+                    {priceSource && ppsqm > 0 && (
+                        <div className="metric-row">
+                            <span>{t('portfolioForm.pricePerSqm', { source: priceSource })}</span>
+                            <span>{formatMoney(ppsqm)} {formData.currency}/m\u00B2</span>
+                        </div>
+                    )}
+                    {purchasePrice > 0 && (
+                        <div className="metric-row">
+                            <span>{t('portfolioForm.youPaid')}</span>
+                            <span>{formatMoney(purchasePrice)} {formData.currency}</span>
+                        </div>
+                    )}
+                    {hasValuation ? (
+                        <>
+                            <div className="metric-row highlight">
+                                <span>{t('portfolioForm.estimatedValueToday')}</span>
+                                <span>{formatMoney(computedValue)} {formData.currency}</span>
+                            </div>
+                            {purchasePrice > 0 && gainLoss != null && (
+                                <div className={`metric-row ${gainLoss >= 0 ? 'positive' : 'negative'}`}>
+                                    <span>{gainLoss >= 0 ? t('portfolioForm.profitVsPurchase') : t('portfolioForm.lossVsPurchase')}</span>
+                                    <span>
+                                        {gainLoss >= 0 ? '+' : ''}{formatMoney(gainLoss)} ({gainPct?.toFixed(1)}%)
+                                    </span>
                                 </div>
-                            </div>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>{t('portfolioForm.renovationState')}</label>
-                                    <select value={formData.renovation_state} onChange={e => update('renovation_state', e.target.value)}>
-                                        {RENOVATION_STATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-                                    </select>
-                                </div>
-                                {formData.property_type === 'flat' && (
-                                    <div className="form-group">
-                                        <label>{t('portfolioForm.floor')}</label>
-                                        <select value={formData.floor} onChange={e => update('floor', e.target.value)}>
-                                            <option value="">{t('portfolioForm.notSpecified')}</option>
-                                            {FLOORS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="form-group">
-                                <label>{t('portfolioForm.purchasePriceTotal')}</label>
-                                <input type="number" step="0.01" placeholder="5000000" value={formData.purchase_price}
-                                    onChange={e => update('purchase_price', e.target.value)} required />
-                            </div>
-                            <div className="form-group">
-                                <label>{t('portfolioForm.purchaseDate')}</label>
-                                <input type="date" value={formData.purchase_date}
-                                    onChange={e => update('purchase_date', e.target.value)} />
-                            </div>
-                            {/* Valuation -- fully automatic */}
-                            <div className="computed-metrics">
-                                {priceSource && ppsqm > 0 && (
-                                    <div className="metric-row">
-                                        <span>{t('portfolioForm.pricePerSqm', { source: priceSource })}</span>
-                                        <span>{formatMoney(ppsqm)} {formData.currency}/m²</span>
-                                    </div>
-                                )}
-                                {purchasePrice > 0 && (
-                                    <div className="metric-row">
-                                        <span>{t('portfolioForm.youPaid')}</span>
-                                        <span>{formatMoney(purchasePrice)} {formData.currency}</span>
-                                    </div>
-                                )}
-                                {hasValuation ? (
-                                    <>
-                                        <div className="metric-row highlight">
-                                            <span>{t('portfolioForm.estimatedValueToday')}</span>
-                                            <span>{formatMoney(computedValue)} {formData.currency}</span>
-                                        </div>
-                                        {purchasePrice > 0 && gainLoss != null && (
-                                            <div className={`metric-row ${gainLoss >= 0 ? 'positive' : 'negative'}`}>
-                                                <span>{gainLoss >= 0 ? t('portfolioForm.profitVsPurchase') : t('portfolioForm.lossVsPurchase')}</span>
-                                                <span>
-                                                    {gainLoss >= 0 ? '+' : ''}{formatMoney(gainLoss)} ({gainPct?.toFixed(1)}%)
-                                                </span>
-                                            </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    sqm > 0 && !priceSource && (
-                                        <div className="metric-row neutral-hint">
-                                            <span>{t('portfolioForm.selectCountryHint')}</span>
-                                        </div>
-                                    )
-                                )}
-                            </div>
-
-                            {isEdit && (
-                                <PropertyValueChart
-                                    propertyId={property.id}
-                                    purchasePrice={purchasePrice}
-                                    currency={formData.currency}
-                                />
                             )}
+                        </>
+                    ) : (
+                        sqm > 0 && !priceSource && (
+                            <div className="metric-row neutral-hint">
+                                <span>{t('portfolioForm.selectCountryHint')}</span>
+                            </div>
+                        )
+                    )}
+                </div>
 
-                            <div className="form-group">
-                                <label>{t('portfolioForm.manualValueOverride')}</label>
-                                <input type="number" step="0.01" placeholder="Leave empty for automatic valuation"
-                                    value={formData.estimated_value}
-                                    onChange={e => update('estimated_value', e.target.value)} />
-                            </div>
+                {isEdit && (
+                    <PropertyValueChart
+                        propertyId={property.id}
+                        purchasePrice={purchasePrice}
+                        currency={formData.currency}
+                    />
+                )}
 
-                            <div className="form-group">
-                                <label>{t('portfolioForm.notes')}</label>
-                                <textarea placeholder="Optional notes..." value={formData.notes}
-                                    onChange={e => update('notes', e.target.value)} rows={2} />
-                            </div>
-                            <div className="form-group">
-                                <label>{t('portfolioForm.color')}</label>
-                                <div className="color-picker">
-                                    {PRESET_COLORS.map(c => (
-                                        <div key={c} className={`color-swatch ${formData.color === c ? 'selected' : ''}`}
-                                            style={{ background: c }} onClick={() => update('color', c)} />
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="form-actions">
-                                <button type="submit" className="save-btn" disabled={loading}>
-                                    {loading ? <Loader2 className="spin" size={18} /> : <Save size={18} />}
-                                    <span>{isEdit ? t('portfolioForm.update') : t('portfolioForm.save')}</span>
-                                </button>
-                                {isEdit && (
-                                    <button type="button" className="delete-btn" onClick={handleDelete} disabled={loading}>
-                                        <Trash2 size={18} />
-                                        <span>{t('portfolioForm.delete')}</span>
-                                    </button>
-                                )}
-                            </div>
-                        </form>
+                <div className="form-group">
+                    <label>{t('portfolioForm.manualValueOverride')}</label>
+                    <input type="number" step="0.01" placeholder="Leave empty for automatic valuation"
+                        value={formData.estimated_value}
+                        onChange={e => update('estimated_value', e.target.value)} />
+                </div>
+
+                <div className="form-group">
+                    <label>{t('portfolioForm.notes')}</label>
+                    <textarea placeholder="Optional notes..." value={formData.notes}
+                        onChange={e => update('notes', e.target.value)} rows={2} />
+                </div>
+                <div className="form-group">
+                    <label>{t('portfolioForm.color')}</label>
+                    <div className="color-picker">
+                        {PRESET_COLORS.map(c => (
+                            <div key={c} className={`color-swatch ${formData.color === c ? 'selected' : ''}`}
+                                style={{ background: c }} onClick={() => update('color', c)} />
+                        ))}
                     </div>
                 </div>
-            </div>
+                <div className="form-actions">
+                    {isEdit && (
+                        <button type="button" className="delete-btn" onClick={handleDelete} disabled={loading}>
+                            <Trash2 size={18} />
+                            <span>{t('portfolioForm.delete')}</span>
+                        </button>
+                    )}
+                    <button type="submit" className="save-btn" disabled={loading}>
+                        {loading ? <Loader2 className="spin" size={18} /> : <Save size={18} />}
+                        <span>{isEdit ? t('portfolioForm.update') : t('portfolioForm.save')}</span>
+                    </button>
+                </div>
+            </form>
         </div>
     );
 }

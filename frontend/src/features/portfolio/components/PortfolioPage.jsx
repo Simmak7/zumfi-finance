@@ -13,8 +13,9 @@ import { StockTrendChart } from './StockTrendChart';
 import { StockCurrencyModal } from './StockCurrencyModal';
 import { StockPnlModal } from './StockPnlModal';
 import { StockPnlSection } from './StockPnlSection';
+import { StockBuysSection } from './StockBuysSection';
+import { AddStockModal } from './AddStockModal';
 import { PropertyList } from './PropertyList';
-import { PropertyForm } from './PropertyForm';
 import { PropertyTrendChart } from './PropertyTrendChart';
 import { PropertyBreakdownModal } from './PropertyBreakdownModal';
 import { PortfolioBreakdownModal } from './PortfolioBreakdownModal';
@@ -45,7 +46,7 @@ export function PortfolioPage() {
     const [showPropertyModal, setShowPropertyModal] = useState(false);
     const [showPortfolioModal, setShowPortfolioModal] = useState(false);
     const [showAddSavingsModal, setShowAddSavingsModal] = useState(false);
-    const [showPropertyForm, setShowPropertyForm] = useState(false);
+    const [showAddStockModal, setShowAddStockModal] = useState(false);
     const [stockBreakdown, setStockBreakdown] = useState(null);
     const [stockPnl, setStockPnl] = useState(null);
     const { openInspector } = useInspector();
@@ -68,7 +69,11 @@ export function PortfolioPage() {
             getStockBreakdown(12, selectedMonth).then(setStockBreakdown).catch(() => {});
         };
         window.addEventListener('portfolio-updated', handleUpdate);
-        return () => window.removeEventListener('portfolio-updated', handleUpdate);
+        window.addEventListener('statements-updated', handleUpdate);
+        return () => {
+            window.removeEventListener('portfolio-updated', handleUpdate);
+            window.removeEventListener('statements-updated', handleUpdate);
+        };
     }, [selectedMonth]);
 
     useEffect(() => {
@@ -77,14 +82,22 @@ export function PortfolioPage() {
             getStockPnl(selectedMonth).then(setStockPnl).catch(() => {});
         };
         window.addEventListener('portfolio-updated', handleUpdate);
-        return () => window.removeEventListener('portfolio-updated', handleUpdate);
+        window.addEventListener('statements-updated', handleUpdate);
+        return () => {
+            window.removeEventListener('portfolio-updated', handleUpdate);
+            window.removeEventListener('statements-updated', handleUpdate);
+        };
     }, [selectedMonth]);
 
     useEffect(() => {
         fetchData();
         const handleUpdate = () => fetchData();
         window.addEventListener('portfolio-updated', handleUpdate);
-        return () => window.removeEventListener('portfolio-updated', handleUpdate);
+        window.addEventListener('statements-updated', handleUpdate);
+        return () => {
+            window.removeEventListener('portfolio-updated', handleUpdate);
+            window.removeEventListener('statements-updated', handleUpdate);
+        };
     }, [selectedMonth]);
 
     // Feed portfolio data to Zumfi for proximity interactions
@@ -128,6 +141,7 @@ export function PortfolioPage() {
                     {!isClosed && activeTab === 'savings' && (
                         <button
                             className="portfolio-add-btn savings"
+                            data-zumfi-zone="port-add-savings-btn"
                             onClick={() => setShowAddSavingsModal(true)}
                         >
                             <PiggyBank size={18} />
@@ -137,7 +151,8 @@ export function PortfolioPage() {
                     {activeTab === 'investments' && (
                         <button
                             className="portfolio-add-btn property"
-                            onClick={() => setShowPropertyForm(true)}
+                            data-zumfi-zone="port-add-property-btn"
+                            onClick={() => openInspector('portfolio-property-form', {})}
                         >
                             <Building2 size={18} />
                             <span>{t('portfolio.addPropertyBtn')}</span>
@@ -146,13 +161,16 @@ export function PortfolioPage() {
                     {!isClosed && activeTab === 'stocks' && (
                         <button
                             className="portfolio-add-btn stock"
-                            onClick={() => openInspector('portfolio-stock-form', {})}
+                            data-zumfi-zone="port-add-stock-btn"
+                            onClick={() => setShowAddStockModal(true)}
                         >
                             <BarChart3 size={18} />
                             <span>{t('portfolio.addStockBtn')}</span>
                         </button>
                     )}
-                    <MonthPicker value={selectedMonth} onChange={setSelectedMonth} max={maxMonth} />
+                    <div data-zumfi-zone="port-month-picker">
+                        <MonthPicker value={selectedMonth} onChange={setSelectedMonth} max={maxMonth} />
+                    </div>
                 </div>
             </header>
 
@@ -291,6 +309,9 @@ export function PortfolioPage() {
                     <div data-zumfi-zone="port-stock-pnl">
                         <StockPnlSection selectedMonth={selectedMonth} />
                     </div>
+                    <div data-zumfi-zone="port-stock-buys">
+                        <StockBuysSection selectedMonth={selectedMonth} />
+                    </div>
                 </>
             )}
 
@@ -326,9 +347,10 @@ export function PortfolioPage() {
                     onSuccess={fetchData}
                 />
             )}
-            {showPropertyForm && (
-                <PropertyForm
-                    onClose={() => setShowPropertyForm(false)}
+            {showAddStockModal && (
+                <AddStockModal
+                    onClose={() => setShowAddStockModal(false)}
+                    onSuccess={fetchData}
                 />
             )}
         </div>

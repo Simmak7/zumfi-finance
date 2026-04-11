@@ -11,7 +11,7 @@ from .schemas import UserSettingsUpdate, UserSettingsResponse
 router = APIRouter()
 
 
-def _build_response(user, page_order, hidden_pages):
+def _build_response(user, page_order, hidden_pages, category_trend_order):
     return UserSettingsResponse(
         user_id=user.id,
         email=user.email,
@@ -21,6 +21,7 @@ def _build_response(user, page_order, hidden_pages):
         hidden_pages=hidden_pages,
         show_zumfi_rabbit=user.show_zumfi_rabbit if user.show_zumfi_rabbit is not None else True,
         language=user.language or "en",
+        category_trend_order=category_trend_order,
     )
 
 
@@ -31,7 +32,7 @@ async def get_settings(
 ):
     """Get current user's settings."""
     data = await SettingsService.get_settings(db, current_user.id)
-    return _build_response(data["user"], data["page_order"], data["hidden_pages"])
+    return _build_response(data["user"], data["page_order"], data["hidden_pages"], data["category_trend_order"])
 
 
 @router.put("", response_model=UserSettingsResponse)
@@ -50,7 +51,8 @@ async def update_settings(
             hidden_pages=data.hidden_pages,
             show_zumfi_rabbit=data.show_zumfi_rabbit,
             language=data.language,
+            category_trend_order=data.category_trend_order,
         )
-        return _build_response(result["user"], result["page_order"], result["hidden_pages"])
+        return _build_response(result["user"], result["page_order"], result["hidden_pages"], result["category_trend_order"])
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

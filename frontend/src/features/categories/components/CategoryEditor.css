@@ -679,4 +679,39 @@
         min-height: 32px;
         padding: 0.3rem;
     }
+
+    .category-header {
+        gap: 0.4rem;
+        padding: 0.6rem 0.75rem;
+    }
+
+    .category-info {
+        min-width: 0;
+        gap: 0.4rem;
+    }
+
+    .category-name {
+        font-size: 0.82rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+
+    .mapping-count {
+        font-size: 0.7rem;
+        flex-shrink: 0;
+    }
+
+    .drag-handle {
+        flex-shrink: 0;
+    }
+
+    .category-actions {
+        flex-shrink: 0;
+    }
+
+    .delete-btn {
+        flex-shrink: 0;
+    }
 }

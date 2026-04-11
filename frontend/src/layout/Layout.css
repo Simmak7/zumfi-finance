@@ -68,9 +68,9 @@
         padding-bottom: 5rem;
         height: 100vh;
         height: 100dvh;
-        overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
+        overflow-x: hidden;
     }
 
     .inspector-backdrop {
@@ -92,12 +92,17 @@
         transform: translateX(100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 50;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .app-shell.inspector-open .inspector-col {
         transform: translateX(0);
+    }
+
+    .app-shell.inspector-open .mobile-nav {
+        display: none;
     }
 
     @keyframes backdropFade {

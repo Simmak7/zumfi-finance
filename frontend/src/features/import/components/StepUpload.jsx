@@ -163,10 +163,6 @@ export function StepUpload({ onComplete, onExcelHistoryDone }) {
                                     {window.innerWidth <= 768 ? t('import.tapToChoose') : t('import.dropFiles')}
                                 </p>
                                 <p className="drop-zone-hint"></p>
-                                <div className="drop-zone-formats">
-                                    <FileSpreadsheet size={16} />
-                                    <span>{t('import.supportedFormats')}</span>
-                                </div>
                             </div>
                         )}
                     </div>

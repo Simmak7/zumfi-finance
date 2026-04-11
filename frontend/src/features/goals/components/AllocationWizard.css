@@ -13,18 +13,18 @@
     background: #1e1e2d;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1.5rem;
-    padding: 2rem;
-    width: 520px;
+    padding: 2.5rem;
+    width: 650px;
     max-width: 95vw;
     max-height: 85vh;
     overflow-y: auto;
-    overflow-x: hidden;
     box-sizing: border-box;
+    transition: width 0.3s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #ffffff;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.05rem;
 }
 
 /* Force white on every element — overrides :root rgba(255,255,255,0.87) */
@@ -41,7 +41,8 @@
 .wizard-modal .success-icon { color: #22c55e; }
 
 .wizard-modal.wizard-wide {
-    width: 520px;
+    width: fit-content;
+    min-width: 700px;
     max-width: 95vw;
 }
 
@@ -90,10 +91,6 @@
     background: #6366f1;
 }
 
-.wizard-step.alloc-step {
-    display: block;
-}
-
 .wizard-step h3 {
     margin: 0 0 1rem 0;
     font-size: 0.95rem;
@@ -122,7 +119,8 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.95rem;
-    gap: 1rem;
+    gap: 2rem;
+    white-space: nowrap;
 }
 
 .surplus-income { color: #22c55e; }
@@ -171,6 +169,7 @@
     border-radius: 0.75rem;
     padding: 0.75rem 1.1rem;
     margin-bottom: 1rem;
+    white-space: nowrap;
 }
 
 .remaining-banner-label {
@@ -221,7 +220,8 @@
     padding: 0.85rem 1.1rem;
     border-radius: 0.75rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    gap: 1rem;
+    gap: 2rem;
+    white-space: nowrap;
 }
 
 .goal-alloc-info {
@@ -233,14 +233,15 @@
 }
 
 .goal-alloc-name {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .goal-alloc-remaining {
-    font-size: 0.85rem;
-    font-weight: 600;
-    opacity: 0.6;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .goal-alloc-input-wrap {
@@ -283,9 +284,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1rem;
+    font-size: 1.1rem;
     padding: 0.5rem 0;
-    gap: 1rem;
+    white-space: nowrap;
+    gap: 2rem;
 }
 
 .confirm-amount {

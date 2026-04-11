@@ -104,6 +104,7 @@ from features.imports.router import router as imports_router
 from features.settings.router import router as settings_router
 from features.portfolio.router import router as portfolio_router
 from features.donate.router import router as donate_router
+from features.feedback.router import router as feedback_router
 
 app.include_router(auth_router)
 app.include_router(categories_router)
@@ -118,3 +119,4 @@ app.include_router(imports_router)
 app.include_router(settings_router, prefix="/settings", tags=["Settings"])
 app.include_router(portfolio_router)
 app.include_router(donate_router)
+app.include_router(feedback_router)

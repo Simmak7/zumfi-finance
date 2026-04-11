@@ -12,6 +12,7 @@
 }
 
 /* Prevent interactive elements from stealing pointer during Zumfi drag */
+body.zumfi-dragging [data-zumfi-zone],
 body.zumfi-dragging [data-zumfi-zone] * {
     pointer-events: none !important;
 }

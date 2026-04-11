@@ -982,6 +982,56 @@
         cursor: pointer;
         white-space: nowrap;
     }
+
+    /* ── Mobile touch target fixes ── */
+
+    .tx-checkbox-btn {
+        padding: 0.4rem;
+        min-width: 32px;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tx-meta {
+        flex-wrap: wrap;
+    }
+
+    .tx-cat-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        max-width: 100%;
+    }
+
+    .confirm-tick-btn {
+        padding: 0.35rem;
+        min-width: 30px;
+        min-height: 30px;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.25);
+        border-radius: 0.3rem;
+        color: #22c55e;
+        flex-shrink: 0;
+    }
+
+    .categorize-similar-btn {
+        padding: 0.35rem 0.5rem;
+        min-width: 32px;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tx-right {
+        align-items: flex-end;
+    }
+
+    .tx-actions {
+        justify-content: flex-end;
+    }
 }
 
 .mobile-cat-btn {

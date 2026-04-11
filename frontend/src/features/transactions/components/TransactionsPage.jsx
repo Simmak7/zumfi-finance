@@ -64,7 +64,7 @@ export function TransactionsPage() {
         getCategories().then(setCategories).catch(() => {});
         getStatements().then(stmts => {
             const sorted = (stmts || [])
-                .filter(s => s.status === 'completed' && s.statement_type === 'bank')
+                .filter(s => s.status === 'completed' && s.statement_type !== 'savings')
                 .sort((a, b) => (b.period_end || '').localeCompare(a.period_end || ''));
             setStatements(sorted);
         }).catch(() => {});
@@ -353,7 +353,7 @@ export function TransactionsPage() {
                         <option value="description-desc">{t('transactions.nameZA')}</option>
                     </select>
                 </div>
-                <div className="period-filter-group category-filter-group" ref={catDropdownRef}>
+                <div className="period-filter-group category-filter-group" data-zumfi-zone="tx-category-filter" ref={catDropdownRef}>
                     <label className="period-filter-label">{t('transactions.category')}</label>
                     <button
                         className={clsx('category-filter-btn', selectedCategories.length > 0 && 'has-selection')}

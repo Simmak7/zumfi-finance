@@ -118,8 +118,10 @@ export function BillsPage() {
                     <h1 className="page-title">{t('bills.title')}</h1>
                     <p className="page-subtitle">{t('bills.subtitle')}</p>
                 </div>
-                <div className="bills-header-actions" data-zumfi-zone="bills-autofill">
-                    <MonthPicker value={selectedMonth} onChange={setSelectedMonth} max={maxMonth} />
+                <div className="bills-header-actions">
+                    <div data-zumfi-zone="bills-month-picker">
+                        <MonthPicker value={selectedMonth} onChange={setSelectedMonth} max={maxMonth} />
+                    </div>
                 </div>
             </header>
 
@@ -179,6 +181,7 @@ export function BillsPage() {
                     <div className="bills-actions-row">
                         <button
                             className="autofill-btn"
+                            data-zumfi-zone="bills-autofill"
                             onClick={handleAutofill}
                             disabled={autofilling}
                         >
@@ -187,6 +190,7 @@ export function BillsPage() {
                         </button>
                         <button
                             className="add-bill-btn"
+                            data-zumfi-zone="bills-add-btn"
                             onClick={() => openInspector('add-bill', null)}
                         >
                             <Plus size={18} />

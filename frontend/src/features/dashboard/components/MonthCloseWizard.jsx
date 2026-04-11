@@ -15,15 +15,26 @@ import './MonthCloseWizard.css';
 
 const STEP_KEYS = ['step1', 'step2', 'step4', 'savingsOverview', 'stockPortfolio', 'step5'];
 
-export function isMonthClosed(month) {
-    if (!month) return false;
-    const closed = JSON.parse(localStorage.getItem('closed_months') || '[]');
-    if (closed.length === 0) return false;
-    // A month is closed if it's equal to or before any closed month
-    return closed.some(c => month <= c);
+function _closedKey(userId) {
+    return userId ? `closed_months_${userId}` : 'closed_months';
 }
 
-export function MonthCloseWizard({ month, onClose }) {
+export function isMonthClosed(month, userId) {
+    if (!month) return false;
+    const closed = JSON.parse(localStorage.getItem(_closedKey(userId)) || '[]');
+    return closed.includes(month);
+}
+
+function markMonthClosed(month, userId) {
+    const key = _closedKey(userId);
+    const closed = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!closed.includes(month)) {
+        closed.push(month);
+        localStorage.setItem(key, JSON.stringify(closed));
+    }
+}
+
+export function MonthCloseWizard({ month, onClose, userId }) {
     const { t } = useTranslation();
     const { settings } = useSettings();
     const currency = settings?.preferred_currency || 'CZK';
@@ -75,7 +86,10 @@ export function MonthCloseWizard({ month, onClose }) {
     const alreadyAllocated = data ? Number(data.surplus?.already_allocated || 0) : 0;
     const totalIncome = data ? Number(data.surplus?.total_income || 0) : 0;
     const totalExpenses = data ? Number(data.surplus?.total_expenses || 0) : 0;
-    const isClosed = alreadyAllocated > 0 && available === 0;
+
+    // Single source of truth: localStorage only, but only if month has data
+    const hasData = totalIncome > 0 || totalExpenses > 0;
+    const isClosed = hasData && isMonthClosed(month, userId);
 
     const savingsChange = portfolio && portfolio.previous_total_savings != null
         ? portfolio.total_savings - portfolio.previous_total_savings : null;
@@ -101,7 +115,7 @@ export function MonthCloseWizard({ month, onClose }) {
             .map(([goal_id, amount]) => ({ goal_id: Number(goal_id), amount }));
         if (items.length === 0) {
             setActionsLog(prev => [...prev, t('monthClose.noAllocations')]);
-            setStep(lastStep);
+            goNext();
             return;
         }
         setSubmitting(true);
@@ -109,7 +123,7 @@ export function MonthCloseWizard({ month, onClose }) {
             await allocateToGoals({ month, allocations: items });
             setActionsLog(prev => [...prev, t('monthClose.allocatedToGoals', { amount: fmtc(totalAllocated), count: items.length })]);
             window.dispatchEvent(new Event('goals-updated'));
-            setStep(lastStep);
+            goNext();
         } catch {
             addToast(t('monthClose.allocationFailed'), 'error');
         } finally {
@@ -120,6 +134,11 @@ export function MonthCloseWizard({ month, onClose }) {
     const skipAllocate = () => {
         setActionsLog(prev => [...prev, t('monthClose.skippedAllocation')]);
         goNext();
+    };
+
+    const handleDone = () => {
+        markMonthClosed(month, userId);
+        onClose();
     };
 
     return (
@@ -150,7 +169,7 @@ export function MonthCloseWizard({ month, onClose }) {
                     <div className="mcw-body"><SkeletonLoader variant="card" count={3} /></div>
                 ) : (
                     <div className="mcw-body">
-                        {step === 0 && <StepSummary data={data} fmtc={fmtc} goNext={goNext} />}
+                        {step === 0 && <StepSummary data={data} goNext={goNext} />}
                         {step === 1 && <StepReview data={data} onClose={onClose} navigate={navigate} goNext={goNext} goBack={goBack} />}
                         {step === 2 && (
                             <StepAllocate
@@ -159,12 +178,12 @@ export function MonthCloseWizard({ month, onClose }) {
                                 isClosed={isClosed} allocations={allocations} setAllocations={setAllocations}
                                 totalAllocated={totalAllocated} submitting={submitting}
                                 handleAllocate={handleAllocate} skipAllocate={skipAllocate}
-                                goNext={goNext} goBack={goBack} fmtc={fmtc} currSymbol={currSymbol}
+                                goNext={goNext} goBack={goBack}
                             />
                         )}
-                        {step === 3 && <StepSavings portfolio={portfolio} savingsChange={savingsChange} fmtc={fmtc} goNext={goNext} goBack={goBack} />}
-                        {step === 4 && <StepPortfolio stockValue={stockValue} stockDelta={stockDelta} realizedPnl={realizedPnl} hasStockData={hasStockData} fmtc={fmtc} goNext={isClosed ? onClose : goNext} goBack={goBack} isClosed={isClosed} />}
-                        {step === 5 && !isClosed && <StepDone month={month} monthLabel={monthLabel} actionsLog={actionsLog} onClose={onClose} />}
+                        {step === 3 && <StepSavings portfolio={portfolio} savingsChange={savingsChange} goNext={goNext} goBack={goBack} />}
+                        {step === 4 && <StepPortfolio stockValue={stockValue} stockDelta={stockDelta} realizedPnl={realizedPnl} hasStockData={hasStockData} goNext={isClosed ? onClose : goNext} goBack={goBack} isClosed={isClosed} />}
+                        {step === 5 && <StepDone monthLabel={monthLabel} actionsLog={actionsLog} onClose={isClosed ? onClose : handleDone} isClosed={isClosed} />}
                     </div>
                 )}
             </div>
@@ -174,8 +193,9 @@ export function MonthCloseWizard({ month, onClose }) {
 
 /* ── Step Components ── */
 
-function StepSummary({ data, fmtc, goNext }) {
+function StepSummary({ data, goNext }) {
     const { t } = useTranslation();
+    const fmtc = useFmtc();
     return (
         <div className="mcw-step-content">
             <h3><TrendingUp size={18} /> {t('monthClose.monthSummary')}</h3>
@@ -235,11 +255,41 @@ function StepReview({ data, onClose, navigate, goNext, goBack }) {
 function StepAllocate({
     data, available, alreadyAllocated, totalIncome, totalExpenses,
     isClosed, allocations, setAllocations, totalAllocated, submitting,
-    handleAllocate, skipAllocate, goNext, goBack, fmtc, currSymbol,
+    handleAllocate, skipAllocate, goNext, goBack,
 }) {
     const { t } = useTranslation();
-    // Already fully allocated (closed)
-    if (isClosed || (alreadyAllocated > 0 && available === 0)) {
+    const fmtc = useFmtc();
+    const { settings } = useSettings();
+    const currSymbol = CURRENCY_SYMBOLS[settings?.preferred_currency || 'CZK'] || settings?.preferred_currency || 'CZK';
+
+    // Overview mode: show what was allocated (read-only)
+    if (isClosed) {
+        return (
+            <div className="mcw-step-content">
+                <h3><PiggyBank size={18} /> {t('monthClose.allocateSurplus')}</h3>
+                {alreadyAllocated > 0 ? (
+                    <>
+                        <p className="mcw-success-text">
+                            <CheckCircle size={16} /> {t('monthClose.savingsAllocated')}
+                        </p>
+                        <div className="mcw-alloc-summary">
+                            <span>{t('monthClose.totalAllocated')}</span>
+                            <strong>{fmtc(alreadyAllocated)}</strong>
+                        </div>
+                    </>
+                ) : (
+                    <p className="mcw-info-text">{t('monthClose.noRemainingSurplus')}</p>
+                )}
+                <div className="mcw-nav">
+                    <button className="mcw-back-btn" onClick={goBack}>{t('monthClose.back')}</button>
+                    <button className="mcw-next-btn" onClick={goNext}>{t('monthClose.next')} <ArrowRight size={16} /></button>
+                </div>
+            </div>
+        );
+    }
+
+    // Close mode: already allocated everything this month (before clicking Done)
+    if (alreadyAllocated > 0 && available === 0) {
         return (
             <div className="mcw-step-content">
                 <h3><PiggyBank size={18} /> {t('monthClose.allocateSurplus')}</h3>
@@ -312,8 +362,9 @@ function StepAllocate({
     );
 }
 
-function StepSavings({ portfolio, savingsChange, fmtc, goNext, goBack }) {
+function StepSavings({ portfolio, savingsChange, goNext, goBack }) {
     const { t } = useTranslation();
+    const fmtc = useFmtc();
     const hasSavings = portfolio && portfolio.total_savings > 0;
     return (
         <div className="mcw-step-content">
@@ -355,8 +406,9 @@ function StepSavings({ portfolio, savingsChange, fmtc, goNext, goBack }) {
     );
 }
 
-function StepPortfolio({ stockValue, stockDelta, realizedPnl, hasStockData, fmtc, goNext, goBack, isClosed }) {
+function StepPortfolio({ stockValue, stockDelta, realizedPnl, hasStockData, goNext, goBack, isClosed }) {
     const { t } = useTranslation();
+    const fmtc = useFmtc();
     return (
         <div className="mcw-step-content">
             <h3><BarChart3 size={18} /> {t('monthClose.stockPortfolio')}</h3>
@@ -403,31 +455,29 @@ function StepPortfolio({ stockValue, stockDelta, realizedPnl, hasStockData, fmtc
     );
 }
 
-function markMonthClosed(month) {
-    const closed = JSON.parse(localStorage.getItem('closed_months') || '[]');
-    if (!closed.includes(month)) {
-        closed.push(month);
-        localStorage.setItem('closed_months', JSON.stringify(closed));
-    }
-}
-
-function StepDone({ month, monthLabel, actionsLog, onClose }) {
-    React.useEffect(() => markMonthClosed(month), [month]);
+function StepDone({ monthLabel, actionsLog, onClose, isClosed }) {
     return (
         <div className="mcw-step-content mcw-done">
             <div className="mcw-done-icon"><Check size={36} /></div>
-            <h3>Month Closed!</h3>
+            <h3>{isClosed ? 'Month Reviewed' : 'Month Closed!'}</h3>
             <p className="mcw-info-text">{monthLabel} has been reviewed.</p>
             {actionsLog.length > 0 && (
                 <ul className="mcw-actions-log">
                     {actionsLog.map((log, i) => <li key={i}><Check size={14} /> {log}</li>)}
                 </ul>
             )}
-            <button className="mcw-done-btn" onClick={onClose}>Done</button>
+            <button className="mcw-done-btn" onClick={onClose}>{isClosed ? 'Close' : 'Done'}</button>
         </div>
     );
 }
 
-function fmt(value, sym = "Kc") {
+function fmt(value, sym = "Kč") {
     return Number(value || 0).toLocaleString('cs-CZ', { maximumFractionDigits: 0 }) + ' ' + sym;
+}
+
+function useFmtc() {
+    const { settings } = useSettings();
+    const currency = settings?.preferred_currency || 'CZK';
+    const sym = CURRENCY_SYMBOLS[currency] || currency;
+    return (value) => fmt(value, sym);
 }

@@ -96,7 +96,9 @@ export function BudgetPage() {
                         <Sparkles size={16} />
                         <span>{t('budget.autoSuggest')}</span>
                     </button>
-                    <MonthPicker value={selectedMonth} onChange={setSelectedMonth} max={maxMonth} />
+                    <div data-zumfi-zone="budget-month-picker">
+                        <MonthPicker value={selectedMonth} onChange={setSelectedMonth} max={maxMonth} />
+                    </div>
                 </div>
             </header>
 

@@ -72,6 +72,7 @@ export function PortfolioKpiCards({
             <>
                 <div
                     className="kpi-card kpi-card-hero clickable"
+                    data-zumfi-zone="port-kpi-total"
                     onClick={onPortfolioClick || undefined}
                     title={t('portfolio.portfolioBreakdown')}
                 >
@@ -88,7 +89,7 @@ export function PortfolioKpiCards({
                 </div>
 
                 <div className="kpi-grid">
-                    <div className="kpi-card">
+                    <div className="kpi-card" data-zumfi-zone="port-kpi-savings">
                         <div className="kpi-icon savings-icon">
                             <PiggyBank size={20} />
                         </div>
@@ -101,7 +102,7 @@ export function PortfolioKpiCards({
                         </div>
                     </div>
 
-                    <div className="kpi-card">
+                    <div className="kpi-card" data-zumfi-zone="port-kpi-stocks">
                         <div className="kpi-icon stock-icon">
                             <BarChart3 size={20} />
                         </div>
@@ -114,7 +115,7 @@ export function PortfolioKpiCards({
                         </div>
                     </div>
 
-                    <div className="kpi-card">
+                    <div className="kpi-card" data-zumfi-zone="port-kpi-properties">
                         <div className="kpi-icon property-icon">
                             <Building2 size={20} />
                         </div>
@@ -135,7 +136,7 @@ export function PortfolioKpiCards({
     if (activeTab === 'savings') {
         return (
             <div className="kpi-grid">
-                <div className="kpi-card">
+                <div className="kpi-card" data-zumfi-zone="port-kpi-savings">
                     <div className="kpi-icon savings-icon">
                         <PiggyBank size={20} />
                     </div>
@@ -157,6 +158,7 @@ export function PortfolioKpiCards({
             <div className="kpi-grid">
                 <div
                     className={`kpi-card ${onPropertyClick ? 'clickable' : ''}`}
+                    data-zumfi-zone="port-kpi-properties"
                     onClick={onPropertyClick || undefined}
                     title={onPropertyClick ? t('portfolio.portfolioBreakdown') : undefined}
                 >
@@ -181,6 +183,7 @@ export function PortfolioKpiCards({
             <div className="kpi-grid">
                 <div
                     className={`kpi-card ${onStockClick ? 'clickable' : ''}`}
+                    data-zumfi-zone="port-kpi-stocks"
                     onClick={onStockClick || undefined}
                     title={onStockClick ? t('portfolio.portfolioBreakdown') : undefined}
                 >
@@ -204,6 +207,7 @@ export function PortfolioKpiCards({
 
                 <div
                     className={`kpi-card ${onPnlClick ? 'clickable' : ''}`}
+                    data-zumfi-zone="port-kpi-pnl"
                     onClick={onPnlClick || undefined}
                     title={onPnlClick ? t('stockPnl.title') : undefined}
                 >
@@ -215,7 +219,7 @@ export function PortfolioKpiCards({
                         <div className={`kpi-value ${isStocksPnlPositive ? 'text-green' : 'text-red'}`}>
                             {hasStockPnlData
                                 ? <>
-                                    {isStocksPnlPositive ? '+' : ''}{formatCurrency(realizedCzk, 'CZK')}
+                                    {isStocksPnlPositive ? '+' : ''}{formatCurrency(realizedCzk, currency)}
                                   </>
                                 : <>
                                     {stocks_gain_loss >= 0 ? '+' : ''}{formatMoney(stocks_gain_loss)}

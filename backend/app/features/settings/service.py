@@ -31,6 +31,9 @@ class SettingsService:
             "hidden_pages": SettingsService._parse_json_list(
                 user.hidden_pages, []
             ),
+            "category_trend_order": SettingsService._parse_json_list(
+                user.category_trend_order, []
+            ),
         }
 
     @staticmethod
@@ -42,6 +45,7 @@ class SettingsService:
         hidden_pages: list[str] | None = None,
         show_zumfi_rabbit: bool | None = None,
         language: str | None = None,
+        category_trend_order: list[str] | None = None,
     ) -> dict:
         values = {}
 
@@ -69,6 +73,9 @@ class SettingsService:
                     f"Must be one of {VALID_LANGUAGES}."
                 )
             values["language"] = language
+
+        if category_trend_order is not None:
+            values["category_trend_order"] = json.dumps(category_trend_order)
 
         if values:
             await db.execute(

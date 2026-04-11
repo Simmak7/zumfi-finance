@@ -156,16 +156,16 @@ export function SavingsAccountModal({ account, onClose, onSuccess }) {
                             </div>
                         </div>
                         <div className="form-actions">
-                            <button type="submit" className="save-btn" disabled={loading}>
-                                {loading ? <Loader2 className="spin" size={18} /> : <Save size={18} />}
-                                <span>{isEdit ? t('portfolioForm.update') : t('portfolioForm.save')}</span>
-                            </button>
                             {isEdit && (
                                 <button type="button" className="delete-btn" onClick={handleDelete} disabled={loading}>
                                     <Trash2 size={18} />
                                     <span>{t('portfolioForm.delete')}</span>
                                 </button>
                             )}
+                            <button type="submit" className="save-btn" disabled={loading}>
+                                {loading ? <Loader2 className="spin" size={18} /> : <Save size={18} />}
+                                <span>{isEdit ? t('portfolioForm.update') : t('portfolioForm.save')}</span>
+                            </button>
                         </div>
                     </form>
                 </div>

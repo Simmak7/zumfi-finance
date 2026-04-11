@@ -40,20 +40,30 @@ function isPositionVisible(x, y) {
 /**
  * Home position: right next to the house icon in the sidebar.
  * Zumfi sits to the right of the house, vertically centered on it.
+ * Reads actual DOM position of the house element for accuracy.
  */
 export function getHomePosition() {
-    const h = window.innerHeight;
-    // House vertical center from top:
-    // bottom of sidebar = h - SIDEBAR_PADDING
-    // user section sits at bottom: h - SIDEBAR_PADDING - USER_SECTION_HEIGHT
-    // house margin above user: HOME_MARGIN_BOTTOM
-    // house top = h - SIDEBAR_PADDING - USER_SECTION_HEIGHT - HOME_MARGIN_BOTTOM - HOME_HEIGHT
-    const houseTop = h - SIDEBAR_PADDING - USER_SECTION_HEIGHT - HOME_MARGIN_BOTTOM - HOME_HEIGHT;
-    const houseCenterY = houseTop + HOME_HEIGHT / 2;
+    const c = getConstraints();
+    let x, y;
 
+    const houseEl = document.querySelector('.zumfi-home');
+    if (houseEl) {
+        const rect = houseEl.getBoundingClientRect();
+        x = Math.round(rect.left + rect.width + 8);
+        y = Math.round(rect.top + rect.height / 2 - MASCOT_HEIGHT / 2);
+    } else {
+        // Fallback: calculate from constants if house not in DOM
+        const h = window.innerHeight;
+        const houseTop = h - SIDEBAR_PADDING - USER_SECTION_HEIGHT - HOME_MARGIN_BOTTOM - HOME_HEIGHT;
+        const houseCenterY = houseTop + HOME_HEIGHT / 2;
+        x = SIDEBAR_H_PADDING + HOME_WIDTH + 8;
+        y = Math.round(houseCenterY - MASCOT_HEIGHT / 2);
+    }
+
+    // Clamp to visible viewport so mascot never lands off-screen
     return {
-        x: SIDEBAR_H_PADDING + HOME_WIDTH + 8,  // right edge of house + gap = 104
-        y: Math.round(houseCenterY - MASCOT_HEIGHT / 2),
+        x: Math.max(c.left, Math.min(x, c.right)),
+        y: Math.max(c.top, Math.min(y, c.bottom)),
     };
 }
 

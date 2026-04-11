@@ -10,7 +10,7 @@ import { HelpPage } from './features/help/components/HelpPage';
 import { PortfolioPage } from './features/portfolio/components/PortfolioPage';
 import { DonateSuccessPage } from './features/donate/components/DonateSuccessPage';
 import { DonateCancelPage } from './features/donate/components/DonateCancelPage';
-import { LoginPage } from './features/auth/components/LoginPage';
+import { LandingPage } from './features/auth/components/LandingPage';
 import { GoogleCallback } from './features/auth/components/GoogleCallback';
 import { InspectorProvider } from './context/InspectorContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -40,7 +40,7 @@ function AuthGuard({ children }) {
     }
 
     if (!user) {
-        return <LoginPage />;
+        return <LandingPage />;
     }
 
     return children;

@@ -41,7 +41,7 @@ async def get_month_close_data(
 
 @router.get("/monthly-history")
 async def get_monthly_history(
-    months: int = Query(default=6, ge=2, le=24),
+    months: int = Query(default=6, ge=1, le=24),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
@@ -52,7 +52,7 @@ async def get_monthly_history(
 @router.get("/category-trends")
 async def get_category_trends(
     month: str = Query(None, pattern=r"^\d{4}-\d{2}$"),
-    months: int = Query(default=12, ge=2, le=24),
+    months: int = Query(default=12, ge=1, le=24),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):

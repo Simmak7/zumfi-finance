@@ -18,7 +18,7 @@ const NAV_ITEMS_MAP = {
 };
 
 const SETTINGS_ITEM = { key: 'settings', icon: Settings, labelKey: 'nav.settings', path: '/settings' };
-const MAX_PRIMARY = 4;
+const MAX_PRIMARY = 5;
 
 export function MobileNav() {
     const [moreOpen, setMoreOpen] = useState(false);

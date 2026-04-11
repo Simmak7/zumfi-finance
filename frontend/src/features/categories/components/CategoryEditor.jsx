@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Pencil, Plus, Trash2, X, AlertCircle, ChevronDown, ChevronRight, Check, Save, GripVertical } from 'lucide-react';
 import {
-    DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors,
+    DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors,
 } from '@dnd-kit/core';
 import {
     arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable,
@@ -242,7 +242,8 @@ export function CategoryEditor({ onSuccess }) {
     };
 
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(PointerSensor, { activationConstraint: { distance: 3 } }),
+        useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
     );
 
@@ -257,12 +258,17 @@ export function CategoryEditor({ onSuccess }) {
 
         const reordered = arrayMove(sectionCats, oldIndex, newIndex);
 
-        // Optimistic update
-        const otherCats = categories.filter(c => c.section !== group);
-        setCategories([...otherCats, ...reordered]);
+        // Build new full list preserving section order: general, fixed, in_and_out
+        const newAll = [
+            ...(group === 'general' ? reordered : categories.filter(c => c.section === 'general')),
+            ...(group === 'fixed' ? reordered : categories.filter(c => c.section === 'fixed')),
+            ...(group === 'in_and_out' ? reordered : categories.filter(c => c.section === 'in_and_out')),
+        ];
+        setCategories(newAll);
 
+        // Send ALL category IDs so sort_order is globally consistent
         try {
-            await reorderCategories(reordered.map(c => c.id));
+            await reorderCategories(newAll.map(c => c.id));
         } catch (err) {
             addToast(t('categories.failedToSaveOrder'), 'error');
             await loadCategories();

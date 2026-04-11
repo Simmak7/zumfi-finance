@@ -18,6 +18,7 @@ function nextMonth(monthStr) {
 export function MonthProvider({ children }) {
     const [selectedMonth, setSelectedMonth] = useState(null);
     const [maxMonth, setMaxMonth] = useState(null);
+    const [lastDataMonth, setLastDataMonth] = useState(null);
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
@@ -28,6 +29,7 @@ export function MonthProvider({ children }) {
                 const current = getCurrentMonth();
                 const lastMonth = data?.month || current;
                 setSelectedMonth(lastMonth);
+                setLastDataMonth(lastMonth);
                 // Allow one month ahead so user can navigate to upload new data
                 const next = nextMonth(lastMonth);
                 setMaxMonth(next <= current ? next : current);
@@ -37,6 +39,7 @@ export function MonthProvider({ children }) {
                 if (cancelled) return;
                 const fallback = getCurrentMonth();
                 setSelectedMonth(fallback);
+                setLastDataMonth(fallback);
                 setMaxMonth(fallback);
                 setReady(true);
             });
@@ -53,6 +56,7 @@ export function MonthProvider({ children }) {
                         const current = getCurrentMonth();
                         const next = nextMonth(data.month);
                         setMaxMonth(next <= current ? next : current);
+                        setLastDataMonth(data.month);
                         // Navigate to the new latest month
                         setSelectedMonth(data.month);
                     }
@@ -67,7 +71,7 @@ export function MonthProvider({ children }) {
     if (!ready) return null;
 
     return (
-        <MonthContext.Provider value={{ selectedMonth, setSelectedMonth, maxMonth }}>
+        <MonthContext.Provider value={{ selectedMonth, setSelectedMonth, maxMonth, lastDataMonth }}>
             {children}
         </MonthContext.Provider>
     );

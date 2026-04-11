@@ -80,7 +80,7 @@ export function StockDetailModal({ stock, onClose }) {
             Value: m.market_value != null ? Number(m.market_value) : null,
         }));
 
-    const hasChartData = chartData.length >= 2;
+    const hasChartData = chartData.length >= 1;
 
     // Compute summary stats
     const latestWithValue = [...history].reverse().find(m => m.market_value != null);

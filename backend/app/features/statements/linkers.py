@@ -38,29 +38,57 @@ async def link_savings_account(
     bank_name: str | None,
     balance: Decimal,
     statement: Statement,
+    *,
+    currency: str | None = None,
+    suggested_name: str | None = None,
+    notes: str | None = None,
 ) -> bool:
-    """Find or create a portfolio SavingsAccount and update its balance."""
+    """Find or create a portfolio SavingsAccount and update its balance.
+
+    Lookup strategy:
+        - If `suggested_name` is provided (bank-specific parser extracted a
+          product-typed name like "Fio Term Deposit (...8376)"), match on
+          (institution, name) so multiple products at the same bank
+          (regular savings + term deposit) stay as distinct accounts.
+        - Otherwise fall back to matching by institution alone (backward
+          compatible with banks that only expose a single savings product).
+
+    Currency comes from the parser when available; we no longer hardcode CZK
+    for banks whose savings/term-deposit accounts are in another currency
+    (e.g. Fio SK term deposits in EUR).
+    """
     if not bank_name:
         return False
 
     institution_lower = bank_name.lower()
-    result = await db.execute(
-        select(SavingsAccount).where(
-            SavingsAccount.owner_id == owner_id,
-            SavingsAccount.status == "active",
-            func.lower(SavingsAccount.institution) == institution_lower,
-        )
+    query = select(SavingsAccount).where(
+        SavingsAccount.owner_id == owner_id,
+        SavingsAccount.status == "active",
+        func.lower(SavingsAccount.institution) == institution_lower,
     )
+    if suggested_name:
+        query = query.where(SavingsAccount.name == suggested_name)
+
+    result = await db.execute(query)
     savings = result.scalar_one_or_none()
 
     if not savings:
+        # Don't create a savings account if balance is zero — only create
+        # when there is actual recorded data from a statement.
+        if balance <= 0:
+            logger.info(
+                f"Skipping savings account creation for {bank_name}: "
+                f"balance is {balance}"
+            )
+            return False
         bank_display = bank_name.capitalize()
         savings = SavingsAccount(
             owner_id=owner_id,
-            name=f"{bank_display} Savings",
+            name=suggested_name or f"{bank_display} Savings",
             institution=bank_name,
             balance=balance,
-            currency="CZK",
+            currency=(currency or "CZK"),
+            notes=notes,
         )
         db.add(savings)
         await db.flush()
@@ -79,6 +107,13 @@ async def link_savings_account(
         )
         if is_newest:
             savings.balance = balance
+            # Keep currency + notes in sync with the most recent statement,
+            # but never overwrite a currency the user may have set manually
+            # before the bank-specific extractor existed.
+            if currency and (not savings.currency or savings.currency == "CZK"):
+                savings.currency = currency
+            if notes and not savings.notes:
+                savings.notes = notes
 
     statement.linked_savings_id = savings.id
     await db.flush()
@@ -197,15 +232,23 @@ async def link_stock_holdings(
     period_end = parsed["period_end"] or date.today()
     snap_month = f"{period_end.year}-{period_end.month:02d}"
 
-    # Only compute cost basis from multi-month statements (>3 months).
-    # Individual monthly statements have partial transaction data that would
-    # produce incorrect cumulative cost basis values.
+    # Determine if this is a comprehensive multi-month statement (>3 months)
+    # or a single-month statement with partial transaction data.
     period_start = parsed["period_start"]
     is_multi_month = (
         period_start and period_end
         and (period_end.year - period_start.year) * 12
         + (period_end.month - period_start.month) > 3
     )
+
+    # For monthly statements: collect BUY transactions per ticker
+    # to incrementally update existing cost basis (weighted average).
+    monthly_buys: dict[str, list] = {}
+    if not is_multi_month:
+        for section in parsed["sections"]:
+            for txn in section.get("transactions", []):
+                if txn["type"] == "BUY":
+                    monthly_buys.setdefault(txn["ticker"], []).append(txn)
 
     total_holdings = 0
     color_idx = 0
@@ -277,6 +320,39 @@ async def link_stock_holdings(
                         f"show {h['shares']} — cost basis unknown"
                     )
 
+            # For monthly statements: if this ticker had BUY transactions,
+            # compute incremental cost basis from existing + new purchases.
+            if not is_multi_month and ticker in monthly_buys and avg_cost is None:
+                buys = monthly_buys[ticker]
+                new_cost = sum(Decimal(str(b["value"])) + Decimal(str(b.get("fees", 0))) for b in buys)
+                new_shares = sum(Decimal(str(b["quantity"])) for b in buys)
+
+                # Check if there's an existing holding with cost data
+                existing = await db.execute(
+                    select(StockHolding).where(
+                        StockHolding.owner_id == owner_id,
+                        StockHolding.ticker == ticker,
+                        StockHolding.currency == currency,
+                    )
+                )
+                existing_holding = existing.scalar_one_or_none()
+                old_avg = Decimal(str(existing_holding.avg_cost_per_share)) if existing_holding else Decimal("0")
+                old_shares = Decimal(str(existing_holding.shares)) if existing_holding else Decimal("0")
+
+                # Shares that existed before the buys in this statement
+                pre_buy_shares = Decimal(str(h["shares"])) - new_shares
+                if pre_buy_shares < 0:
+                    pre_buy_shares = Decimal("0")
+
+                old_cost = old_avg * pre_buy_shares if old_avg > 0 else Decimal("0")
+                total_cost = old_cost + new_cost
+                total_shares = Decimal(str(h["shares"]))
+
+                if total_shares > Decimal("0.0001"):
+                    avg_cost = total_cost / total_shares
+                    final_cost = total_cost
+                    logger.info(f"  {ticker}: incremental cost basis from {len(buys)} buys → avg_cost={avg_cost:.4f}")
+
             # Upsert stock holding
             stock = await _upsert_stock_holding(
                 db, owner_id, h, currency,
@@ -335,6 +411,45 @@ async def link_stock_holdings(
                 await _upsert_holding_snapshot(
                     db, owner_id, hist_holding, currency, month_str,
                     total_invested=state["total_invested"],
+                )
+
+    await db.flush()
+
+    # Mark stocks as "sold" if they were active but don't appear in this
+    # statement's holdings. This catches stocks sold between statements.
+    all_statement_tickers = set()
+    for section in parsed["sections"]:
+        for h in section["holdings"]:
+            all_statement_tickers.add((h["ticker"], section["currency"]))
+
+    active_result = await db.execute(
+        select(StockHolding).where(
+            StockHolding.owner_id == owner_id,
+            StockHolding.status == "active",
+            StockHolding.shares > Decimal("0.0001"),
+        )
+    )
+    for holding in active_result.scalars().all():
+        key = (holding.ticker, holding.currency)
+        if key not in all_statement_tickers:
+            # Stock was active but doesn't appear in the latest statement.
+            # Only mark as sold if it had a snapshot in a previous month
+            # (confirming it was previously tracked via Revolut).
+            prev_snap = await db.execute(
+                select(StockHoldingSnapshot).where(
+                    StockHoldingSnapshot.owner_id == owner_id,
+                    StockHoldingSnapshot.ticker == holding.ticker,
+                    StockHoldingSnapshot.currency == holding.currency,
+                    StockHoldingSnapshot.snapshot_month < snap_month,
+                    StockHoldingSnapshot.shares > Decimal("0.0001"),
+                ).limit(1)
+            )
+            if prev_snap.scalar_one_or_none():
+                holding.status = "sold"
+                holding.shares = Decimal("0")
+                logger.info(
+                    f"  {holding.ticker} ({holding.currency}): marked as sold "
+                    f"(not in {snap_month} holdings)"
                 )
 
     await db.flush()

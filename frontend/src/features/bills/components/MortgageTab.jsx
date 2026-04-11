@@ -166,6 +166,7 @@ export function MortgageTab() {
             <div className="mortgage-actions-row">
                 <button
                     className="add-bill-btn"
+                    data-zumfi-zone="mortgage-add-btn"
                     onClick={() => setShowAddModal(true)}
                 >
                     <Plus size={18} />

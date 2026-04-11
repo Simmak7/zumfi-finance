@@ -42,12 +42,12 @@ export function IncomeExpensesChart({ data, currency = 'CZK' }) {
     const incomeLabel = t('charts.income');
     const expensesLabel = t('charts.expenses');
 
-    if (!data || data.length < 2) {
+    if (!data || data.length < 1) {
         return (
             <div className="chart-card">
                 <h3>{t('charts.incomeVsExpenses')}</h3>
                 <div className="chart-empty">
-                    Not enough data. Import statements for multiple months.
+                    Not enough data. Import statements to see the chart.
                 </div>
             </div>
         );
@@ -58,6 +58,26 @@ export function IncomeExpensesChart({ data, currency = 'CZK' }) {
         [incomeLabel]: d.total_income,
         [expensesLabel]: d.total_expenses,
     }));
+
+    // Compute smart Y-axis domain that zooms in when values are close.
+    // Include all values (including 0s) so months with no income or no
+    // expenses prevent the zoom — the chart must show 0 for those months.
+    const allValues = data.flatMap(d => [d.total_income, d.total_expenses]);
+    const dataMax = allValues.length > 0 ? Math.max(...allValues) : 0;
+    const dataMin = allValues.length > 0 ? Math.min(...allValues) : 0;
+    const range = dataMax - dataMin;
+
+    let yDomain;
+    if (dataMax > 0 && dataMin > 0 && dataMin > dataMax * 0.6) {
+        // All values are positive and close together (min > 60% of max) — zoom in
+        const padding = Math.max(range * 0.5, dataMax * 0.05);
+        yDomain = [
+            Math.max(0, Math.floor((dataMin - padding) / 1000) * 1000),
+            Math.ceil((dataMax + padding) / 1000) * 1000,
+        ];
+    } else {
+        yDomain = [0, 'auto'];
+    }
 
     return (
         <div className="chart-card" data-zumfi-zone="income-chart">
@@ -84,7 +104,8 @@ export function IncomeExpensesChart({ data, currency = 'CZK' }) {
                         stroke="rgba(255,255,255,0.3)"
                         tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }}
                         tickFormatter={formatAmount}
-                        width={50}
+                        width={55}
+                        domain={yDomain}
                     />
                     <Tooltip content={<CustomTooltip currency={currency} />} />
                     <Legend

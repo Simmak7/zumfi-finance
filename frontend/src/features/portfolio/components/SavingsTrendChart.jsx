@@ -42,7 +42,7 @@ function CustomTooltip({ active, payload, label, currency = 'CZK' }) {
 
 export function SavingsTrendChart() {
     const [data, setData] = useState([]);
-    const { maxMonth } = useMonth();
+    const { lastDataMonth } = useMonth();
     const { settings } = useSettings();
     const { t } = useTranslation();
     const currency = settings?.preferred_currency || 'CZK';
@@ -50,8 +50,9 @@ export function SavingsTrendChart() {
     useEffect(() => {
         const load = async () => {
             try {
-                const history = await getSavingsHistory(12, maxMonth);
-                setData(history);
+                const history = await getSavingsHistory(12, lastDataMonth);
+                const filtered = history.filter(d => d.total_savings > 0);
+                setData(filtered);
             } catch (err) {
                 console.error('Error loading savings history:', err);
             }
@@ -61,10 +62,9 @@ export function SavingsTrendChart() {
         const handleUpdate = () => load();
         window.addEventListener('portfolio-updated', handleUpdate);
         return () => window.removeEventListener('portfolio-updated', handleUpdate);
-    }, [maxMonth]);
+    }, [lastDataMonth]);
 
-    // Only show chart if there are at least 2 months with data
-    const hasData = data.filter(d => d.total_savings > 0).length >= 2;
+    const hasData = data.filter(d => d.total_savings > 0).length >= 1;
     if (!hasData) {
         return (
             <div className="chart-card">

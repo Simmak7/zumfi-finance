@@ -36,22 +36,10 @@ const en = {
   welcome: {
     title: 'Welcome to ZumFi!',
     subtitle: 'Get started in 3 easy steps',
-    step1: 'Upload bank statement',
-    step2: 'Review transactions',
-    step3: 'Set up bills',
+    step1: 'Set up categories',
+    step2: 'Upload bank statement',
+    step3: 'Review transactions',
     dismiss: 'Dismiss',
-  },
-
-  firstTime: {
-    title: 'Welcome to ZumFi!',
-    subtitle: 'Here\'s how to get started with your personal finance tracker.',
-    step1Title: 'Create your categories',
-    step1Desc: 'Set up spending categories that match your lifestyle',
-    step2Title: 'Upload a bank statement',
-    step2Desc: 'Import your transactions from a PDF or CSV file',
-    step3Title: 'Categorize transactions',
-    step3Desc: 'Review and tag your transactions for insights',
-    gotIt: 'Got it, I\'ll explore on my own',
   },
 
   // KPI Cards
@@ -626,7 +614,7 @@ const en = {
   // Import
   import: {
     title: 'Import Transactions',
-    subtitle: 'Import from CSV, Excel, PDF, or Word files',
+    subtitle: 'Import PDF bank statement, savings account statement, or stocks/profit and loss statement',
     importWizard: 'Import Wizard',
     viewDocuments: 'View Documents',
     upload: 'Upload',
@@ -773,6 +761,24 @@ const en = {
     orEnterManually: 'Or enter manually:',
   },
 
+  // Landing page
+  landing: {
+    signIn: 'Sign In',
+    heroLine1: 'Your finances.',
+    heroLine2: 'One import away.',
+    heroSubtitle: 'Upload a bank statement, and Zumfi does the rest — categorizes spending, tracks investments, and keeps your budget on point.',
+    getStarted: 'Get Started',
+    free: 'Free forever. No credit card.',
+    fImportTitle: 'Statement Import',
+    fImportDesc: 'Drop a PDF from your bank. Transactions are parsed and categorized automatically.',
+    fPortfolioTitle: 'Portfolio Tracker',
+    fPortfolioDesc: 'Stocks, savings accounts, properties — all in one view with live trends.',
+    fBudgetTitle: 'Budgets & Goals',
+    fBudgetDesc: 'Set spending limits and savings targets. See exactly where your money goes.',
+    fSecureTitle: 'Private & Secure',
+    fSecureDesc: 'Your data stays yours. Two-factor auth, encrypted tokens, self-hostable.',
+  },
+
   // Auth / Login
   auth: {
     signIn: 'Sign In',
@@ -846,8 +852,6 @@ const en = {
     alreadyAllocated: 'Already allocated',
     allocate: 'Allocate',
     allocating: 'Allocating...',
-    remaining: 'Remaining',
-    allocated: 'Allocated',
     done: 'Done',
     fullyAllocated: 'Fully Allocated',
     fullyAllocatedDesc: 'You have already allocated all available savings for this month.',
@@ -1083,6 +1087,29 @@ const en = {
     cancelTitle: 'Maybe next time!',
     cancelMessage: 'Zumi will wait patiently for carrots. No pressure!',
     sponsorOnGithub: 'Sponsor on GitHub',
+  },
+
+  feedback: {
+    fixMe: 'Fix me',
+    reportIssue: 'Report an issue',
+    title: 'Report an Issue',
+    subtitle: 'Help us improve by reporting what went wrong. We review every report.',
+    page: 'Where is the issue?',
+    selectPage: 'Select a page...',
+    subject: 'What happened?',
+    subjectPlaceholder: 'Brief headline of the problem',
+    description: 'Tell us more',
+    descriptionPlaceholder: 'Describe what went wrong, what you expected, and any steps to reproduce...',
+    attachments: 'Screenshots',
+    addScreenshot: 'Add screenshot',
+    fileHint: 'Up to {max} images, {mb} MB each',
+    email: 'Your email (optional)',
+    emailPlaceholder: 'we@will-get-back-to.you',
+    emailHint: 'Leave your email if you want us to follow up with you about this issue.',
+    send: 'Send Report',
+    sending: 'Sending...',
+    success: 'Thank you! Your issue has been reported. We are looking into it.',
+    error: 'Failed to send report. Please try again later.',
   },
 };
 
